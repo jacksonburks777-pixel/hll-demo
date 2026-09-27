@@ -1854,6 +1854,7 @@ function viewScore(r) {
 function viewScoring(gid) {
   const g = W.gameById[gid];
   if (!g) return `<p>Game not found.</p>`;
+  if (!g.rep && g.status === "final") return `${scoreboard(g)}<div class="card pad"><p>The final score for this game was entered by the league admin.</p></div>`;
   if (g.status === "scheduled" || !g.rep) return pregame(g);
   const s = g.rep;
   if (g.status === "final") {
@@ -1959,8 +1960,11 @@ ACT["sk-undo"] = (el) => {
   if (!g || !g.events.length) return;
   const last = g.events[g.events.length - 1];
   const events = g.events.slice(0, -1);
-  const rep = E.replay({ setup: g.setup, events }, W.rules, W.names);
+  const rep = E.replay({ setup: g.setup, events }, { ...W.rules, tiesAllowed: false }, W.names);
   saveGame(g, { events, status: rep.status === "final" ? "final" : "live" });
+  advancePlayoffs();
+  save();
+  build();
   render();
   toast(`Undid: ${eventLabel(last)}`);
 };
@@ -2748,6 +2752,22 @@ function advancePlayoffs() {
     d.setHours(h, 30, 0, 0);
     return d.toISOString();
   };
+  // Games nobody has started can be removed and re-created if an earlier result changed (e.g. an undo).
+  const untouched = (g) => g && !S.games[g.id] && (g.status === "scheduled" || g.status === "canceled");
+  const drop = (g) => (po.games = po.games.filter((x) => x !== g));
+  [[5, 1, 2], [6, 3, 4]].forEach(([slot, a, b]) => {
+    const wa = w(a);
+    const wb = w(b);
+    const existing = find(slot);
+    if (existing && untouched(existing) && !(wa && wb && [existing.home, existing.away].sort().join() === [wa, wb].sort().join())) drop(existing);
+  });
+  {
+    const series = po.games.filter((g) => g.slot === 7);
+    const fa = w(5);
+    const fb = w(6);
+    const same = series[0] && fa && fb && [series[0].home, series[0].away].sort().join() === [fa, fb].sort().join();
+    if (series.length && !same && series.every(untouched)) series.forEach(drop);
+  }
   [[5, 1, 2], [6, 3, 4]].forEach(([slot, a, b]) => {
     const wa = w(a);
     const wb = w(b);
@@ -2769,7 +2789,10 @@ function advancePlayoffs() {
     const x = winnerOf(W.gameById[g.id]);
     if (x) wins[x] = (wins[x] || 0) + 1;
   });
-  if (Object.values(wins).some((n) => n >= 2)) po.games.filter((g) => g.slot === 7 && g.status === "scheduled" && !S.games[g.id]).forEach((g) => (g.status = "canceled"));
+  const decided = Object.values(wins).some((n) => n >= 2);
+  po.games
+    .filter((g) => g.slot === 7 && !S.games[g.id] && (g.status === "scheduled" || g.status === "canceled"))
+    .forEach((g) => (g.status = decided ? "canceled" : "scheduled"));
 }
 ACT["reset"] = () => {
   if (!confirm("Reset the demo? Anything you scored or changed goes back to the start.")) return;
