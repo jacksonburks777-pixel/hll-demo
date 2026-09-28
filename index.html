@@ -437,6 +437,12 @@ details summary { cursor: pointer; }
 .tour-progress { flex: 1; height: 5px; background: var(--line); border-radius: 99px; overflow: hidden; margin-right: 12px; }
 .tour-progress i { display: block; height: 100%; background: var(--red); }
 
+.sk-grid-4 { grid-template-columns: repeat(4, 1fr) !important; }
+.sk-strong { font-weight: 800 !important; }
+tr.now td { background: #fffbeb; }
+.tag-now { background: #fde68a; color: #78350f; }
+.box-notes span { display: inline-block; margin-right: 12px; }
+
 </style>
 </head>
 <body>
@@ -455,7 +461,7 @@ window.addEventListener("error", function (e) { var m = document.getElementById(
 (() => {
 "use strict";
 // ---- the site's code (src/lib)
-"use strict";var HLL=(()=>{var Oe=Object.defineProperty;var Sn=Object.getOwnPropertyDescriptor;var kn=Object.getOwnPropertyNames;var Rn=Object.prototype.hasOwnProperty;var Pn=(e,t)=>{for(var a in t)Oe(e,a,{get:t[a],enumerable:!0})},wn=(e,t,a,o)=>{if(t&&typeof t=="object"||typeof t=="function")for(let n of kn(t))!Rn.call(e,n)&&n!==a&&Oe(e,n,{get:()=>t[n],enumerable:!(o=Sn(t,n))||o.enumerable});return e};var An=e=>wn(Oe({},"__esModule",{value:!0}),e);var er={};Pn(er,{ADV_BAT:()=>ht,BAT_STATS:()=>Zt,BB_TYPES:()=>Le,CAREER_MIN:()=>we,COLUMNS:()=>ae,DEFAULT_RULES:()=>ue,DEFAULT_SCORING:()=>zt,LEADER_CATEGORIES:()=>Ot,OUT_FOR:()=>rt,PIT_STATS:()=>Yt,POS:()=>V,QUAL_IP:()=>Re,QUAL_PA:()=>ke,QUAL_TEXT:()=>It,RECORD_CATEGORIES:()=>Lt,RESULTS:()=>z,SEASON_GAMES:()=>Pe,SLOT_LABEL:()=>Qt,STARTERS:()=>_e,WAR_COLUMNS:()=>At,advPitColumns:()=>yt,advancedFromGames:()=>be,autopick:()=>an,avg:()=>$e,careerRecords:()=>$t,checkSchedule:()=>pn,computeStandings:()=>Et,dayKey:()=>U,engineRules:()=>st,era:()=>ve,fieldingFromGames:()=>de,fieldingPct:()=>pt,fipConstant:()=>gt,fmt1:()=>he,fmt2:()=>ye,fmtAdv:()=>Bt,fmtIp:()=>Ge,fmtPts:()=>tn,fmtRate:()=>Y,fmtWar:()=>Pt,formatDay:()=>Dt,formatGb:()=>Gt,formatLongDay:()=>Mt,formatPct:()=>Wt,formatStat:()=>_t,formatTime:()=>Ut,fromBatLine:()=>je,fromImportedBat:()=>Jt,fromImportedPit:()=>en,fromPitLine:()=>Ne,gamePoints:()=>qe,gamesFor:()=>De,hasBatting:()=>J,hasPitching:()=>ee,inningsPitched:()=>pe,isQab:()=>Te,lockFor:()=>Ve,mergeStats:()=>ct,minOuts:()=>Ue,minPa:()=>Me,nextWeekStart:()=>Ke,obp:()=>Be,openSlot:()=>Xe,ops:()=>Ee,ordinal:()=>xe,parseRules:()=>bn,parseSchedule:()=>cn,pickLabel:()=>sn,pickOwner:()=>rn,pitchLimit:()=>fe,pitcherAvailability:()=>mn,points:()=>Ae,posOf:()=>se,projectionOf:()=>ln,qualifies:()=>oe,rankBy:()=>Ft,rankValue:()=>on,replay:()=>at,restDays:()=>me,resultHeadlines:()=>dn,scoreLeague:()=>nn,seasonRecords:()=>Ct,seasonRounds:()=>Kt,seasonWeeks:()=>Vt,slg:()=>Se,slotsFor:()=>Xt,standingsFromRecords:()=>vt,starOfGame:()=>Ye,statsFromGames:()=>ut,suggestLineup:()=>ot,valueOf:()=>Qe,warFromGames:()=>Ce,weekOf:()=>qt,weekStart:()=>v,whip:()=>We,withWar:()=>wt,woba:()=>Z});var V=["P","C","1B","2B","3B","SS","LF","CF","RF"],se=e=>V[e-1],z={"1B":{label:"Single",verb:"singles",hit:1},"2B":{label:"Double",verb:"doubles",hit:2},"3B":{label:"Triple",verb:"triples",hit:3},HR:{label:"Home run",verb:"homers",hit:4},GO:{label:"Ground out",verb:"grounds out",out:1,multi:!0},FO:{label:"Fly out",verb:"flies out",out:1},LO:{label:"Line out",verb:"lines out",out:1},PO:{label:"Pop out",verb:"pops out",out:1},BO:{label:"Bunt out",verb:"bunts out",out:1,multi:!0},DP:{label:"Double play",verb:"hits into a double play",out:2,multi:!0},SF:{label:"Sac fly",verb:"hits a sacrifice fly",out:1},SAC:{label:"Sac bunt",verb:"lays down a sacrifice bunt",out:1,multi:!0},FC:{label:"Fielder's choice",verb:"reaches on a fielder's choice",multi:!0},E:{label:"Error",verb:"reaches on an error"}},Le={G:"Ground ball",L:"Line drive",F:"Fly ball",P:"Pop up",B:"Bunt"},rt={G:"GO",L:"LO",F:"FO",P:"PO",B:"BO"};var _n={1:"the pitcher",2:"the catcher",3:"first base",4:"second base",5:"third base",6:"shortstop",7:"left field",8:"center field",9:"right field"};function In(e){let t={B:1};return e[0]?(t[1]=2,e[1]?(t[2]=3,e[2]&&(t[3]=4)):e[2]&&(t[3]=3)):(e[1]&&(t[2]=2),e[2]&&(t[3]=3)),t}var Fn=()=>({G:0,PA:0,AB:0,H:0,"1B":0,"2B":0,"3B":0,HR:0,R:0,RBI:0,BB:0,K:0,HBP:0,SAC:0,SF:0,SB:0,CS:0,ROE:0,FC:0,TB:0}),On=()=>({G:0,P:0,S:0,BF:0,OUTS:0,H:0,R:0,ER:0,BB:0,K:0,HBP:0,HR:0,W:0,L:0,SV:0,HD:0}),Ln=()=>({PO:0,A:0,E:0});function st(e){return{innings:e.innings,runCap:e.runCapPerHalfInning,runCapLastInning:e.runCapInFinalInning,mercy:{on:e.mercyRule.enabled,lead:e.mercyRule.runLead,after:e.mercyRule.afterInnings}}}function xe(e){let t=["th","st","nd","rd"],a=e%100;return e+(t[(a-20)%10]||t[a]||t[0])}function at(e,t,a,o={}){var et;let n={inning:1,half:0,outs:0,balls:0,strikes:0,bases:[null,null,null],score:[0,0],line:[[],[]],hits:[0,0],errors:[0,0],lineup:[e.lineups[0].map(c=>({...c})),e.lineups[1].map(c=>({...c}))],bench:[[...e.bench[0]],[...e.bench[1]]],status:"live",endReason:"",log:[],bat:{},pit:{},fld:{},defPos:{},errAt:{},bip:[],appeared:new Set,pitchersUsed:[[],[]],decision:null,batter:null,pitcher:null,pas:[]},p=[0,0],i=0,r=!1,s=c=>o[c]||"Player",l=c=>{var d;return(d=n.bat)[c]||(d[c]=Fn())},u=c=>{var d;return(d=n.pit)[c]||(d[c]=On())},m=c=>{var d;return(d=n.fld)[c]||(d[c]=Ln())},h=()=>n.half,y=()=>1-n.half,R=()=>n.lineup[h()][p[h()]%n.lineup[h()].length].pid,b=()=>(n.lineup[y()].find(c=>c.pos==="P")??n.lineup[y()][0]).pid,B=(c,d)=>n.lineup[c].find(g=>g.pos===se(d))?.pid;n.lineup.forEach(c=>c.forEach(d=>n.appeared.add(d.pid))),n.lineup.forEach((c,d)=>{let g=c.find(S=>S.pos==="P");g&&n.pitchersUsed[d].push(g.pid)});let k=(c,d="play")=>n.log.push({inning:n.inning,half:n.half,text:c,kind:d,score:[...n.score]}),A=c=>{for(;n.line[c].length<n.inning;)n.line[c].push(0)};A(0);let $=()=>n.inning>=a.innings,x=()=>a.runCap!=null&&a.runCap>0&&(!$()||a.runCapLastInning);function O(c){n.status!=="final"&&(n.status="final",n.endReason=c,k(`Final${c?" \u2014 "+c:""}`,"info"))}function G(){var c,d;if(n.status!=="final"){n.outs++,u(b()).OUTS++;for(let g of n.lineup[y()]){let S=(c=n.defPos)[d=g.pid]||(c[d]={});S[g.pos]=(S[g.pos]??0)+1}}}function Ie(c,d){return r||n.status==="final"?!1:(n.score[h()]++,i++,A(h()),n.line[h()][n.inning-1]++,l(c.pid).R++,u(c.resp).R++,c.earned&&u(c.resp).ER++,d&&l(d).RBI++,x()&&i>=(a.runCap??1/0)&&(r=!0),n.half===1&&$()&&n.score[1]>n.score[0]&&O("Walk-off!"),!0)}function ce(){if(n.status==="final"||n.outs<3&&!r)return;let c=r&&n.outs<3?` (${a.runCap}-run limit)`:"";k(`End of ${n.half?"bottom":"top"} ${xe(n.inning)}${c}`,"info");let d=n.inning,g=n.half===0;n.outs=0,n.balls=0,n.strikes=0,n.bases=[null,null,null],i=0,r=!1,te=0;let[S,w]=n.score;if(g){if(d>=a.innings&&w>S)return O("");if(a.mercy.on&&d>=a.mercy.after&&w-S>=a.mercy.lead)return O("Mercy rule");n.half=1,A(1)}else{if(d>=a.innings&&S!==w)return O("");if(a.mercy.on&&d>=a.mercy.after&&Math.abs(S-w)>=a.mercy.lead)return O("Mercy rule");n.half=0,n.inning++,A(0)}}let K=[],te=0;function D(){n.balls=0,n.strikes=0,p[h()]++,K=[],te++}function j(c,d={}){let g={batter:R(),pitcher:b(),team:h(),inning:n.inning,half:n.half,outs:n.outs,bases:[!!n.bases[0],!!n.bases[1],!!n.bases[2]],pitches:[...K],result:c,runs:0,rbi:0,leadoff:te===0,...d};return n.pas.push(g),g}function f(c,d,g){let S=[null,null,null],w=[],C=[],P=[];for(let T of[3,2,1]){let I=n.bases[T-1];I&&P.push([T,I])}d&&P.push(["B",d]);for(let[T,I]of P){let H=c[String(T)]??(T==="B"?1:T);H==="X"?(T!=="B"&&C.push(s(I.pid)),G()):H===4?Ie(I,g)&&w.push(s(I.pid)):S[H-1]=I}return n.bases=S,{scored:w,outs:C}}let _=({scored:c,outs:d})=>[c.length?`${c.join(", ")} ${c.length>1?"score":"scores"}.`:"",d.length?`${d.join(", ")} out.`:""].filter(Boolean).join(" ");function X(c){let d=R(),g=b();l(d).PA++,l(d)[c]++,u(g)[c]++,u(g).BF++;let S=j(c),w=f(In(n.bases),{pid:d,resp:g,earned:!0},d);S.runs=S.rbi=w.scored.length,k(`${s(d)} ${c==="BB"?"walks":"is hit by a pitch"}. ${_(w)}`.trim(),w.scored.length?"run":"play"),D()}let ne=[[],[]],Je=c=>n.score[c]-n.score[1-c];function gn(){for(let c of[0,1]){let d=(n.lineup[c].find(w=>w.pos==="P")??n.lineup[c][0]).pid,g=ne[c].at(-1);if(g?.pid===d)continue;g&&(g.exitLead=Je(c),g.outsOut=n.pit[g.pid]?.OUTS??0);let S=n.half!==c?n.bases.filter(Boolean).length:0;ne[c].push({pid:d,first:!g,entryLead:Je(c),entryRunners:S,outsIn:n.pit[d]?.OUTS??0,outsOut:null,exitLead:null})}}for(let c of t){if(n.status==="final")break;switch(gn(),c.t){case"pitch":{let d=u(b());if(d.P++,K.push(c.r),c.r==="B")n.balls++,n.balls>=4&&X("BB");else if(d.S++,c.r==="F")n.strikes<2&&n.strikes++;else if(++n.strikes>=3){let g=R(),S=l(g);S.PA++,S.AB++,S.K++,u(b()).K++,u(b()).BF++,j("K",{looking:c.r==="CS"});let w=B(y(),2);w&&m(w).PO++,G(),k(`${s(g)} strikes out ${c.r==="CS"?"looking":"swinging"}.`,"out"),D()}break}case"hbp":u(b()).P++,K.push("H"),X("HBP");break;case"play":{let d=z[c.r],g=R(),S=b(),w=u(S),C=l(g);w.P++,w.S++,w.BF++,C.PA++,c.r==="SF"?C.SF++:c.r==="SAC"?C.SAC++:C.AB++,d.hit&&(C.H++,C[c.r]++,C.TB+=d.hit,w.H++,n.hits[h()]++,c.r==="HR"&&w.HR++),c.r==="E"&&C.ROE++,c.r==="FC"&&C.FC++,c.loc&&n.bip.push({pid:g,x:c.loc[0],y:c.loc[1],bb:c.bb,r:c.r});let P=String(c.f??"").replace(/^E/,"").split("-").map(Number).filter(Boolean);if(c.r==="E"){let N=B(y(),P[0]);if(N){m(N).E++;let re=(et=n.errAt)[N]||(et[N]={});re[se(P[0])]=(re[se(P[0])]??0)+1}n.errors[y()]++}let T=c.r==="E"||c.r==="DP"?null:g,I=w.OUTS;K.push("X");let H=j(c.r,{bb:c.bb,hard:c.hh??c.bb==="L"}),W=f(c.m,{pid:g,resp:S,earned:c.r!=="E"},T);H.runs=W.scored.length,H.rbi=T?W.scored.length:0;let Q=w.OUTS-I;c.r!=="E"&&P.length&&Q>0&&(d.out||c.r==="FC")&&P.forEach((N,re)=>{let Fe=B(y(),N);if(!Fe)return;let nt=re===P.length-1,Bn=Q>=2&&P.length>=3&&re===P.length-2;(nt||Bn)&&m(Fe).PO++,nt||m(Fe).A++});let hn=c.bb&&!d.out&&c.r!=="SF"&&c.r!=="SAC"?` on a ${Le[c.bb].toLowerCase()}`:"",tt=P[0],yn=d.hit&&tt?` to ${_n[tt]}`:c.f?` (${c.f})`:"";k(`${s(g)} ${d.verb}${hn}${yn}. ${_(W)}`.trim(),W.scored.length?"run":d.hit?"hit":d.out?"out":"play"),D();break}case"runner":{let d=n.bases.map(P=>P?.pid??null),g=f(c.m,null,null),S={SB:"steals",CS:"caught stealing",WP:"wild pitch",PB:"passed ball",PK:"picked off"};for(let[P,T]of Object.entries(c.m)){let I=d[Number(P)-1];I&&(c.k==="SB"&&T!==Number(P)&&T!=="X"&&l(I).SB++,c.k==="CS"&&T==="X"&&l(I).CS++)}let w=Object.keys(c.m).map(P=>d[Number(P)-1]).filter(P=>!!P).map(s),C=c.k==="WP"||c.k==="PB"?`${S[c.k][0].toUpperCase()}${S[c.k].slice(1)}, runners move up.`:`${w.join(", ")} ${S[c.k]}.`;k(`${C} ${_({scored:g.scored,outs:[]})}`.trim(),g.scored.length?"run":"play");break}case"sub":{let d=n.lineup[c.team][c.slot];if(!d)break;let g=d.pid;n.bench[c.team]=n.bench[c.team].filter(S=>S!==c.pid),n.bench[c.team].push(g),d.pid=c.pid,n.appeared.add(c.pid),d.pos==="P"&&n.pitchersUsed[c.team].push(c.pid),k(`Substitution: ${s(c.pid)} replaces ${s(g)} (${d.pos}).`,"info");break}case"pos":{let d=n.lineup[c.team],g=d.find(w=>w.pid===c.pid),S=d.find(w=>w.pos===c.pos);g&&S&&g!==S&&(S.pos=g.pos,g.pos=c.pos,c.pos==="P"&&n.pitchersUsed[c.team].push(c.pid),k(`${s(c.pid)} moves to ${c.pos}${c.pos==="P"?", new pitcher":""}.`,"info"));break}case"end":O(c.reason??"");break}ce()}if(n.appeared.forEach(c=>l(c).G=1),Object.values(n.pit).forEach(c=>c.G=1),n.status==="final"&&n.score[0]!==n.score[1]){let c=n.score[1]>n.score[0]?1:0,d=(I,H)=>[...new Set(n.pitchersUsed[I])].filter(W=>n.pit[W]).sort((W,Q)=>n.pit[Q][H]-n.pit[W][H])[0],g=d(c,"OUTS")??n.pitchersUsed[c][0],S=d(1-c,"R")??n.pitchersUsed[1-c][0];g&&(u(g).W=1),S&&(u(S).L=1),n.decision={W:g,L:S};let w=I=>I.entryLead>0&&(I.entryLead<=3||I.entryLead<=I.entryRunners+2),C=I=>(I.outsOut??n.pit[I.pid]?.OUTS??0)-I.outsIn,P=ne[c].at(-1),T;if(P&&!P.first&&P.pid!==g&&C(P)>=1&&P.entryLead>0){let I=C(P);(P.entryLead<=3&&I>=3||P.entryLead<=P.entryRunners+2||I>=9)&&(T=P.pid)}T&&(u(T).SV=1,n.decision.SV=T);for(let I of[0,1])ne[I].forEach((H,W)=>{let Q=W===ne[I].length-1;H.first||Q||H.pid===g||H.pid===S||H.pid===T||w(H)&&C(H)>=1&&(H.exitLead??0)>0&&n.pit[H.pid]&&(n.pit[H.pid].HD=1)})}return n.batter=n.status==="final"?null:R(),n.pitcher=n.status==="final"?null:b(),n}var pe=e=>`${Math.floor(e/3)}.${e%3}`;function me(e){return e>=66?4:e>=51?3:e>=36?2:e>=21?1:0}var fe=(e,t)=>e!=null&&e<=10?t.pitchLimits.age9to10:t.pitchLimits.age11to12;function ot(e){let t=e.slice(0,9),a=new Set(t),o=i=>{let r=[...a].find(s=>i.some(l=>s.positions.includes(l)))??[...a][0];return a.delete(r),r},n=[["P",["P"]],["C",["C"]],["1B",["1B"]],["SS",["INF"]],["2B",["INF"]],["3B",["INF"]],["CF",["OF"]],["LF",["OF"]],["RF",["OF"]]],p=new Map;for(let[i,r]of n){if(!a.size)break;p.set(o(r).id,i)}return{lineup:t.map(i=>({pid:i.id,pos:p.get(i.id)??"RF"})),bench:e.slice(9).map(i=>i.id)}}var it=(e,t,a)=>({season_id:e,player_id:t,team_id:a,g:0,gs:0,pa:0,ab:0,r:0,h:0,singles:0,doubles:0,triples:0,hr:0,rbi:0,bb:0,so:0,hbp:0,roe:0,fc:0,tb:0,p_g:0,p_gs:0,outs:0,p_h:0,p_r:0,er:0,p_bb:0,p_hbp:0,p_so:0,w:0,l:0,sv:0,hld:0,pitches:0}),lt=(e,t)=>e.lineups[1].some(a=>a.pid===t)||e.bench[1].includes(t)?1:0,xn=Object.keys(it("","","")).filter(e=>!["season_id","player_id","team_id"].includes(e));function Tn(e,t){let a={...e};for(let o of xn){let n=e[o],p=t[o];a[o]=n==null&&p==null?null:(n??0)+(p??0)}return a}function ut(e){let t=new Map;for(let{seasonId:a,teamIds:o,setup:n,state:p}of e){let i=l=>{let u=o[lt(n,l)],m=`${l}|${u}`,h=t.get(m);return h||t.set(m,h=it(a,l,u)),h},r=new Set(n.lineups.flat().map(l=>l.pid)),s=new Set(n.lineups.map(l=>l.find(u=>u.pos==="P")?.pid).filter(Boolean));for(let[l,u]of Object.entries(p.bat)){let m=i(l);m.g+=1,r.has(l)&&(m.gs+=1),m.pa+=u.PA,m.ab+=u.AB,m.r+=u.R,m.h+=u.H,m.singles+=u["1B"],m.doubles+=u["2B"],m.triples+=u["3B"],m.hr+=u.HR,m.rbi+=u.RBI,m.bb+=u.BB,m.so+=u.K,m.hbp+=u.HBP,m.roe+=u.ROE,m.fc+=u.FC,m.tb+=u.TB}for(let[l,u]of Object.entries(p.pit)){if(!u.P&&!u.OUTS&&!u.BF)continue;let m=i(l);m.p_g+=1,s.has(l)&&(m.p_gs+=1),m.outs+=u.OUTS,m.p_h+=u.H,m.p_r+=u.R,m.er+=u.ER,m.p_bb+=u.BB,m.p_hbp+=u.HBP,m.p_so+=u.K,m.w+=u.W,m.l+=u.L,m.sv+=u.SV,m.hld+=u.HD,m.pitches+=u.P}}return[...t.values()]}function ct(...e){let t=new Map;for(let a of e)for(let o of a){let n=`${o.player_id}|${o.team_id}`,p=t.get(n);t.set(n,p?Tn(p,o):o)}return[...t.values()]}function de(e){let t=new Map;for(let{teamIds:a,setup:o,state:n}of e){let p=new Set,i=r=>{let s=a[lt(o,r)],l=`${r}|${s}`,u=t.get(l);return u||t.set(l,u={player_id:r,team_id:s,g:0,po:0,a:0,e:0,outsAt:{},eAt:{},totalOuts:0}),p.has(l)||(p.add(l),u.g++),u};for(let[r,s]of Object.entries(n.fld)){let l=i(r);l.po+=s.PO,l.a+=s.A,l.e+=s.E}for(let[r,s]of Object.entries(n.errAt??{})){let l=i(r);for(let[u,m]of Object.entries(s))l.eAt[u]=(l.eAt[u]??0)+m}for(let[r,s]of Object.entries(n.defPos)){let l=i(r);for(let[u,m]of Object.entries(s))l.outsAt[u]=(l.outsAt[u]??0)+m,l.totalOuts+=m}}return[...t.values()]}var pt=e=>e.po+e.a+e.e?(e.po+e.a)/(e.po+e.a+e.e):null;var mt=new Set(["K","GO","FO","LO","PO","BO","DP","SF","SAC"]),ft=e=>e==="SS"||e==="F"||e==="X";function dt(e){let t=0,a=0;for(let o of e)t>=2&&a++,(o==="CS"||o==="SS"||o==="F"&&t<2)&&t++;return a}function Te(e){return dt(e.pitches)>=3||e.pitches.length>=6||e.result==="2B"||e.result==="3B"||e.result==="HR"||!!e.hard||e.result==="BB"||e.result==="SAC"||e.result==="SF"}var Hn=(e,t)=>({player_id:e,team_id:t,PA:0,AB:0,H:0,"1B":0,"2B":0,"3B":0,HR:0,BB:0,HBP:0,K:0,KL:0,SF:0,SAC:0,RBI:0,pitches:0,qab:0,twoStrike3:0,sixPlus:0,bip:0,gb:0,ld:0,fb:0,hard:0,rispAB:0,rispH:0,twoOutRbi:0,swings:0,whiffs:0,firstSwings:0,SB:0,CS:0}),Cn=(e,t)=>({player_id:e,team_id:t,BF:0,outs:0,pitches:0,strikes:0,fps:0,K:0,BB:0,HBP:0,H:0,HR:0,SF:0,SAC:0,ER:0,swings:0,whiffs:0,bip:0,gb:0,hard:0,under3:0,leadoff:0,leadoffOut:0,clean:0});function be(e){let t=new Map,a=new Map,o=(p,i)=>{let r=`${p}|${i}`,s=t.get(r);return s||t.set(r,s=Hn(p,i)),s},n=(p,i)=>{let r=`${p}|${i}`,s=a.get(r);return s||a.set(r,s=Cn(p,i)),s};for(let p of e){let i=s=>p.setup.lineups[1].some(l=>l.pid===s)||p.setup.bench[1].includes(s)?1:0;for(let s of p.state.pas){let l=o(s.batter,p.teamIds[s.team]),u=n(s.pitcher,p.teamIds[1-s.team]),m=s.result,h=m in z?z[m]:null,y=m==="K"||h!=null&&m!=="SF"&&m!=="SAC",R=h?.hit??0;l.PA++,u.BF++,y&&l.AB++,R&&(l.H++,u.H++,l[m]++,m==="HR"&&u.HR++),m==="BB"&&(l.BB++,u.BB++),m==="HBP"&&(l.HBP++,u.HBP++),m==="K"&&(l.K++,u.K++,s.looking&&l.KL++),m==="SF"&&(l.SF++,u.SF++),m==="SAC"&&(l.SAC++,u.SAC++),l.RBI+=s.rbi,s.outs===2&&(l.twoOutRbi+=s.rbi),l.pitches+=s.pitches.length,Te(s)&&l.qab++,dt(s.pitches)>=3&&l.twoStrike3++,s.pitches.length>=6&&l.sixPlus++,s.bb&&(l.bip++,u.bip++,s.bb==="G"&&(l.gb++,u.gb++),s.bb==="L"&&l.ld++,(s.bb==="F"||s.bb==="P")&&l.fb++,s.hard&&(l.hard++,u.hard++)),(s.bases[1]||s.bases[2])&&y&&(l.rispAB++,R&&l.rispH++);let b=s.pitches.filter(ft).length,B=s.pitches.filter(k=>k==="SS").length;l.swings+=b,l.whiffs+=B,u.swings+=b,u.whiffs+=B,s.pitches[0]&&ft(s.pitches[0])&&l.firstSwings++,s.pitches[0]&&s.pitches[0]!=="B"&&s.pitches[0]!=="H"&&u.fps++,s.pitches.length<=3&&u.under3++,s.leadoff&&(u.leadoff++,mt.has(m)&&u.leadoffOut++)}let r=new Map;for(let s of p.state.pas)r.set(`${s.inning}|${s.half}`,[...r.get(`${s.inning}|${s.half}`)??[],s]);for(let s of r.values())s.length===3&&s.every(l=>mt.has(l.result)&&l.result!=="DP"&&l.pitcher===s[0].pitcher)&&n(s[0].pitcher,p.teamIds[1-s[0].team]).clean++;for(let[s,l]of Object.entries(p.state.pit)){if(!l.P&&!l.OUTS)continue;let u=n(s,p.teamIds[i(s)]);u.pitches+=l.P,u.strikes+=l.S,u.outs+=l.OUTS,u.ER+=l.ER}for(let[s,l]of Object.entries(p.state.bat)){if(!l.SB&&!l.CS)continue;let u=o(s,p.teamIds[i(s)]);u.SB+=l.SB,u.CS+=l.CS}}return{bat:[...t.values()],pit:[...a.values()]}}var F=(e,t)=>t?e/t:null,M={BB:.69,HBP:.72,"1B":.89,"2B":1.27,"3B":1.62,HR:2.1},Z=e=>F(M.BB*e.BB+M.HBP*e.HBP+M["1B"]*e["1B"]+M["2B"]*e["2B"]+M["3B"]*e["3B"]+M.HR*e.HR,e.AB+e.BB+e.SF+e.HBP),bt=(e,t,a,o,n)=>F(e-t,a-o-t+n),$n=e=>F(e["2B"]+2*e["3B"]+3*e.HR,e.AB);function gt(e){let t=e.reduce((o,n)=>({er:o.er+n.ER,outs:o.outs+n.outs,raw:o.raw+(13*n.HR+3*(n.BB+n.HBP)-2*n.K)}),{er:0,outs:0,raw:0});if(!t.outs)return 0;let a=t.outs/3;return t.er*6/a-t.raw/a*(6/9)}var En=(e,t)=>e.outs?(13*e.HR+3*(e.BB+e.HBP)-2*e.K)/(e.outs/3)*(6/9)+t:null,ht=[{key:"PA",label:"PA",help:"Plate appearances",get:e=>e.PA},{key:"QAB",label:"QAB",help:"Quality at-bats: 3+ pitches after 2 strikes, 6+ pitches, an extra-base hit, a hard-hit ball, a walk, or a sacrifice",get:e=>e.qab},{key:"QABP",label:"QAB%",help:"Quality at-bats per plate appearance",get:e=>F(e.qab,e.PA),kind:"pct",rate:!0},{key:"PPA",label:"P/PA",help:"Pitches seen per plate appearance",get:e=>F(e.pitches,e.PA),kind:"rate2",rate:!0},{key:"BBK",label:"BB/K",help:"Walks per strikeout",get:e=>e.K?e.BB/e.K:e.BB?e.BB:null,kind:"rate2",rate:!0},{key:"C",label:"C%",help:"Contact: at-bats that didn't end in a strikeout",get:e=>F(e.AB-e.K,e.AB),kind:"pct",rate:!0},{key:"KP",label:"K%",help:"Strikeouts per plate appearance",get:e=>F(e.K,e.PA),kind:"pct",rate:!0,asc:!0},{key:"BBP",label:"BB%",help:"Walks per plate appearance",get:e=>F(e.BB,e.PA),kind:"pct",rate:!0},{key:"SWING",label:"Swing%",help:"Share of pitches swung at",get:e=>F(e.swings,e.pitches),kind:"pct",rate:!0},{key:"WHIFF",label:"Whiff%",help:"Swings that missed",get:e=>F(e.whiffs,e.swings),kind:"pct",rate:!0,asc:!0},{key:"HHB",label:"HHB%",help:"Balls in play that were hard hit (line drives count unless the scorekeeper marked otherwise)",get:e=>F(e.hard,e.bip),kind:"pct",rate:!0},{key:"LD",label:"LD%",help:"Balls in play that were line drives",get:e=>F(e.ld,e.bip),kind:"pct",rate:!0},{key:"GB",label:"GB%",help:"Balls in play that were ground balls",get:e=>F(e.gb,e.bip),kind:"pct",rate:!0},{key:"FB",label:"FB%",help:"Balls in play that were fly balls or pop-ups",get:e=>F(e.fb,e.bip),kind:"pct",rate:!0},{key:"BABIP",label:"BABIP",help:"Batting average on balls in play (not counting home runs)",get:e=>bt(e.H,e.HR,e.AB,e.K,e.SF),kind:"rate3",rate:!0},{key:"ISO",label:"ISO",help:"Isolated power: extra bases per at-bat (slugging minus average)",get:$n,kind:"rate3",rate:!0},{key:"WOBA",label:"wOBA",help:"Weighted on-base average: every way of reaching base, weighted by how much it's worth (a double counts more than a walk)",get:Z,kind:"rate3",rate:!0},{key:"RISP",label:"AVG/RISP",help:"Batting average with runners in scoring position (2nd or 3rd)",get:e=>F(e.rispH,e.rispAB),kind:"rate3",rate:!0},{key:"RBI2",label:"2-out RBI",help:"Runs batted in with two outs",get:e=>e.twoOutRbi},{key:"SBP",label:"SB%",help:"Stolen bases per attempt",get:e=>F(e.SB,e.SB+e.CS),kind:"pct"}],yt=e=>[{key:"IP",label:"IP",help:"Innings pitched (.1 and .2 are one and two outs)",get:t=>t.outs,kind:"ip"},{key:"BF",label:"BF",help:"Batters faced",get:t=>t.BF},{key:"P",label:"#P",help:"Pitches thrown",get:t=>t.pitches},{key:"SP",label:"S%",help:"Strike percentage (called, swinging, fouls and balls in play)",get:t=>F(t.strikes,t.pitches),kind:"pct",rate:!0},{key:"FPS",label:"FPS%",help:"First-pitch strikes",get:t=>F(t.fps,t.BF),kind:"pct",rate:!0},{key:"PIP",label:"P/IP",help:"Pitches per inning",get:t=>F(t.pitches,t.outs/3),kind:"rate2",rate:!0,asc:!0},{key:"PBF",label:"P/BF",help:"Pitches per batter faced",get:t=>F(t.pitches,t.BF),kind:"rate2",rate:!0,asc:!0},{key:"KP",label:"K%",help:"Strikeouts per batter faced",get:t=>F(t.K,t.BF),kind:"pct",rate:!0},{key:"BBP",label:"BB%",help:"Walks per batter faced",get:t=>F(t.BB,t.BF),kind:"pct",rate:!0,asc:!0},{key:"KBB",label:"K/BB",help:"Strikeouts per walk",get:t=>t.BB?t.K/t.BB:t.K?t.K:null,kind:"rate2",rate:!0},{key:"WHIFF",label:"Whiff%",help:"Swings that missed",get:t=>F(t.whiffs,t.swings),kind:"pct",rate:!0},{key:"U3",label:"<3%",help:"Batters finished in 3 pitches or fewer",get:t=>F(t.under3,t.BF),kind:"pct",rate:!0},{key:"LOO",label:"LOO%",help:"Leadoff batters retired",get:t=>F(t.leadoffOut,t.leadoff),kind:"pct",rate:!0},{key:"123",label:"1-2-3",help:"Innings with three up, three down",get:t=>t.clean},{key:"BAA",label:"BAA",help:"Batting average against",get:t=>F(t.H,t.BF-t.BB-t.HBP-t.SF-t.SAC),kind:"rate3",rate:!0,asc:!0},{key:"BABIP",label:"BABIP",help:"Batting average on balls in play against",get:t=>bt(t.H,t.HR,t.BF-t.BB-t.HBP-t.SF-t.SAC,t.K,t.SF),kind:"rate3",rate:!0,asc:!0},{key:"GB",label:"GB%",help:"Balls in play allowed that were ground balls",get:t=>F(t.gb,t.bip),kind:"pct",rate:!0},{key:"HHB",label:"HHB%",help:"Balls in play allowed that were hard hit",get:t=>F(t.hard,t.bip),kind:"pct",rate:!0,asc:!0},{key:"FIP",label:"FIP",help:"Fielding-independent pitching: an ERA-style number from just strikeouts, walks, hit batters and home runs (what the pitcher controls)",get:t=>En(t,e),kind:"rate2",rate:!0,asc:!0}];function Bt(e,t){return t==null?"\u2013":e==="pct"?`${(t*100).toFixed(1)}%`:e==="rate3"?t>=1?t.toFixed(3):t.toFixed(3).replace(/^0/,""):e==="rate2"?t.toFixed(2):e==="war"?t.toFixed(1):e==="runs"?`${t>.05?"+":""}${t.toFixed(1)}`:e==="ip"?`${Math.floor(t/3)}.${t%3}`:String(t)}var vn=.12,St=1.2,Wn=.294,kt=.57,Gn={P:0,C:12.5,"1B":-12.5,"2B":2.5,"3B":2.5,SS:7.5,LF:-7.5,CF:2.5,RF:-7.5},E=(e,t)=>e.reduce((a,o)=>a+t(o),0),ge=e=>`${e.player_id}|${e.team_id}`,Rt=e=>13*e.HR+3*(e.BB+e.HBP)-2*e.K,He=e=>e.AB+e.BB+e.SF+e.HBP;function Ce(e){let{bat:t,pit:a}=be(e),o=de(e),n={lines:[],league:{rpw:10,runScale:1,lgWoba:0}},p=E(t,f=>f.PA),i=E(a,f=>f.outs);if(!e.length||!p||!i)return n;let r=E(e,f=>f.state.score[0]+f.state.score[1]),s=r/e.length,l=Math.max(4,2*Math.pow(Math.max(s,1),.713)),u=r/p/vn,m=E(t,f=>(Z(f)??0)*He(f))/Math.max(1,E(t,He)),h=f=>{let _=Z(f);return _==null?0:(_-m)/St*He(f)*u},y=.2*u,R=-(2*r/i+.075),b=f=>f["1B"]+f.BB+f.HBP,B=(E(t,f=>f.SB)*y+E(t,f=>f.CS)*R)/Math.max(1,E(t,b)),k=f=>f.SB*y+f.CS*R-B*b(f),A=M["1B"]/St*u,$=Object.fromEntries(V.map(f=>{let _=E(o,X=>X.outsAt[f]??0);return[f,_?E(o,X=>X.eAt[f]??0)/_:0]})),x=f=>-E([...V],_=>((f.eAt[_]??0)-$[_]*(f.outsAt[_]??0))*A),O=f=>E([...V],_=>Gn[_]/1458*((f.outsAt[_]??0)/3)*u),G=E(a,Rt)/i,Ie=f=>-u*(Rt(f)-G*f.outs)/27,ce=(.5-Wn)*e.length*2,K=kt*ce*l/p,te=(1-kt)*ce*l/i,D=new Map,j=f=>{let _=D.get(ge(f));return _||D.set(ge(f),_={player_id:f.player_id,team_id:f.team_id,bat:0,bsr:0,fld:0,pos:0,repl:0,pitch:0,pitchRepl:0,batWar:0,pitWar:0,war:0}),_};for(let f of t){let _=j(f);_.bat=h(f),_.bsr=k(f),_.repl=K*f.PA}for(let f of o){let _=j(f);_.fld=x(f),_.pos=O(f)}for(let f of a){if(!f.outs&&!f.BF)continue;let _=j(f);_.pitch=Ie(f),_.pitchRepl=te*f.outs}for(let f of D.values())f.batWar=(f.bat+f.bsr+f.fld+f.pos+f.repl)/l,f.pitWar=(f.pitch+f.pitchRepl)/l,f.war=f.batWar+f.pitWar;return{lines:[...D.values()],league:{rpw:l,runScale:u,lgWoba:m}}}var Pt=e=>e==null?"\u2013":e.toFixed(1);function wt(e,t){let a=new Map;for(let n of t)a.set(n.seasonId,[...a.get(n.seasonId)??[],n]);let o=new Map;for(let[n,p]of a)for(let i of Ce(p).lines)o.set(`${n}|${ge(i)}`,i);return e.map(n=>{let p=o.get(`${n.season_id}|${ge(n)}`);return p?{...n,war:p.war,pit_war:n.outs?p.pitWar:null}:n})}var At=[{key:"WAR",label:"WAR",help:"Wins above replacement: how many more wins this player was worth than a bench player, counting hitting, running, fielding and pitching",get:e=>e.war,kind:"war"},{key:"BWAR",label:"Off/Def WAR",help:"The hitting, baserunning and fielding part of WAR",get:e=>e.batWar,kind:"war"},{key:"PWAR",label:"pWAR",help:"The pitching part of WAR",get:e=>e.pitch||e.pitchRepl?e.pitWar:null,kind:"war"},{key:"BAT",label:"Batting",help:"Runs created at the plate compared with an average hitter (from wOBA)",get:e=>e.bat,kind:"runs"},{key:"BSR",label:"Baserunning",help:"Runs from stolen bases and caught stealing, compared with the league's usual steal rate",get:e=>e.bsr,kind:"runs"},{key:"FLD",label:"Fielding",help:"Runs from errors, compared with the average error rate at each position played (the site can't measure range)",get:e=>e.fld,kind:"runs"},{key:"POS",label:"Position",help:"Credit for playing harder positions (catcher, shortstop) and a debit for easier ones (first base, corner outfield), by innings played",get:e=>e.pos,kind:"runs"},{key:"REPL",label:"Replacement",help:"Runs a bench player would have cost the team over the same plate appearances",get:e=>e.repl,kind:"runs"},{key:"PITCH",label:"Pitching",help:"Runs saved compared with an average pitcher, from strikeouts, walks, hit batters and home runs (FIP)",get:e=>e.pitch||e.pitchRepl?e.pitch+e.pitchRepl:null,kind:"runs"}];var L=e=>e??0,J=e=>e.pa!=null&&L(e.pa)>0,ee=e=>e.outs!=null&&(L(e.outs)>0||L(e.p_g)>0),$e=e=>L(e.ab)?L(e.h)/L(e.ab):null,Be=e=>L(e.pa)?(L(e.h)+L(e.bb)+L(e.hbp)+L(e.roe)+L(e.fc))/L(e.pa):null,Se=e=>L(e.ab)?L(e.tb)/L(e.ab):null,Ee=e=>{let t=Be(e),a=Se(e);return t==null||a==null?null:t+a},ve=e=>L(e.outs)?L(e.er)*6*3/L(e.outs):null,We=e=>L(e.outs)?(L(e.p_h)+L(e.p_bb))*3/L(e.outs):null,Y=e=>e==null?"---":e>=1?e.toFixed(3):e.toFixed(3).replace(/^0/,""),he=e=>e==null?"\u2013":e.toFixed(1),ye=e=>e==null?"---":e.toFixed(2),Ge=e=>e==null?"\u2013":`${Math.floor(e/3)}.${e%3}`,ae={bat:[{key:"G",label:"G",get:e=>e.g},{key:"PA",label:"PA",get:e=>e.pa},{key:"AB",label:"AB",get:e=>e.ab},{key:"R",label:"R",get:e=>e.r},{key:"H",label:"H",get:e=>e.h},{key:"2B",label:"2B",get:e=>e.doubles},{key:"3B",label:"3B",get:e=>e.triples},{key:"HR",label:"HR",get:e=>e.hr},{key:"RBI",label:"RBI",get:e=>e.rbi},{key:"BB",label:"BB",get:e=>e.bb},{key:"K",label:"K",get:e=>e.so},{key:"AVG",label:"AVG",get:$e,fmt:Y,rate:!0},{key:"OBP",label:"OBP",get:Be,fmt:Y,rate:!0},{key:"SLG",label:"SLG",get:Se,fmt:Y,rate:!0},{key:"OPS",label:"OPS",get:Ee,fmt:Y,rate:!0},{key:"WAR",label:"WAR",get:e=>e.war??null,fmt:he}],pit:[{key:"G",label:"G",get:e=>e.p_g},{key:"IP",label:"IP",get:e=>e.outs,fmt:Ge},{key:"W",label:"W",get:e=>e.w},{key:"L",label:"L",get:e=>e.l},{key:"SV",label:"SV",get:e=>e.sv},{key:"H",label:"H",get:e=>e.p_h},{key:"R",label:"R",get:e=>e.p_r},{key:"ER",label:"ER",get:e=>e.er},{key:"BB",label:"BB",get:e=>e.p_bb},{key:"K",label:"K",get:e=>e.p_so},{key:"ERA",label:"ERA",get:ve,fmt:ye,rate:!0,asc:!0},{key:"WHIP",label:"WHIP",get:We,fmt:ye,rate:!0,asc:!0},{key:"WAR",label:"pWAR",get:e=>e.pit_war??null,fmt:he}]},_t=(e,t)=>t==null?"\u2013":e.fmt?e.fmt(t):String(t),ke=2,Re=10,Pe=14,De=(e,t)=>typeof e=="number"?e:e.get(t)??0,Me=e=>Math.ceil(e*ke),Ue=e=>Math.ceil(e*Re*3/Pe),It=`${ke} plate appearances per game their team has played, or for pitchers ${Re} innings by the end of a ${Pe}-game season (in proportion before that)`;function oe(e,t,a){let o=De(a,t.team_id);return e==="bat"?L(t.pa)>=Me(o):L(t.outs)>=Ue(o)}function Ft(e,t,a,o,n){let p=ae[t].find(s=>s.key===a);if(!p)return{col:void 0,rows:e.filter(s=>t==="bat"?J(s):ee(s))};let i=n?n==="desc":!p.asc,r=e.filter(s=>t==="bat"?J(s):ee(s)).filter(s=>!p.rate||oe(t,s,o)).map(s=>({s,v:p.get(s)})).filter(s=>s.v!=null).sort((s,l)=>i?l.v-s.v:s.v-l.v).map(s=>s.s);return{col:p,desc:i,rows:r}}var Ot=[{type:"bat",key:"AVG",label:"Batting average"},{type:"bat",key:"HR",label:"Home runs"},{type:"bat",key:"RBI",label:"Runs batted in"},{type:"bat",key:"H",label:"Hits"},{type:"bat",key:"R",label:"Runs"},{type:"bat",key:"OPS",label:"OPS"},{type:"bat",key:"WAR",label:"WAR"},{type:"pit",key:"K",label:"Strikeouts"},{type:"pit",key:"ERA",label:"ERA"},{type:"pit",key:"W",label:"Wins"},{type:"pit",key:"WHIP",label:"WHIP"}];var we={pa:40,outs:45},Lt={bat:[["AVG","Batting average"],["HR","Home runs"],["RBI","Runs batted in"],["H","Hits"],["R","Runs"],["2B","Doubles"],["3B","Triples"],["BB","Walks"],["OBP","On-base %"],["SLG","Slugging %"],["OPS","OPS"],["WAR","WAR"],["G","Games played"]],pit:[["K","Strikeouts"],["WAR","Pitching WAR"],["W","Wins"],["ERA","ERA"],["WHIP","WHIP"],["IP","Innings pitched"],["SV","Saves"],["G","Games pitched"]]},xt=(e,t)=>ae[e].find(a=>a.key===t),Tt=(e,t)=>e==="bat"?J(t):ee(t),Ht=(e,t,a)=>t.filter(o=>o.value!==0).sort((o,n)=>e.asc?o.value-n.value:n.value-o.value).slice(0,a);function Ct(e,t,a,o,n=10){let p=xt(t,a);if(!p)return[];let i=[];for(let r of e){let s=o.get(r.season_id);if(!s||!Tt(t,r)||p.rate&&!oe(t,r,s.teamGames))continue;let l=p.get(r);l!=null&&i.push({playerId:r.player_id,teamId:r.team_id,label:s.name,value:l})}return Ht(p,i,n)}var Dn=["g","gs","pa","ab","r","h","singles","doubles","triples","hr","rbi","bb","so","hbp","roe","fc","tb","p_g","p_gs","outs","p_h","p_r","er","p_bb","p_hbp","p_so","w","l","sv","hld","pitches","war","pit_war"];function Mn(e,t){let a=new Map(t.map((p,i)=>[p,i])),o=[...e].sort((p,i)=>(a.get(p.season_id)??0)-(a.get(i.season_id)??0)),n=new Map;for(let p of o){let i=n.get(p.player_id);if(!i){n.set(p.player_id,{line:{...p},seasons:1});continue}i.seasons++,i.line.team_id=p.team_id;for(let r of Dn){let s=i.line[r],l=p[r];i.line[r]=s==null&&l==null?null:(s??0)+(l??0)}}return n}function $t(e,t,a,o,n=10){let p=xt(t,a);if(!p)return[];let i=[];for(let[r,{line:s,seasons:l}]of Mn(e,o)){if(!Tt(t,s)||p.rate&&(t==="bat"?(s.pa??0)<we.pa:(s.outs??0)<we.outs))continue;let u=p.get(s);u!=null&&i.push({playerId:r,teamId:s.team_id,label:`${l} season${l>1?"s":""}`,value:u})}return Ht(p,i,n)}function Et(e,t){let a=new Map(e.map(i=>[i.id,[]]));for(let i of t){if(i.game_type!=="regular"||i.status!=="final"||!i.home_team_id||!i.away_team_id||i.home_score==null||i.away_score==null)continue;let r=i.scheduled_at??"";a.get(i.home_team_id)?.push({opp:i.away_team_id,rf:i.home_score,ra:i.away_score,at:r}),a.get(i.away_team_id)?.push({opp:i.home_team_id,rf:i.away_score,ra:i.home_score,at:r})}let o=e.map(i=>{let r=a.get(i.id),s=r.filter(y=>y.rf>y.ra).length,l=r.filter(y=>y.rf<y.ra).length,u=r.length-s-l,m=r.reduce((y,R)=>y+R.rf,0),h=r.reduce((y,R)=>y+R.ra,0);return{team:i,gp:r.length,w:s,l,t:u,pct:r.length?(s+u/2)/r.length:0,gb:0,rf:m,ra:h,diff:m-h,streak:Kn(r),needsCoinFlip:!1}});o.sort((i,r)=>r.pct-i.pct);let n=[];for(let i=0;i<o.length;){let r=i+1;for(;r<o.length&&Math.abs(o[r].pct-o[i].pct)<1e-9;)r++;n.push(...Un(o.slice(i,r),a)),i=r}let p=n[0];for(let i of n)i.gb=p?(p.w-i.w+(i.l-p.l))/2:0;return n}function vt(e,t){let a=new Map(t.map(p=>[p.team_id,p])),o=e.map(p=>{let i=a.get(p.id)??{w:0,l:0,t:0,runs_for:0,runs_against:0},r=i.w+i.l+i.t;return{team:p,gp:r,w:i.w,l:i.l,t:i.t,pct:r?(i.w+i.t/2)/r:0,gb:0,rf:i.runs_for,ra:i.runs_against,diff:i.runs_for-i.runs_against,streak:"\u2013",needsCoinFlip:!1}});o.sort((p,i)=>i.pct-p.pct||i.diff-p.diff||p.ra-i.ra||(p.team.tiebreak_rank??1/0)-(i.team.tiebreak_rank??1/0)||p.team.name.localeCompare(i.team.name));let n=o[0];for(let p of o)p.gb=n?(n.w-p.w+(p.l-n.l))/2:0;return o}function Un(e,t){if(e.length===1)return e;let a=new Set(e.map(r=>r.team.id)),o=new Map;for(let r of e){let s=t.get(r.team.id).filter(m=>a.has(m.opp)),l=s.filter(m=>m.rf>m.ra).length,u=s.filter(m=>m.rf===m.ra).length;o.set(r.team.id,s.length?(l+u/2)/s.length:.5)}let n=r=>[-o.get(r.team.id),-r.diff,r.ra],p=(r,s)=>{let l=n(r),u=n(s);for(let m=0;m<l.length;m++)if(Math.abs(l[m]-u[m])>1e-9)return l[m]-u[m];return 0},i=[...e].sort((r,s)=>{let l=p(r,s);if(l!==0)return l;let u=r.team.tiebreak_rank??1/0,m=s.team.tiebreak_rank??1/0;return u!==m?u-m:r.team.name.localeCompare(s.team.name)});for(let r=0;r<i.length;r++)for(let s of[r-1,r+1]){let l=i[s];if(!l)continue;p(i[r],l)===0&&i[r].team.tiebreak_rank==null&&(i[r].needsCoinFlip=!0)}return i}function Kn(e){let t=[...e].sort((p,i)=>p.at.localeCompare(i.at));if(!t.length)return"\u2013";let a=p=>p.rf>p.ra?"W":p.rf<p.ra?"L":"T",o=a(t[t.length-1]),n=0;for(let p=t.length-1;p>=0&&a(t[p])===o;p--)n++;return`${o}${n}`}function Wt(e,t){return t?e>=1?"1.000":e.toFixed(3).replace(/^0/,""):".000"}function Gt(e){return e===0?"\u2013":Number.isInteger(e)?String(e):e.toFixed(1)}var q="America/New_York",jn=new Intl.DateTimeFormat("en-US",{timeZone:q,weekday:"short",month:"short",day:"numeric"}),Nn=new Intl.DateTimeFormat("en-US",{timeZone:q,weekday:"long",month:"long",day:"numeric"}),Vn=new Intl.DateTimeFormat("en-US",{timeZone:q,hour:"numeric",minute:"2-digit"}),qn=new Intl.DateTimeFormat("en-CA",{timeZone:q,year:"numeric",month:"2-digit",day:"2-digit"}),Dt=e=>jn.format(new Date(e)),Mt=e=>Nn.format(new Date(e)),Ut=e=>Vn.format(new Date(e)),U=e=>qn.format(typeof e=="string"?new Date(e):e);function Xn(e){let t=[...e];t.length%2&&t.push(null);let a=t.length,o=[];for(let n=0;n<a-1;n++){let p=[];for(let i=0;i<a/2;i++){let r=t[i],s=t[a-1-i];if(!r||!s)continue;let l=i===0?n%2===1:(n+i)%2===1;p.push(l?{home:s,away:r}:{home:r,away:s})}o.push(p),t.splice(1,0,t.pop())}return o}function Kt(e,t){let a=Xn(e),o=[];for(;o.length<t;)o.push(...a.slice(0,t-o.length));let n=new Map(e.map(i=>[i,0])),p=new Map;return o.map(i=>i.map(({home:r,away:s})=>{let l=[r,s].sort().join("|"),u=p.get(l),m=r;u?m=u===r?s:r:n.get(s)<n.get(r)&&(m=s);let h=m===r?s:r;return n.set(m,n.get(m)+1),p.set(l,m),{home:m,away:h}}))}function jt(e){let[t,a,o]=e.split("-").map(Number);return new Date(Date.UTC(t,a-1,o)).getUTCDay()}function ie(e,t){let[a,o,n]=e.split("-").map(Number);return new Date(Date.UTC(a,o-1,n+t)).toISOString().slice(0,10)}function Nt(e,t,a){let[o,n,p]=e.split("-").map(Number),[i,r]=t.split(":").map(Number),s=Date.UTC(o,n-1,p,i,r),l=s;for(let u=0;u<2;u++)l=s-Qn(new Date(l),a);return new Date(l)}function Qn(e,t){let a=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:t,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).formatToParts(e).map(n=>[n.type,n.value]));return Date.UTC(+a.year,+a.month-1,+a.day,+a.hour,+a.minute,+a.second)-Math.floor(e.getTime()/1e3)*1e3}function v(e){let t=U(new Date(e)),a=ie(t,-((jt(t)+6)%7));return Nt(a,"00:00",q).getTime()}var Ke=e=>v(v(e)+192*3600*1e3);function Vt(e){let t=e.filter(p=>!!p).map(p=>Date.parse(p));if(!t.length)return[];let a=v(Math.min(...t)),o=v(Math.max(...t)),n=[];for(let p=a,i=1;p<=o;i++){let r=Ke(p);n.push({n:i,start:p,end:r}),p=r}return n}var qt=(e,t)=>{let a=typeof t=="string"?Date.parse(t):t;return e.find(o=>a>=o.start&&a<o.end)};var _e=9,Xt=e=>[...Array(_e).fill("ST"),...Array(e<=10?3:1).fill("BN")],Qt={ST:"Starter",BN:"Bench"},zt={bat:{R:1,TB:1,RBI:1,BB:1,SB:1,K:-1},pit:{IP:3,K:1,W:2,HD:2,SV:5,H:-1,BB:-1,ER:-2,L:-2}},Zt=[["R","Runs scored"],["TB","Total bases"],["RBI","Runs batted in"],["BB","Walks"],["SB","Stolen bases"],["K","Strikeouts"],["H","Hits"],["HR","Home runs"],["HBP","Hit by pitch"],["CS","Caught stealing"]],Yt=[["IP","Innings pitched"],["K","Strikeouts"],["W","Wins"],["HD","Holds"],["SV","Saves"],["H","Hits allowed"],["BB","Walks issued"],["ER","Earned runs"],["L","Losses"],["HBP","Hit batters"],["R","Runs allowed"]],je=e=>({R:e.R,TB:e.TB,RBI:e.RBI,BB:e.BB,SB:e.SB,K:e.K,H:e.H,HR:e.HR,HBP:e.HBP,CS:e.CS}),Ne=e=>({IP:e.OUTS/3,K:e.K,W:e.W,HD:e.HD,SV:e.SV,H:e.H,BB:e.BB,ER:e.ER,L:e.L,HBP:e.HBP,R:e.R}),Jt=e=>({R:e.r??0,TB:e.tb??0,RBI:e.rbi??0,BB:e.bb??0,K:e.so??0,H:e.h??0,HR:e.hr??0,HBP:e.hbp??0}),en=e=>({IP:(e.outs??0)/3,K:e.p_so??0,W:e.w??0,HD:e.hld??0,SV:e.sv??0,H:e.p_h??0,BB:e.p_bb??0,ER:e.er??0,L:e.l??0,HBP:e.p_hbp??0,R:e.p_r??0}),Ae=(e,t)=>Object.entries(t).reduce((a,[o,n])=>a+(e[o]??0)*n,0),tn=e=>(Math.round(e*10)/10).toFixed(1).replace(/\.0$/,"");function Ve(e,t){if(!e)return null;let a=Date.parse(e);return t!=null&&a<t?null:Math.max(v(a),t??-1/0)}function qe(e,t,a){let o=e.state.bat[t],n=e.state.pit[t];return(o?Ae(je(o),a.bat):0)+(n?Ae(Ne(n),a.pit):0)}var zn=(e,t)=>Date.parse(e.start_at)<=t&&(e.end_at==null||t<Date.parse(e.end_at));function nn(e,t,a,o,n){let p=new Map(e.map(r=>[r,{teamId:r,total:0,players:new Map,byWeek:new Map}])),i=new Map;for(let r of t)i.set(r.player_id,[...i.get(r.player_id)??[],r]);for(let r of a){let s=Ve(r.playedAt,n);if(s==null)continue;let l=v(Date.parse(r.playedAt));for(let u of new Set([...Object.keys(r.state.bat),...Object.keys(r.state.pit)])){let m=i.get(u)?.find(b=>zn(b,s));if(!m||m.slot_index>=_e)continue;let h=qe(r,u,o),y=p.get(m.team_id);if(!y)continue;let R=y.players.get(u)??{playerId:u,points:0,games:0};R.points+=h,R.games+=1,y.players.set(u,R),y.total+=h,y.byWeek.set(l,(y.byWeek.get(l)??0)+h)}}return p}function rn(e,t){let a=Math.floor(e/t),o=e%t;return a%2?t-1-o:o}var sn=(e,t)=>`${Math.floor(e/t)+1}.${String(e%t+1).padStart(2,"0")}`;function Xe(e,t){let a=t.findIndex((o,n)=>!e[n]&&o==="ST");return a>=0?a:t.findIndex((o,n)=>!e[n]&&o==="BN")}var Qe=e=>e.bat+e.pit;function an(e,t,a,o){let n=Xe(t,a);if(n<0||!e.length)return null;let p=e[0].id,i=-1/0;for(let r of e){let s=Qe(o.get(r.id)??{bat:0,pit:0});s>i&&(i=s,p=r.id)}return{id:p,slot:n}}var on=e=>{let t=e.now.bat+e.now.pit,a=e.last.bat+e.last.pit;return t!==0?t+a*.25:a},ln=e=>{let t=(a,o)=>a!==0?a+o*.25:o;return{bat:t(e.now.bat,e.last.bat),pit:t(e.now.pit,e.last.pit)}};var le=e=>e.toLowerCase().replace(/[^a-z0-9]/g,"");function ze(e,t){let a=le(t);if(a)return e.find(o=>le(o.name)===a||le(o.abbreviation)===a)??e.find(o=>le(o.name).startsWith(a)&&a.length>=3)}function Zn(e,t){let a=e.trim().replace(/^[a-z]+,?\s+(?=[a-z]+\s+\d)/i,""),o=a.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(o)return Ze(+o[1],+o[2],+o[3]);if(o=a.match(/^(\d{1,2})[/.-](\d{1,2})(?:[/.-](\d{2,4}))?$/),o)return Ze(o[3]?o[3].length===2?2e3+ +o[3]:+o[3]:t,+o[1],+o[2]);if(o=a.match(/^([a-z]{3,9})\.?\s+(\d{1,2})(?:,?\s+(\d{4}))?$/i),o){let n=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"].indexOf(o[1].slice(0,3).toLowerCase())+1;if(n)return Ze(o[3]?+o[3]:t,n,+o[2])}return null}function Ze(e,t,a){let o=new Date(Date.UTC(e,t-1,a));return o.getUTCMonth()!==t-1||o.getUTCDate()!==a?null:o.toISOString().slice(0,10)}function Yn(e){let t=e.trim().toLowerCase().replace(/\s+/g,"");if(!t)return"";if(t==="noon")return"12:00";let a=t.match(/^(\d{1,2})(?::(\d{2}))?(am|pm|a|p)?$/);if(!a)return null;let o=+a[1],n=a[2]?+a[2]:0;if(a[3]){if(o<1||o>12)return null;a[3].startsWith("p")&&o!==12&&(o+=12),a[3].startsWith("a")&&o===12&&(o=0)}else if(!a[2]||o>23)return null;return n>59?null:`${String(o).padStart(2,"0")}:${String(n).padStart(2,"0")}`}function Jn(e){if(e.includes("	"))return e.split("	").map(n=>n.trim());let t=[],a="",o=!1;for(let n of e)n==='"'?o=!o:n===","&&!o?(t.push(a.trim()),a=""):a+=n;return t.push(a.trim()),t}var un={date:/^(date|day)$/,time:/^(time|start|starttime)$/,field:/^(field|location|park|diamond)$/,away:/^(away|visitor|visitors|visiting|road)(team)?$/,home:/^home(team)?$/};function cn(e,t,a){let o=e.split(/\r?\n/),n=["date","time","field","away","home"],p=[];return o.forEach((i,r)=>{if(!i.trim())return;let s=Jn(i),l=s.map(x=>le(x)),u=l.map(x=>Object.keys(un).find(O=>un[O].test(x)));if(u.filter(Boolean).length>=2&&!p.length){let x=l.some(O=>/^(game|matchup|teams)$/.test(O));n=u.map((O,G)=>O??(x&&/^(game|matchup|teams)$/.test(l[G])?"away":""));return}let m=x=>{let O=n.indexOf(x);return O>=0?s[O]??"":""},h=m("away"),y=m("home"),R=[h,y,...s].find(x=>/\s(@|at|vs\.?|v\.?)\s/i.test(x));if(R&&(!y||!ze(t,y))){let[x,O]=R.split(/\s(?:@|at|vs\.?|v\.?)\s/i);h=x,y=O}let b=Zn(m("date"),a),B=Yn(m("time")),k=ze(t,h),A=ze(t,y),$=[!b&&`can't read the date "${m("date")}"`,B==null&&`can't read the time "${m("time")}"`,!k&&`no team called "${h}"`,!A&&`no team called "${y}"`,k&&A&&k.id===A.id&&"a team can't play itself"].filter(Boolean);p.push($.length?{line:r+1,error:$.join("; ")}:{line:r+1,game:{date:b,time:B,field:m("field"),away:k.id,home:A.id}})}),p}function pn(e,t,a={}){let o=a.maxPerWeek??2,n=b=>a.label?.(b)??t.find(B=>B.id===b)?.name??"A team",p=e.filter(b=>b.status!=="canceled"),i=new Map(t.map(b=>[b.id,{team:b,games:0,home:0,away:0,perWeek:new Map}])),r=new Set,s=[],l=new Map,u=new Map,m=new Map,h=0,y=0;for(let b of p){(!b.home_team_id||!b.away_team_id)&&y++,b.scheduled_at||h++;for(let[B,k]of[[b.home_team_id,"home"],[b.away_team_id,"away"]]){let A=B?i.get(B):void 0;if(A&&(A.games++,A[k]++,b.scheduled_at)){let $=v(b.scheduled_at);r.add($),A.perWeek.set($,(A.perWeek.get($)??0)+1);let x=U(b.scheduled_at),O=l.get(x)??new Map;O.set(B,(O.get(B)??0)+1),l.set(x,O)}}if(b.scheduled_at&&b.field){let B=`${b.scheduled_at}|${b.field.trim().toLowerCase()}`;m.set(B,b.field.trim()),u.set(B,(u.get(B)??0)+1)}}for(let[b,B]of l)for(let[k,A]of B)A>1&&s.push(`${n(k)} plays ${A} games on ${b}.`);for(let[b,B]of u){if(B<2)continue;let k=b.split("|")[0];s.push(`${B} games at the same time on ${m.get(b)} (${U(k)}).`)}for(let b of i.values())for(let[B,k]of b.perWeek)k>o&&s.push(`${b.team.name} has ${k} games the week of ${U(new Date(B))} (more than ${o}).`);let R=[...i.values()].map(b=>b.games);R.length&&Math.max(...R)!==Math.min(...R)&&s.push(`Teams don't all have the same number of games (${Math.min(...R)} to ${Math.max(...R)}).`);for(let b of i.values())Math.abs(b.home-b.away)>2&&s.push(`${b.team.name} has ${b.home} home and ${b.away} away games.`);return h&&s.push(`${h} game${h===1?" has":"s have"} no date yet.`),y&&s.push(`${y} game${y===1?" is":"s are"} missing a team.`),{teams:[...i.values()],weeks:[...r].sort((b,B)=>b-B),problems:s}}function mn(e,t,a,o){let n=new Map;for(let i of e)for(let[r,s]of Object.entries(i.state.pit)){if(!s.P&&!s.OUTS)continue;let l=n.get(r)??new Map,u=l.get(i.date)??{pitches:0,outs:0};u.pitches+=s.P,u.outs+=s.OUTS,l.set(i.date,u),n.set(r,l)}let p=ie(t,-6);return[...n].map(([i,r])=>{let l=[...r.keys()].sort().at(-1),u=r.get(l),m=me(u.pitches),h=ie(l,m+1),y=l<t&&h<=t,R=0,b=0,B=0;for(let[k,A]of r)R+=A.pitches,b+=A.outs,k>=p&&k<=t&&(B+=A.pitches);return{playerId:i,pitches:R,outs:b,outings:r.size,lastDate:l,lastPitches:u.pitches,rest:m,eligibleOn:h,availableToday:y,maxPerDay:fe(a(i),o),last7:B}})}var fn={quarterfinal:"Quarterfinal",semifinal:"Semifinal",championship:"Championship"};function Ye(e,t,a,o){let n,p=(i,r)=>{(!n||i>n.score)&&(n={score:i,text:r})};for(let[i,r]of Object.entries(e.bat)){if(!r.PA)continue;let s=t==null||o(i)===t?1:.6,l=(r.TB+r.R+r.RBI+r.BB*.5+r.SB*.5)*s,u=[`${r.H}-for-${r.AB}`];for(let[m,h]of[["HR","HR"],["3B","3B"],["2B","2B"]])r[m]&&u.push(r[m]>1?`${r[m]} ${h}`:h);r.RBI&&u.push(`${r.RBI} RBI`),r.R>=2&&u.push(`${r.R} R`),r.SB>=2&&u.push(`${r.SB} SB`),l>=4&&p(l,`${a(i)}: ${u.join(", ")}`)}for(let[i,r]of Object.entries(e.pit)){if(r.OUTS<6)continue;let s=t==null||o(i)===t?1:.6,l=(r.OUTS/3+r.K-r.ER*1.5-r.H*.5)*s,u=[`${pe(r.OUTS)} IP`,`${r.K} K`];r.H<=2&&u.push(r.H===0?"no hits":`${r.H} H`),r.ER===0&&u.push("no earned runs"),l>=5&&p(l,`${a(i)}: ${u.join(", ")}`)}return n?.text}function dn(e,t,a,o,n,p=4){return e.filter(r=>r.status==="final"&&r.home_team_id&&r.away_team_id&&r.home_score!=null&&r.away_score!=null).sort((r,s)=>(s.scheduled_at??"").localeCompare(r.scheduled_at??"")).slice(0,p).map(r=>{let s=t.get(r.away_team_id)?.name??"Away",l=t.get(r.home_team_id)?.name??"Home",[u,m]=[r.away_score,r.home_score],h=a.get(r.id),y=h?.endReason==="Walk-off!",R=u===m?null:m>u?1:0,[b,B,k,A]=m>u?[l,s,m,u]:[s,l,u,m],$=r.innings&&r.innings>6?` in ${r.innings}`:"",x=R==null?`${s} and ${l} tie ${u}-${u}`:y?`${b} walk off ${B}, ${k}-${A}${$}`:k-A>=8?`${b} roll past ${B}, ${k}-${A}`:k-A===1?`${b} edge ${B}, ${k}-${A}${$}`:`${b} beat ${B}, ${k}-${A}${$}`,O=r.game_type==="playoff"&&r.playoff_round?fn[r.playoff_round]+(r.series_game?` \xB7 Game ${r.series_game}`:""):"Final",G=n.get(r.id);return{id:r.id,href:`/games/${r.id}`,title:x,kicker:O,when:r.scheduled_at,star:h&&G?Ye(h,R,o,G):void 0}})}var ue={innings:6,runCapPerHalfInning:10,runCapInFinalInning:!0,mercyRule:{enabled:!1,runLead:10,afterInnings:4},tiesAllowed:!0,minDefensiveOuts:6,leadoffsAllowed:!1,balks:!1,droppedThirdStrike:!1,pitchLimits:{age9to10:75,age11to12:85}};function bn(e){let t=e??{};return{...ue,...t,mercyRule:{...ue.mercyRule,...t.mercyRule??{}},pitchLimits:{...ue.pitchLimits,...t.pitchLimits??{}}}}return An(er);})();
+"use strict";var HLL=(()=>{var $e=Object.defineProperty;var Fn=Object.getOwnPropertyDescriptor;var On=Object.getOwnPropertyNames;var Tn=Object.prototype.hasOwnProperty;var $n=(e,t)=>{for(var o in t)$e(e,o,{get:t[o],enumerable:!0})},Ln=(e,t,o,s)=>{if(t&&typeof t=="object"||typeof t=="function")for(let n of On(t))!Tn.call(e,n)&&n!==o&&$e(e,n,{get:()=>t[n],enumerable:!(s=Fn(t,n))||s.enumerable});return e};var Hn=e=>Ln($e({},"__esModule",{value:!0}),e);var lr={};$n(lr,{ADV_BAT:()=>wt,BAT_STATS:()=>rn,BB_TYPES:()=>Le,CAREER_MIN:()=>Ae,COLUMNS:()=>ie,DEFAULT_RULES:()=>ce,DEFAULT_SCORING:()=>nn,LEADER_CATEGORIES:()=>Ct,OUT_FOR:()=>it,PIT_STATS:()=>sn,POS:()=>q,QUAL_IP:()=>Re,QUAL_PA:()=>Pe,QUAL_TEXT:()=>xt,RECORD_CATEGORIES:()=>vt,RESULTS:()=>Z,SEASON_GAMES:()=>we,SLOT_LABEL:()=>tn,STARTERS:()=>Fe,WAR_COLUMNS:()=>Lt,advPitColumns:()=>At,advancedFromGames:()=>ge,autopick:()=>fn,avg:()=>ve,careerRecords:()=>Ut,checkSchedule:()=>hn,computeStandings:()=>Kt,dayKey:()=>K,defaultMoves:()=>lt,engineRules:()=>pt,era:()=>We,fieldingFromGames:()=>be,fieldingPct:()=>yt,fipConstant:()=>Rt,fmt1:()=>ye,fmt2:()=>Be,fmtAdv:()=>_t,fmtIp:()=>Me,fmtPts:()=>ln,fmtRate:()=>J,fmtWar:()=>Tt,forcedMoves:()=>oe,formatDay:()=>Xt,formatGb:()=>Vt,formatLongDay:()=>qt,formatPct:()=>jt,formatStat:()=>Ht,formatTime:()=>Qt,fromBatLine:()=>Xe,fromImportedBat:()=>an,fromImportedPit:()=>on,fromPitLine:()=>qe,gamePoints:()=>ze,gamesFor:()=>Ue,hasBatting:()=>ee,hasPitching:()=>te,inningsPitched:()=>fe,isQab:()=>xe,lockFor:()=>Qe,mergeStats:()=>ht,minOuts:()=>Ne,minPa:()=>Ke,movesProblem:()=>ct,nextWeekStart:()=>Ve,obp:()=>Se,openSlot:()=>Ze,ops:()=>De,ordinal:()=>He,parseRules:()=>kn,parseSchedule:()=>gn,pickLabel:()=>pn,pickOwner:()=>cn,pitchLimit:()=>de,pitcherAvailability:()=>yn,points:()=>Ie,posOf:()=>ae,projectionOf:()=>dn,qualifies:()=>le,rankBy:()=>Et,rankValue:()=>mn,replay:()=>ft,restDays:()=>me,resultHeadlines:()=>Sn,resultPossible:()=>ut,scoreLeague:()=>un,seasonRecords:()=>Mt,seasonRounds:()=>zt,seasonWeeks:()=>Yt,slg:()=>ke,slotsFor:()=>en,spreadDates:()=>Zt,standingsFromRecords:()=>Nt,starOfGame:()=>tt,statsFromGames:()=>gt,suggestLineup:()=>mt,valueOf:()=>Ye,warFromGames:()=>Ce,weekOf:()=>Jt,weekStart:()=>G,whip:()=>Ge,withWar:()=>$t,woba:()=>Y});var q=["P","C","1B","2B","3B","SS","LF","CF","RF"],ae=e=>q[e-1],Z={"1B":{label:"Single",verb:"singles",hit:1},"2B":{label:"Double",verb:"doubles",hit:2},"3B":{label:"Triple",verb:"triples",hit:3},HR:{label:"Home run",verb:"homers",hit:4},GRD:{label:"Ground-rule double",verb:"hits a ground-rule double",hit:2},IPHR:{label:"Inside-the-park HR",verb:"hits an inside-the-park home run",hit:4},RHB:{label:"Runner hit by ball",verb:"singles, and the ball hits a runner",hit:1},GO:{label:"Ground out",verb:"grounds out",out:1,multi:!0},FO:{label:"Fly out",verb:"flies out",out:1},LO:{label:"Line out",verb:"lines out",out:1},PO:{label:"Pop out",verb:"pops out",out:1},BO:{label:"Bunt out",verb:"bunts out",out:1,multi:!0},IF:{label:"Infield fly",verb:"is out on the infield fly rule",out:1},DP:{label:"Double play",verb:"hits into a double play",out:2,multi:!0},TP:{label:"Triple play",verb:"hits into a triple play",out:3,multi:!0},SF:{label:"Sac fly",verb:"hits a sacrifice fly",out:1},SAC:{label:"Sac bunt",verb:"lays down a sacrifice bunt",out:1,multi:!0},FC:{label:"Fielder's choice",verb:"reaches on a fielder's choice",multi:!0},E:{label:"Error",verb:"reaches on an error"}},Le={G:"Ground ball",L:"Line drive",F:"Fly ball",P:"Pop up",B:"Bunt"},it={G:"GO",L:"LO",F:"FO",P:"PO",B:"BO"};var xn={1:"the pitcher",2:"the catcher",3:"first base",4:"second base",5:"third base",6:"shortstop",7:"left field",8:"center field",9:"right field"};function lt(e,t){let o=[1,2,3].filter(u=>e[u-1]),s={},n=u=>o.forEach(r=>s[String(r)]=Math.min(4,r+u)),c=()=>o.forEach(u=>s[String(u)]=u);switch(t){case"1B":s.B=1,n(1);break;case"2B":s.B=2,n(2);break;case"3B":s.B=3,n(3);break;case"HR":case"IPHR":s.B=4,n(3);break;case"GRD":s.B=2,n(2);break;case"IF":s.B="X",c();break;case"TP":s.B="X",c(),o.slice(0,2).forEach(u=>s[String(u)]="X");break;case"RHB":{s.B=1;let u=o[0];u&&(s[String(u)]="X");let r=[1,2,3].map(l=>l!==u&&e[l-1]?!0:null),i=oe(r);o.filter(l=>l!==u).forEach(l=>s[String(l)]=i[String(l)]??l);break}case"E":s.B=1,n(1);break;case"SF":s.B="X",c(),e[2]&&(s[3]=4);break;case"SAC":s.B="X",n(1);break;case"FC":s.B=1,c(),e[0]?s[1]="X":o.length&&(s[String(Math.max(...o))]="X");break;case"DP":s.B="X",c(),e[0]&&(s[1]="X");break;default:s.B="X",c()}return s}function oe(e){let t={B:1};return e[0]?(t[1]=2,e[1]?(t[2]=3,e[2]&&(t[3]=4)):e[2]&&(t[3]=3)):(e[1]&&(t[2]=2),e[2]&&(t[3]=3)),t}function ut(e,t,o){let s=t.some(Boolean);return e==="DP"||e==="SAC"?s&&o<2:e==="TP"?t.filter(Boolean).length>=2&&o===0:e==="IF"?!!(t[0]&&t[1])&&o<2:e==="RHB"?s:e==="SF"?!!t[2]&&o<2:e==="FC"?s:!0}function ct(e,t,o,s,n){let c=[];for(let l of[1,2,3])e[l-1]&&c.push({from:l,to:o[String(l)]??l});s&&c.push({from:0,to:o.B??1});let u=c.filter(l=>l.to!=="X"),r=c.length-u.length,i=u.filter(l=>l.to!==4).map(l=>l.to);if(new Set(i).size<i.length)return"Two runners can't end up on the same base.";for(let l of u)for(let p of u)if(l.from<p.from&&l.to!==4&&l.to>p.to)return"A runner can't pass the runner ahead of them.";return t+r>3?`That's ${r} outs, but there ${3-t===1?"is":"are"} only ${3-t} left in the inning.`:n==="DP"&&r<2?"A double play needs two outs. Mark which runner was put out.":n==="TP"&&r<3?"A triple play needs three outs. Mark which runners were put out.":null}var En=()=>({G:0,PA:0,AB:0,H:0,"1B":0,"2B":0,"3B":0,HR:0,R:0,RBI:0,BB:0,K:0,HBP:0,SAC:0,SF:0,SB:0,CS:0,ROE:0,FC:0,TB:0}),Cn=()=>({G:0,P:0,S:0,BF:0,OUTS:0,H:0,R:0,ER:0,BB:0,K:0,HBP:0,HR:0,W:0,L:0,SV:0,HD:0}),vn=()=>({PO:0,A:0,E:0});function pt(e){return{innings:e.innings,runCap:e.runCapPerHalfInning,runCapLastInning:e.runCapInFinalInning,mercy:{on:e.mercyRule.enabled,lead:e.mercyRule.runLead,after:e.mercyRule.afterInnings}}}function He(e){let t=["th","st","nd","rd"],o=e%100;return e+(t[(o-20)%10]||t[o]||t[0])}function ft(e,t,o,s={}){let n={inning:1,half:0,outs:0,balls:0,strikes:0,bases:[null,null,null],score:[0,0],line:[[],[]],hits:[0,0],errors:[0,0],lineup:[e.lineups[0].map(a=>({...a})),e.lineups[1].map(a=>({...a}))],bench:[[...e.bench[0]],[...e.bench[1]]],status:"live",endReason:"",log:[],bat:{},pit:{},fld:{},defPos:{},errAt:{},bip:[],appeared:new Set,pitchersUsed:[[],[]],decision:null,batter:null,pitcher:null,pas:[]},c=[0,0],u=0,r=!1,i=a=>s[a]||"Player",l=a=>{var m;return(m=n.bat)[a]||(m[a]=En())},p=a=>{var m;return(m=n.pit)[a]||(m[a]=Cn())},f=a=>{var m;return(m=n.fld)[a]||(m[a]=vn())},y=()=>n.half,B=()=>1-n.half,k=()=>n.lineup[y()][c[y()]%n.lineup[y()].length].pid,d=()=>(n.lineup[B()].find(a=>a.pos==="P")??n.lineup[B()][0]).pid,P=(a,m)=>n.lineup[a].find(g=>g.pos===ae(m))?.pid;n.lineup.forEach(a=>a.forEach(m=>n.appeared.add(m.pid))),n.lineup.forEach((a,m)=>{let g=a.find(h=>h.pos==="P");g&&n.pitchersUsed[m].push(g.pid)});let S=(a,m="play")=>n.log.push({inning:n.inning,half:n.half,text:a,kind:m,score:[...n.score]}),I=a=>{for(;n.line[a].length<n.inning;)n.line[a].push(0)};I(0);let E=()=>n.inning>=o.innings,x=()=>o.runCap!=null&&o.runCap>0&&(!E()||o.runCapLastInning);function $(a){n.status!=="final"&&(n.status="final",n.endReason=a,S(`Final${a?" \u2014 "+a:""}`,"info"))}function D(){var a,m;if(n.status!=="final"){n.outs++,p(d()).OUTS++;for(let g of n.lineup[B()]){let h=(a=n.defPos)[m=g.pid]||(a[m]={});h[g.pos]=(h[g.pos]??0)+1}}}function Oe(a,m){return r||n.status==="final"?!1:(n.score[y()]++,u++,I(y()),n.line[y()][n.inning-1]++,l(a.pid).R++,p(a.resp).R++,a.earned&&p(a.resp).ER++,m&&l(m).RBI++,x()&&u>=(o.runCap??1/0)&&(r=!0),n.half===1&&E()&&n.score[1]>n.score[0]&&$("Walk-off!"),!0)}function pe(){if(n.status==="final"||n.outs<3&&!r)return;let a=r&&n.outs<3?` (${o.runCap}-run limit)`:"";S(`End of ${n.half?"bottom":"top"} ${He(n.inning)}${a}`,"info");let m=n.inning,g=n.half===0;n.outs=0,n.balls=0,n.strikes=0,n.bases=[null,null,null],u=0,r=!1,ne=0;let[h,A]=n.score;if(g){if(m>=o.innings&&A>h)return $("");if(o.mercy.on&&m>=o.mercy.after&&A-h>=o.mercy.lead)return $("Mercy rule");n.half=1,I(1)}else{if(m>=o.innings&&h!==A)return $("");if(o.mercy.on&&m>=o.mercy.after&&Math.abs(h-A)>=o.mercy.lead)return $("Mercy rule");n.half=0,n.inning++,I(0)}}let M=[],ne=0;function W(){n.balls=0,n.strikes=0,c[y()]++,M=[],ne++}function U(a,m={}){let g={batter:k(),pitcher:d(),team:y(),inning:n.inning,half:n.half,outs:n.outs,bases:[!!n.bases[0],!!n.bases[1],!!n.bases[2]],pitches:[...M],result:a,runs:0,rbi:0,leadoff:ne===0,...m};return n.pas.push(g),g}function b(a,m,g){let h=[null,null,null],A=[],F=[],w=[];for(let T of[3,2,1]){let R=n.bases[T-1];R&&w.push([T,R])}m&&w.push(["B",m]);for(let[T,R]of w){let L=a[String(T)]??(T==="B"?1:T);L==="X"?(T!=="B"&&F.push(i(R.pid)),D()):L===4?Oe(R,g)&&A.push(i(R.pid)):h[L-1]=R}return n.bases=h,{scored:A,outs:F}}let _=({scored:a,outs:m})=>[a.length?`${a.join(", ")} ${a.length>1?"score":"scores"}.`:"",m.length?`${m.join(", ")} out.`:""].filter(Boolean).join(" ");function X(a,m=!1){let g=k(),h=d();l(g).PA++,l(g)[a]++,p(h)[a]++,p(h).BF++;let A=U(a),F=b(oe(n.bases),{pid:g,resp:h,earned:!0},g);A.runs=A.rbi=F.scored.length,S(`${i(g)} ${m?"is intentionally walked":a==="BB"?"walks":"is hit by a pitch"}. ${_(F)}`.trim(),F.scored.length?"run":"play"),W()}function re(a){var g;let m=P(B(),a);if(m){f(m).E++;let h=(g=n.errAt)[m]||(g[m]={});h[ae(a)]=(h[ae(a)]??0)+1}n.errors[B()]++}function nt(a,m){let g=String(a??"").replace(/^E/,"").split("-").map(Number).filter(Boolean),h=g.length?g:[m];h.forEach((A,F)=>{let w=P(B(),A);w&&(F===h.length-1?f(w).PO++:f(w).A++)})}let Pn={1:"1B",2:"2B",3:"3B",4:"HR"},se=[[],[]],rt=a=>n.score[a]-n.score[1-a];function Rn(){for(let a of[0,1]){let m=(n.lineup[a].find(A=>A.pos==="P")??n.lineup[a][0]).pid,g=se[a].at(-1);if(g?.pid===m)continue;g&&(g.exitLead=rt(a),g.outsOut=n.pit[g.pid]?.OUTS??0);let h=n.half!==a?n.bases.filter(Boolean).length:0;se[a].push({pid:m,first:!g,entryLead:rt(a),entryRunners:h,outsIn:n.pit[m]?.OUTS??0,outsOut:null,exitLead:null})}}for(let a of t){if(n.status==="final")break;switch(Rn(),a.t){case"pitch":{let m=p(d());if(m.P++,M.push(a.r),a.r==="B")n.balls++,n.balls>=4&&X("BB");else if(m.S++,a.r==="F")n.strikes<2&&n.strikes++;else if(++n.strikes>=3){let g=k(),h=d(),A=l(g);A.PA++,A.AB++,A.K++,p(h).K++,p(h).BF++,U("K",{looking:a.r==="CS"});let F=a.r==="CS"?"looking":a.r==="FT"?"swinging (foul tip)":a.r==="FB"?"on a foul bunt":"swinging",w=a.d3;if(w&&w.reach!=="out"){w.reach==="E"&&re(Number(String(w.f??"2").replace(/^E/,"").split("-")[0])||2);let T=b(w.m,{pid:g,resp:h,earned:w.reach!=="E"},null),R={WP:"a wild pitch",PB:"a passed ball",E:"an error",FC:"a fielder's choice"}[w.reach];S(`${i(g)} strikes out ${F} but reaches first on ${R} (dropped third strike). ${_(T)}`.trim(),T.scored.length?"run":"play")}else if(w){nt(w.f??"2-3",2);let T=b({...w.m,B:"X"},{pid:g,resp:h,earned:!0},null);S(`${i(g)} strikes out ${F}; the ball gets away but he's thrown out (${w.f??"2-3"}). ${_(T)}`.trim(),"out")}else{let T=P(B(),2);T&&f(T).PO++,D(),S(`${i(g)} strikes out ${F}.`,"out")}W()}break}case"hbp":p(d()).P++,M.push("H"),X("HBP");break;case"ibb":X("BB",!0);break;case"ci":{let m=k(),g=d();l(m).PA++,p(g).BF++,re(2),U("CI");let h=b(oe(n.bases),{pid:m,resp:g,earned:!1},null);S(`${i(m)} reaches on catcher's interference. ${_(h)}`.trim(),h.scored.length?"run":"play"),W();break}case"bout":{let m=k(),g=d();l(m).PA++,l(m).AB++,p(g).BF++,U("BOUT"),nt(a.f,2),D(),S(`${i(m)} is called out: ${a.why.toLowerCase()}.`,"out"),W();break}case"play":{let m=Z[a.r],g=k(),h=d(),A=p(h),F=l(g);A.P++,A.S++,A.BF++,F.PA++,a.r==="SF"?F.SF++:a.r==="SAC"?F.SAC++:F.AB++,m.hit&&(F.H++,F[Pn[m.hit]]++,F.TB+=m.hit,A.H++,n.hits[y()]++,m.hit===4&&A.HR++),a.r==="E"&&F.ROE++,a.r==="FC"&&F.FC++,a.loc&&n.bip.push({pid:g,x:a.loc[0],y:a.loc[1],bb:a.bb,r:a.r});let w=String(a.f??"").replace(/^E/,"").split("-").map(Number).filter(Boolean);a.r==="E"&&re(w[0]);for(let N of a.e??[])re(N);a.e?.length&&n.bases.forEach(N=>N&&(N.earned=!1));let T=a.r==="E"||a.r==="DP"?null:g,R=A.OUTS;M.push("X");let L=U(a.r,{bb:a.bb,hard:a.hh??a.bb==="L"}),C=b(a.m,{pid:g,resp:h,earned:a.r!=="E"&&!a.e?.length},T);L.runs=C.scored.length,L.rbi=T?C.scored.length:0;let z=A.OUTS-R;a.r!=="E"&&w.length&&z>0&&(m.out||a.r==="FC")&&w.forEach((N,at)=>{let Te=P(B(),N);if(!Te)return;let ot=at===w.length-1,In=z>=2&&w.length>=3&&at===w.length-2;(ot||In)&&f(Te).PO++,ot||f(Te).A++});let wn=a.bb&&!m.out&&a.r!=="SF"&&a.r!=="SAC"&&a.r!=="GRD"&&a.r!=="RHB"?` on a ${Le[a.bb].toLowerCase()}`:"",st=w[0],An=m.hit&&st?` to ${xn[st]}`:a.f?` (${a.f})`:"",_n=a.e?.length?` Error on the play (${a.e.map(N=>"E"+N).join(", ")}).`:"";S(`${i(g)} ${m.verb}${wn}${An}.${_n} ${_(C)}`.trim(),C.scored.length?"run":m.hit?"hit":m.out?"out":"play"),W();break}case"runner":{let m=n.bases.map(R=>R?.pid??null),g=b(a.m,null,null),h={SB:"steals",CS:"caught stealing",WP:"wild pitch",PB:"passed ball",PK:"picked off",BK:"balk",DI:"moves up on defensive indifference",E:"moves up on an error",ADV:"moves up on the throw",OBS:"is awarded a base on obstruction",APP:"is out on appeal",LE:"is out for leaving the base early",INT:"is out for interference"};a.k==="E"&&re(Number(String(a.f??"").replace(/^E/,"").split("-")[0])||2),(a.k==="E"||a.k==="OBS")&&n.bases.forEach(R=>R&&(R.earned=!1));for(let[R,L]of Object.entries(a.m)){let C=m[Number(R)-1];C&&(a.k==="SB"&&L!==Number(R)&&L!=="X"&&l(C).SB++,a.k==="CS"&&L==="X"&&l(C).CS++)}let A=Object.entries(a.m).filter(([R,L])=>L!==Number(R)),F=(A.length?A:Object.entries(a.m)).map(([R])=>m[Number(R)-1]).filter(R=>!!R).map(i),w=F.length>1?h[a.k].replace(/^moves/,"move").replace(/^is /,"are ").replace(/^steals/,"steal"):h[a.k],T=a.k==="WP"||a.k==="PB"||a.k==="BK"?`${h[a.k][0].toUpperCase()}${h[a.k].slice(1)}, runners move up.`:`${F.join(" and ")} ${w}${a.k==="E"&&a.f?` (${String(a.f).startsWith("E")?a.f:"E"+a.f})`:""}.`;S(`${T} ${_({scored:g.scored,outs:[]})}`.trim(),g.scored.length?"run":"play");break}case"sub":{let m=n.lineup[a.team][a.slot];if(!m)break;let g=m.pid;n.bench[a.team]=n.bench[a.team].filter(A=>A!==a.pid),n.bench[a.team].push(g),m.pid=a.pid,n.appeared.add(a.pid),m.pos==="P"&&n.pitchersUsed[a.team].push(a.pid);let h=a.team===y()?n.bases.find(A=>A?.pid===g):null;h&&(h.pid=a.pid),S(`${h?"Pinch runner":"Substitution"}: ${i(a.pid)} replaces ${i(g)}${h?"":` (${m.pos})`}.`,"info");break}case"cr":{let m=n.bases[a.base-1];if(!m)break;S(`Courtesy runner: ${i(a.pid)} runs for ${i(m.pid)}.`,"info"),m.pid=a.pid,n.appeared.add(a.pid);break}case"remove":{let m=n.lineup[a.team],g=m[a.slot];if(!g||m.length<=1)break;let h=c[a.team]%m.length;m.splice(a.slot,1),a.slot<h&&c[a.team]--,a.slot===h&&a.team===y()&&(n.balls=0,n.strikes=0,M=[]),S(`${i(g.pid)} leaves the game (${a.why.toLowerCase()}). Nobody replaces him; the batting order skips his spot.`,"info");break}case"order":{let m=n.lineup[a.team];c[a.team]=c[a.team]-c[a.team]%m.length+Math.min(a.slot,m.length-1),a.team===y()&&(n.balls=0,n.strikes=0,M=[]),S(`Scorekeeper correction: ${i(m[Math.min(a.slot,m.length-1)].pid)} is up.`,"info");break}case"note":S(a.text,"info");break;case"pos":{let m=n.lineup[a.team],g=m.find(A=>A.pid===a.pid),h=m.find(A=>A.pos===a.pos);g&&h&&g!==h&&(h.pos=g.pos,g.pos=a.pos,a.pos==="P"&&n.pitchersUsed[a.team].push(a.pid),S(`${i(a.pid)} moves to ${a.pos}${a.pos==="P"?", new pitcher":""}.`,"info"));break}case"end":(a.forfeit===0||a.forfeit===1)&&(n.score=a.forfeit===0?[0,6]:[6,0]),$(a.reason??"");break}pe()}if(n.appeared.forEach(a=>l(a).G=1),Object.values(n.pit).forEach(a=>a.G=1),n.status==="final"&&n.score[0]!==n.score[1]){let a=n.score[1]>n.score[0]?1:0,m=(R,L)=>[...new Set(n.pitchersUsed[R])].filter(C=>n.pit[C]).sort((C,z)=>n.pit[z][L]-n.pit[C][L])[0],g=m(a,"OUTS")??n.pitchersUsed[a][0],h=m(1-a,"R")??n.pitchersUsed[1-a][0];g&&(p(g).W=1),h&&(p(h).L=1),n.decision={W:g,L:h};let A=R=>R.entryLead>0&&(R.entryLead<=3||R.entryLead<=R.entryRunners+2),F=R=>(R.outsOut??n.pit[R.pid]?.OUTS??0)-R.outsIn,w=se[a].at(-1),T;if(w&&!w.first&&w.pid!==g&&F(w)>=1&&w.entryLead>0){let R=F(w);(w.entryLead<=3&&R>=3||w.entryLead<=w.entryRunners+2||R>=9)&&(T=w.pid)}T&&(p(T).SV=1,n.decision.SV=T);for(let R of[0,1])se[R].forEach((L,C)=>{let z=C===se[R].length-1;L.first||z||L.pid===g||L.pid===h||L.pid===T||A(L)&&F(L)>=1&&(L.exitLead??0)>0&&n.pit[L.pid]&&(n.pit[L.pid].HD=1)})}return n.batter=n.status==="final"?null:k(),n.pitcher=n.status==="final"?null:d(),n}var fe=e=>`${Math.floor(e/3)}.${e%3}`;function me(e){return e>=66?4:e>=51?3:e>=36?2:e>=21?1:0}var de=(e,t)=>e!=null&&e<=10?t.pitchLimits.age9to10:t.pitchLimits.age11to12;function mt(e){let t=e.slice(0,9),o=new Set(t),s=u=>{let r=[...o].find(i=>u.some(l=>i.positions.includes(l)))??[...o][0];return o.delete(r),r},n=[["P",["P"]],["C",["C"]],["1B",["1B"]],["SS",["INF"]],["2B",["INF"]],["3B",["INF"]],["CF",["OF"]],["LF",["OF"]],["RF",["OF"]]],c=new Map;for(let[u,r]of n){if(!o.size)break;c.set(s(r).id,u)}return{lineup:t.map(u=>({pid:u.id,pos:c.get(u.id)??"RF"})),bench:e.slice(9).map(u=>u.id)}}var dt=(e,t,o)=>({season_id:e,player_id:t,team_id:o,g:0,gs:0,pa:0,ab:0,r:0,h:0,singles:0,doubles:0,triples:0,hr:0,rbi:0,bb:0,so:0,hbp:0,roe:0,fc:0,tb:0,p_g:0,p_gs:0,outs:0,p_h:0,p_r:0,er:0,p_bb:0,p_hbp:0,p_so:0,w:0,l:0,sv:0,hld:0,pitches:0}),bt=(e,t)=>e.lineups[1].some(o=>o.pid===t)||e.bench[1].includes(t)?1:0,Dn=Object.keys(dt("","","")).filter(e=>!["season_id","player_id","team_id"].includes(e));function Wn(e,t){let o={...e};for(let s of Dn){let n=e[s],c=t[s];o[s]=n==null&&c==null?null:(n??0)+(c??0)}return o}function gt(e){let t=new Map;for(let{seasonId:o,teamIds:s,setup:n,state:c}of e){let u=l=>{let p=s[bt(n,l)],f=`${l}|${p}`,y=t.get(f);return y||t.set(f,y=dt(o,l,p)),y},r=new Set(n.lineups.flat().map(l=>l.pid)),i=new Set(n.lineups.map(l=>l.find(p=>p.pos==="P")?.pid).filter(Boolean));for(let[l,p]of Object.entries(c.bat)){let f=u(l);f.g+=1,r.has(l)&&(f.gs+=1),f.pa+=p.PA,f.ab+=p.AB,f.r+=p.R,f.h+=p.H,f.singles+=p["1B"],f.doubles+=p["2B"],f.triples+=p["3B"],f.hr+=p.HR,f.rbi+=p.RBI,f.bb+=p.BB,f.so+=p.K,f.hbp+=p.HBP,f.roe+=p.ROE,f.fc+=p.FC,f.tb+=p.TB}for(let[l,p]of Object.entries(c.pit)){if(!p.P&&!p.OUTS&&!p.BF)continue;let f=u(l);f.p_g+=1,i.has(l)&&(f.p_gs+=1),f.outs+=p.OUTS,f.p_h+=p.H,f.p_r+=p.R,f.er+=p.ER,f.p_bb+=p.BB,f.p_hbp+=p.HBP,f.p_so+=p.K,f.w+=p.W,f.l+=p.L,f.sv+=p.SV,f.hld+=p.HD,f.pitches+=p.P}}return[...t.values()]}function ht(...e){let t=new Map;for(let o of e)for(let s of o){let n=`${s.player_id}|${s.team_id}`,c=t.get(n);t.set(n,c?Wn(c,s):s)}return[...t.values()]}function be(e){let t=new Map;for(let{teamIds:o,setup:s,state:n}of e){let c=new Set,u=r=>{let i=o[bt(s,r)],l=`${r}|${i}`,p=t.get(l);return p||t.set(l,p={player_id:r,team_id:i,g:0,po:0,a:0,e:0,outsAt:{},eAt:{},totalOuts:0}),c.has(l)||(c.add(l),p.g++),p};for(let[r,i]of Object.entries(n.fld)){let l=u(r);l.po+=i.PO,l.a+=i.A,l.e+=i.E}for(let[r,i]of Object.entries(n.errAt??{})){let l=u(r);for(let[p,f]of Object.entries(i))l.eAt[p]=(l.eAt[p]??0)+f}for(let[r,i]of Object.entries(n.defPos)){let l=u(r);for(let[p,f]of Object.entries(i))l.outsAt[p]=(l.outsAt[p]??0)+f,l.totalOuts+=f}}return[...t.values()]}var yt=e=>e.po+e.a+e.e?(e.po+e.a)/(e.po+e.a+e.e):null;var Bt=new Set(["K","GO","FO","LO","PO","BO","DP","TP","IF","SF","SAC","BOUT"]),St=e=>e==="SS"||e==="F"||e==="FT"||e==="FB"||e==="X",Gn=e=>e==="SS"||e==="FT";function kt(e){let t=0,o=0;for(let s of e)t>=2&&o++,(s==="CS"||s==="SS"||s==="FT"||s==="FB"||s==="F"&&t<2)&&t++;return o}function xe(e){return kt(e.pitches)>=3||e.pitches.length>=6||e.result==="2B"||e.result==="GRD"||e.result==="3B"||e.result==="HR"||e.result==="IPHR"||!!e.hard||e.result==="BB"||e.result==="SAC"||e.result==="SF"}var Mn=(e,t)=>({player_id:e,team_id:t,PA:0,AB:0,H:0,"1B":0,"2B":0,"3B":0,HR:0,BB:0,HBP:0,K:0,KL:0,SF:0,SAC:0,RBI:0,pitches:0,qab:0,twoStrike3:0,sixPlus:0,bip:0,gb:0,ld:0,fb:0,hard:0,rispAB:0,rispH:0,twoOutRbi:0,swings:0,whiffs:0,firstSwings:0,SB:0,CS:0}),Un=(e,t)=>({player_id:e,team_id:t,BF:0,outs:0,pitches:0,strikes:0,fps:0,K:0,BB:0,HBP:0,H:0,HR:0,SF:0,SAC:0,ER:0,swings:0,whiffs:0,bip:0,gb:0,hard:0,under3:0,leadoff:0,leadoffOut:0,clean:0});function ge(e){let t=new Map,o=new Map,s=(c,u)=>{let r=`${c}|${u}`,i=t.get(r);return i||t.set(r,i=Mn(c,u)),i},n=(c,u)=>{let r=`${c}|${u}`,i=o.get(r);return i||o.set(r,i=Un(c,u)),i};for(let c of e){let u=i=>c.setup.lineups[1].some(l=>l.pid===i)||c.setup.bench[1].includes(i)?1:0;for(let i of c.state.pas){let l=s(i.batter,c.teamIds[i.team]),p=n(i.pitcher,c.teamIds[1-i.team]),f=i.result,y=f in Z?Z[f]:null,B=f==="K"||f==="BOUT"||y!=null&&f!=="SF"&&f!=="SAC",k=y?.hit??0;l.PA++,p.BF++,B&&l.AB++,k&&(l.H++,p.H++,l[["1B","2B","3B","HR"][k-1]]++,k===4&&p.HR++),f==="BB"&&(l.BB++,p.BB++),f==="HBP"&&(l.HBP++,p.HBP++),f==="K"&&(l.K++,p.K++,i.looking&&l.KL++),f==="SF"&&(l.SF++,p.SF++),f==="SAC"&&(l.SAC++,p.SAC++),l.RBI+=i.rbi,i.outs===2&&(l.twoOutRbi+=i.rbi),l.pitches+=i.pitches.length,xe(i)&&l.qab++,kt(i.pitches)>=3&&l.twoStrike3++,i.pitches.length>=6&&l.sixPlus++,i.bb&&(l.bip++,p.bip++,i.bb==="G"&&(l.gb++,p.gb++),i.bb==="L"&&l.ld++,(i.bb==="F"||i.bb==="P")&&l.fb++,i.hard&&(l.hard++,p.hard++)),(i.bases[1]||i.bases[2])&&B&&(l.rispAB++,k&&l.rispH++);let d=i.pitches.filter(St).length,P=i.pitches.filter(Gn).length;l.swings+=d,l.whiffs+=P,p.swings+=d,p.whiffs+=P,i.pitches[0]&&St(i.pitches[0])&&l.firstSwings++,i.pitches[0]&&i.pitches[0]!=="B"&&i.pitches[0]!=="H"&&p.fps++,i.pitches.length<=3&&p.under3++,i.leadoff&&(p.leadoff++,Bt.has(f)&&p.leadoffOut++)}let r=new Map;for(let i of c.state.pas)r.set(`${i.inning}|${i.half}`,[...r.get(`${i.inning}|${i.half}`)??[],i]);for(let i of r.values())i.length===3&&i.every(l=>Bt.has(l.result)&&l.result!=="DP"&&l.pitcher===i[0].pitcher)&&n(i[0].pitcher,c.teamIds[1-i[0].team]).clean++;for(let[i,l]of Object.entries(c.state.pit)){if(!l.P&&!l.OUTS)continue;let p=n(i,c.teamIds[u(i)]);p.pitches+=l.P,p.strikes+=l.S,p.outs+=l.OUTS,p.ER+=l.ER}for(let[i,l]of Object.entries(c.state.bat)){if(!l.SB&&!l.CS)continue;let p=s(i,c.teamIds[u(i)]);p.SB+=l.SB,p.CS+=l.CS}}return{bat:[...t.values()],pit:[...o.values()]}}var O=(e,t)=>t?e/t:null,j={BB:.69,HBP:.72,"1B":.89,"2B":1.27,"3B":1.62,HR:2.1},Y=e=>O(j.BB*e.BB+j.HBP*e.HBP+j["1B"]*e["1B"]+j["2B"]*e["2B"]+j["3B"]*e["3B"]+j.HR*e.HR,e.AB+e.BB+e.SF+e.HBP),Pt=(e,t,o,s,n)=>O(e-t,o-s-t+n),Kn=e=>O(e["2B"]+2*e["3B"]+3*e.HR,e.AB);function Rt(e){let t=e.reduce((s,n)=>({er:s.er+n.ER,outs:s.outs+n.outs,raw:s.raw+(13*n.HR+3*(n.BB+n.HBP)-2*n.K)}),{er:0,outs:0,raw:0});if(!t.outs)return 0;let o=t.outs/3;return t.er*6/o-t.raw/o*(6/9)}var Nn=(e,t)=>e.outs?(13*e.HR+3*(e.BB+e.HBP)-2*e.K)/(e.outs/3)*(6/9)+t:null,wt=[{key:"PA",label:"PA",help:"Plate appearances",get:e=>e.PA},{key:"QAB",label:"QAB",help:"Quality at-bats: 3+ pitches after 2 strikes, 6+ pitches, an extra-base hit, a hard-hit ball, a walk, or a sacrifice",get:e=>e.qab},{key:"QABP",label:"QAB%",help:"Quality at-bats per plate appearance",get:e=>O(e.qab,e.PA),kind:"pct",rate:!0},{key:"PPA",label:"P/PA",help:"Pitches seen per plate appearance",get:e=>O(e.pitches,e.PA),kind:"rate2",rate:!0},{key:"BBK",label:"BB/K",help:"Walks per strikeout",get:e=>e.K?e.BB/e.K:e.BB?e.BB:null,kind:"rate2",rate:!0},{key:"C",label:"C%",help:"Contact: at-bats that didn't end in a strikeout",get:e=>O(e.AB-e.K,e.AB),kind:"pct",rate:!0},{key:"KP",label:"K%",help:"Strikeouts per plate appearance",get:e=>O(e.K,e.PA),kind:"pct",rate:!0,asc:!0},{key:"BBP",label:"BB%",help:"Walks per plate appearance",get:e=>O(e.BB,e.PA),kind:"pct",rate:!0},{key:"SWING",label:"Swing%",help:"Share of pitches swung at",get:e=>O(e.swings,e.pitches),kind:"pct",rate:!0},{key:"WHIFF",label:"Whiff%",help:"Swings that missed",get:e=>O(e.whiffs,e.swings),kind:"pct",rate:!0,asc:!0},{key:"HHB",label:"HHB%",help:"Balls in play that were hard hit (line drives count unless the scorekeeper marked otherwise)",get:e=>O(e.hard,e.bip),kind:"pct",rate:!0},{key:"LD",label:"LD%",help:"Balls in play that were line drives",get:e=>O(e.ld,e.bip),kind:"pct",rate:!0},{key:"GB",label:"GB%",help:"Balls in play that were ground balls",get:e=>O(e.gb,e.bip),kind:"pct",rate:!0},{key:"FB",label:"FB%",help:"Balls in play that were fly balls or pop-ups",get:e=>O(e.fb,e.bip),kind:"pct",rate:!0},{key:"BABIP",label:"BABIP",help:"Batting average on balls in play (not counting home runs)",get:e=>Pt(e.H,e.HR,e.AB,e.K,e.SF),kind:"rate3",rate:!0},{key:"ISO",label:"ISO",help:"Isolated power: extra bases per at-bat (slugging minus average)",get:Kn,kind:"rate3",rate:!0},{key:"WOBA",label:"wOBA",help:"Weighted on-base average: every way of reaching base, weighted by how much it's worth (a double counts more than a walk)",get:Y,kind:"rate3",rate:!0},{key:"RISP",label:"AVG/RISP",help:"Batting average with runners in scoring position (2nd or 3rd)",get:e=>O(e.rispH,e.rispAB),kind:"rate3",rate:!0},{key:"RBI2",label:"2-out RBI",help:"Runs batted in with two outs",get:e=>e.twoOutRbi},{key:"SBP",label:"SB%",help:"Stolen bases per attempt",get:e=>O(e.SB,e.SB+e.CS),kind:"pct"}],At=e=>[{key:"IP",label:"IP",help:"Innings pitched (.1 and .2 are one and two outs)",get:t=>t.outs,kind:"ip"},{key:"BF",label:"BF",help:"Batters faced",get:t=>t.BF},{key:"P",label:"#P",help:"Pitches thrown",get:t=>t.pitches},{key:"SP",label:"S%",help:"Strike percentage (called, swinging, fouls and balls in play)",get:t=>O(t.strikes,t.pitches),kind:"pct",rate:!0},{key:"FPS",label:"FPS%",help:"First-pitch strikes",get:t=>O(t.fps,t.BF),kind:"pct",rate:!0},{key:"PIP",label:"P/IP",help:"Pitches per inning",get:t=>O(t.pitches,t.outs/3),kind:"rate2",rate:!0,asc:!0},{key:"PBF",label:"P/BF",help:"Pitches per batter faced",get:t=>O(t.pitches,t.BF),kind:"rate2",rate:!0,asc:!0},{key:"KP",label:"K%",help:"Strikeouts per batter faced",get:t=>O(t.K,t.BF),kind:"pct",rate:!0},{key:"BBP",label:"BB%",help:"Walks per batter faced",get:t=>O(t.BB,t.BF),kind:"pct",rate:!0,asc:!0},{key:"KBB",label:"K/BB",help:"Strikeouts per walk",get:t=>t.BB?t.K/t.BB:t.K?t.K:null,kind:"rate2",rate:!0},{key:"WHIFF",label:"Whiff%",help:"Swings that missed",get:t=>O(t.whiffs,t.swings),kind:"pct",rate:!0},{key:"U3",label:"<3%",help:"Batters finished in 3 pitches or fewer",get:t=>O(t.under3,t.BF),kind:"pct",rate:!0},{key:"LOO",label:"LOO%",help:"Leadoff batters retired",get:t=>O(t.leadoffOut,t.leadoff),kind:"pct",rate:!0},{key:"123",label:"1-2-3",help:"Innings with three up, three down",get:t=>t.clean},{key:"BAA",label:"BAA",help:"Batting average against",get:t=>O(t.H,t.BF-t.BB-t.HBP-t.SF-t.SAC),kind:"rate3",rate:!0,asc:!0},{key:"BABIP",label:"BABIP",help:"Batting average on balls in play against",get:t=>Pt(t.H,t.HR,t.BF-t.BB-t.HBP-t.SF-t.SAC,t.K,t.SF),kind:"rate3",rate:!0,asc:!0},{key:"GB",label:"GB%",help:"Balls in play allowed that were ground balls",get:t=>O(t.gb,t.bip),kind:"pct",rate:!0},{key:"HHB",label:"HHB%",help:"Balls in play allowed that were hard hit",get:t=>O(t.hard,t.bip),kind:"pct",rate:!0,asc:!0},{key:"FIP",label:"FIP",help:"Fielding-independent pitching: an ERA-style number from just strikeouts, walks, hit batters and home runs (what the pitcher controls)",get:t=>Nn(t,e),kind:"rate2",rate:!0,asc:!0}];function _t(e,t){return t==null?"\u2013":e==="pct"?`${(t*100).toFixed(1)}%`:e==="rate3"?t>=1?t.toFixed(3):t.toFixed(3).replace(/^0/,""):e==="rate2"?t.toFixed(2):e==="war"?t.toFixed(1):e==="runs"?`${t>.05?"+":""}${t.toFixed(1)}`:e==="ip"?`${Math.floor(t/3)}.${t%3}`:String(t)}var jn=.12,It=1.2,Vn=.294,Ft=.57,Xn={P:0,C:12.5,"1B":-12.5,"2B":2.5,"3B":2.5,SS:7.5,LF:-7.5,CF:2.5,RF:-7.5},v=(e,t)=>e.reduce((o,s)=>o+t(s),0),he=e=>`${e.player_id}|${e.team_id}`,Ot=e=>13*e.HR+3*(e.BB+e.HBP)-2*e.K,Ee=e=>e.AB+e.BB+e.SF+e.HBP;function Ce(e){let{bat:t,pit:o}=ge(e),s=be(e),n={lines:[],league:{rpw:10,runScale:1,lgWoba:0}},c=v(t,b=>b.PA),u=v(o,b=>b.outs);if(!e.length||!c||!u)return n;let r=v(e,b=>b.state.score[0]+b.state.score[1]),i=r/e.length,l=Math.max(4,2*Math.pow(Math.max(i,1),.713)),p=r/c/jn,f=v(t,b=>(Y(b)??0)*Ee(b))/Math.max(1,v(t,Ee)),y=b=>{let _=Y(b);return _==null?0:(_-f)/It*Ee(b)*p},B=.2*p,k=-(2*r/u+.075),d=b=>b["1B"]+b.BB+b.HBP,P=(v(t,b=>b.SB)*B+v(t,b=>b.CS)*k)/Math.max(1,v(t,d)),S=b=>b.SB*B+b.CS*k-P*d(b),I=j["1B"]/It*p,E=Object.fromEntries(q.map(b=>{let _=v(s,X=>X.outsAt[b]??0);return[b,_?v(s,X=>X.eAt[b]??0)/_:0]})),x=b=>-v([...q],_=>((b.eAt[_]??0)-E[_]*(b.outsAt[_]??0))*I),$=b=>v([...q],_=>Xn[_]/1458*((b.outsAt[_]??0)/3)*p),D=v(o,Ot)/u,Oe=b=>-p*(Ot(b)-D*b.outs)/27,pe=(.5-Vn)*e.length*2,M=Ft*pe*l/c,ne=(1-Ft)*pe*l/u,W=new Map,U=b=>{let _=W.get(he(b));return _||W.set(he(b),_={player_id:b.player_id,team_id:b.team_id,bat:0,bsr:0,fld:0,pos:0,repl:0,pitch:0,pitchRepl:0,batWar:0,pitWar:0,war:0}),_};for(let b of t){let _=U(b);_.bat=y(b),_.bsr=S(b),_.repl=M*b.PA}for(let b of s){let _=U(b);_.fld=x(b),_.pos=$(b)}for(let b of o){if(!b.outs&&!b.BF)continue;let _=U(b);_.pitch=Oe(b),_.pitchRepl=ne*b.outs}for(let b of W.values())b.batWar=(b.bat+b.bsr+b.fld+b.pos+b.repl)/l,b.pitWar=(b.pitch+b.pitchRepl)/l,b.war=b.batWar+b.pitWar;return{lines:[...W.values()],league:{rpw:l,runScale:p,lgWoba:f}}}var Tt=e=>e==null?"\u2013":e.toFixed(1);function $t(e,t){let o=new Map;for(let n of t)o.set(n.seasonId,[...o.get(n.seasonId)??[],n]);let s=new Map;for(let[n,c]of o)for(let u of Ce(c).lines)s.set(`${n}|${he(u)}`,u);return e.map(n=>{let c=s.get(`${n.season_id}|${he(n)}`);return c?{...n,war:c.war,pit_war:n.outs?c.pitWar:null}:n})}var Lt=[{key:"WAR",label:"WAR",help:"Wins above replacement: how many more wins this player was worth than a bench player, counting hitting, running, fielding and pitching",get:e=>e.war,kind:"war"},{key:"BWAR",label:"Off/Def WAR",help:"The hitting, baserunning and fielding part of WAR",get:e=>e.batWar,kind:"war"},{key:"PWAR",label:"pWAR",help:"The pitching part of WAR",get:e=>e.pitch||e.pitchRepl?e.pitWar:null,kind:"war"},{key:"BAT",label:"Batting",help:"Runs created at the plate compared with an average hitter (from wOBA)",get:e=>e.bat,kind:"runs"},{key:"BSR",label:"Baserunning",help:"Runs from stolen bases and caught stealing, compared with the league's usual steal rate",get:e=>e.bsr,kind:"runs"},{key:"FLD",label:"Fielding",help:"Runs from errors, compared with the average error rate at each position played (the site can't measure range)",get:e=>e.fld,kind:"runs"},{key:"POS",label:"Position",help:"Credit for playing harder positions (catcher, shortstop) and a debit for easier ones (first base, corner outfield), by innings played",get:e=>e.pos,kind:"runs"},{key:"REPL",label:"Replacement",help:"Runs a bench player would have cost the team over the same plate appearances",get:e=>e.repl,kind:"runs"},{key:"PITCH",label:"Pitching",help:"Runs saved compared with an average pitcher, from strikeouts, walks, hit batters and home runs (FIP)",get:e=>e.pitch||e.pitchRepl?e.pitch+e.pitchRepl:null,kind:"runs"}];var H=e=>e??0,ee=e=>e.pa!=null&&H(e.pa)>0,te=e=>e.outs!=null&&(H(e.outs)>0||H(e.p_g)>0),ve=e=>H(e.ab)?H(e.h)/H(e.ab):null,Se=e=>H(e.pa)?(H(e.h)+H(e.bb)+H(e.hbp)+H(e.roe)+H(e.fc))/H(e.pa):null,ke=e=>H(e.ab)?H(e.tb)/H(e.ab):null,De=e=>{let t=Se(e),o=ke(e);return t==null||o==null?null:t+o},We=e=>H(e.outs)?H(e.er)*6*3/H(e.outs):null,Ge=e=>H(e.outs)?(H(e.p_h)+H(e.p_bb))*3/H(e.outs):null,J=e=>e==null?"---":e>=1?e.toFixed(3):e.toFixed(3).replace(/^0/,""),ye=e=>e==null?"\u2013":e.toFixed(1),Be=e=>e==null?"---":e.toFixed(2),Me=e=>e==null?"\u2013":`${Math.floor(e/3)}.${e%3}`,ie={bat:[{key:"G",label:"G",get:e=>e.g},{key:"PA",label:"PA",get:e=>e.pa},{key:"AB",label:"AB",get:e=>e.ab},{key:"R",label:"R",get:e=>e.r},{key:"H",label:"H",get:e=>e.h},{key:"2B",label:"2B",get:e=>e.doubles},{key:"3B",label:"3B",get:e=>e.triples},{key:"HR",label:"HR",get:e=>e.hr},{key:"RBI",label:"RBI",get:e=>e.rbi},{key:"BB",label:"BB",get:e=>e.bb},{key:"K",label:"K",get:e=>e.so},{key:"AVG",label:"AVG",get:ve,fmt:J,rate:!0},{key:"OBP",label:"OBP",get:Se,fmt:J,rate:!0},{key:"SLG",label:"SLG",get:ke,fmt:J,rate:!0},{key:"OPS",label:"OPS",get:De,fmt:J,rate:!0},{key:"WAR",label:"WAR",get:e=>e.war??null,fmt:ye}],pit:[{key:"G",label:"G",get:e=>e.p_g},{key:"IP",label:"IP",get:e=>e.outs,fmt:Me},{key:"W",label:"W",get:e=>e.w},{key:"L",label:"L",get:e=>e.l},{key:"SV",label:"SV",get:e=>e.sv},{key:"H",label:"H",get:e=>e.p_h},{key:"R",label:"R",get:e=>e.p_r},{key:"ER",label:"ER",get:e=>e.er},{key:"BB",label:"BB",get:e=>e.p_bb},{key:"K",label:"K",get:e=>e.p_so},{key:"ERA",label:"ERA",get:We,fmt:Be,rate:!0,asc:!0},{key:"WHIP",label:"WHIP",get:Ge,fmt:Be,rate:!0,asc:!0},{key:"WAR",label:"pWAR",get:e=>e.pit_war??null,fmt:ye}]},Ht=(e,t)=>t==null?"\u2013":e.fmt?e.fmt(t):String(t),Pe=2,Re=10,we=14,Ue=(e,t)=>typeof e=="number"?e:e.get(t)??0,Ke=e=>Math.ceil(e*Pe),Ne=e=>Math.ceil(e*Re*3/we),xt=`${Pe} plate appearances per game their team has played, or for pitchers ${Re} innings by the end of a ${we}-game season (in proportion before that)`;function le(e,t,o){let s=Ue(o,t.team_id);return e==="bat"?H(t.pa)>=Ke(s):H(t.outs)>=Ne(s)}function Et(e,t,o,s,n){let c=ie[t].find(i=>i.key===o);if(!c)return{col:void 0,rows:e.filter(i=>t==="bat"?ee(i):te(i))};let u=n?n==="desc":!c.asc,r=e.filter(i=>t==="bat"?ee(i):te(i)).filter(i=>!c.rate||le(t,i,s)).map(i=>({s:i,v:c.get(i)})).filter(i=>i.v!=null).sort((i,l)=>u?l.v-i.v:i.v-l.v).map(i=>i.s);return{col:c,desc:u,rows:r}}var Ct=[{type:"bat",key:"AVG",label:"Batting average"},{type:"bat",key:"HR",label:"Home runs"},{type:"bat",key:"RBI",label:"Runs batted in"},{type:"bat",key:"H",label:"Hits"},{type:"bat",key:"R",label:"Runs"},{type:"bat",key:"OPS",label:"OPS"},{type:"bat",key:"WAR",label:"WAR"},{type:"pit",key:"K",label:"Strikeouts"},{type:"pit",key:"ERA",label:"ERA"},{type:"pit",key:"W",label:"Wins"},{type:"pit",key:"WHIP",label:"WHIP"}];var Ae={pa:40,outs:45},vt={bat:[["AVG","Batting average"],["HR","Home runs"],["RBI","Runs batted in"],["H","Hits"],["R","Runs"],["2B","Doubles"],["3B","Triples"],["BB","Walks"],["OBP","On-base %"],["SLG","Slugging %"],["OPS","OPS"],["WAR","WAR"],["G","Games played"]],pit:[["K","Strikeouts"],["WAR","Pitching WAR"],["W","Wins"],["ERA","ERA"],["WHIP","WHIP"],["IP","Innings pitched"],["SV","Saves"],["G","Games pitched"]]},Dt=(e,t)=>ie[e].find(o=>o.key===t),Wt=(e,t)=>e==="bat"?ee(t):te(t),Gt=(e,t,o)=>t.filter(s=>s.value!==0).sort((s,n)=>e.asc?s.value-n.value:n.value-s.value).slice(0,o);function Mt(e,t,o,s,n=10){let c=Dt(t,o);if(!c)return[];let u=[];for(let r of e){let i=s.get(r.season_id);if(!i||!Wt(t,r)||c.rate&&!le(t,r,i.teamGames))continue;let l=c.get(r);l!=null&&u.push({playerId:r.player_id,teamId:r.team_id,label:i.name,value:l})}return Gt(c,u,n)}var qn=["g","gs","pa","ab","r","h","singles","doubles","triples","hr","rbi","bb","so","hbp","roe","fc","tb","p_g","p_gs","outs","p_h","p_r","er","p_bb","p_hbp","p_so","w","l","sv","hld","pitches","war","pit_war"];function Qn(e,t){let o=new Map(t.map((c,u)=>[c,u])),s=[...e].sort((c,u)=>(o.get(c.season_id)??0)-(o.get(u.season_id)??0)),n=new Map;for(let c of s){let u=n.get(c.player_id);if(!u){n.set(c.player_id,{line:{...c},seasons:1});continue}u.seasons++,u.line.team_id=c.team_id;for(let r of qn){let i=u.line[r],l=c[r];u.line[r]=i==null&&l==null?null:(i??0)+(l??0)}}return n}function Ut(e,t,o,s,n=10){let c=Dt(t,o);if(!c)return[];let u=[];for(let[r,{line:i,seasons:l}]of Qn(e,s)){if(!Wt(t,i)||c.rate&&(t==="bat"?(i.pa??0)<Ae.pa:(i.outs??0)<Ae.outs))continue;let p=c.get(i);p!=null&&u.push({playerId:r,teamId:i.team_id,label:`${l} season${l>1?"s":""}`,value:p})}return Gt(c,u,n)}function Kt(e,t){let o=new Map(e.map(u=>[u.id,[]]));for(let u of t){if(u.game_type!=="regular"||u.status!=="final"||!u.home_team_id||!u.away_team_id||u.home_score==null||u.away_score==null)continue;let r=u.scheduled_at??"";o.get(u.home_team_id)?.push({opp:u.away_team_id,rf:u.home_score,ra:u.away_score,at:r}),o.get(u.away_team_id)?.push({opp:u.home_team_id,rf:u.away_score,ra:u.home_score,at:r})}let s=e.map(u=>{let r=o.get(u.id),i=r.filter(B=>B.rf>B.ra).length,l=r.filter(B=>B.rf<B.ra).length,p=r.length-i-l,f=r.reduce((B,k)=>B+k.rf,0),y=r.reduce((B,k)=>B+k.ra,0);return{team:u,gp:r.length,w:i,l,t:p,pct:r.length?(i+p/2)/r.length:0,gb:0,rf:f,ra:y,diff:f-y,streak:Zn(r),needsCoinFlip:!1}});s.sort((u,r)=>r.pct-u.pct);let n=[];for(let u=0;u<s.length;){let r=u+1;for(;r<s.length&&Math.abs(s[r].pct-s[u].pct)<1e-9;)r++;n.push(...zn(s.slice(u,r),o)),u=r}let c=n[0];for(let u of n)u.gb=c?(c.w-u.w+(u.l-c.l))/2:0;return n}function Nt(e,t){let o=new Map(t.map(c=>[c.team_id,c])),s=e.map(c=>{let u=o.get(c.id)??{w:0,l:0,t:0,runs_for:0,runs_against:0},r=u.w+u.l+u.t;return{team:c,gp:r,w:u.w,l:u.l,t:u.t,pct:r?(u.w+u.t/2)/r:0,gb:0,rf:u.runs_for,ra:u.runs_against,diff:u.runs_for-u.runs_against,streak:"\u2013",needsCoinFlip:!1}});s.sort((c,u)=>u.pct-c.pct||u.diff-c.diff||c.ra-u.ra||(c.team.tiebreak_rank??1/0)-(u.team.tiebreak_rank??1/0)||c.team.name.localeCompare(u.team.name));let n=s[0];for(let c of s)c.gb=n?(n.w-c.w+(c.l-n.l))/2:0;return s}function zn(e,t){if(e.length===1)return e;let o=new Set(e.map(r=>r.team.id)),s=new Map;for(let r of e){let i=t.get(r.team.id).filter(f=>o.has(f.opp)),l=i.filter(f=>f.rf>f.ra).length,p=i.filter(f=>f.rf===f.ra).length;s.set(r.team.id,i.length?(l+p/2)/i.length:.5)}let n=r=>[-s.get(r.team.id),-r.diff,r.ra],c=(r,i)=>{let l=n(r),p=n(i);for(let f=0;f<l.length;f++)if(Math.abs(l[f]-p[f])>1e-9)return l[f]-p[f];return 0},u=[...e].sort((r,i)=>{let l=c(r,i);if(l!==0)return l;let p=r.team.tiebreak_rank??1/0,f=i.team.tiebreak_rank??1/0;return p!==f?p-f:r.team.name.localeCompare(i.team.name)});for(let r=0;r<u.length;r++)for(let i of[r-1,r+1]){let l=u[i];if(!l)continue;c(u[r],l)===0&&u[r].team.tiebreak_rank==null&&(u[r].needsCoinFlip=!0)}return u}function Zn(e){let t=[...e].sort((c,u)=>c.at.localeCompare(u.at));if(!t.length)return"\u2013";let o=c=>c.rf>c.ra?"W":c.rf<c.ra?"L":"T",s=o(t[t.length-1]),n=0;for(let c=t.length-1;c>=0&&o(t[c])===s;c--)n++;return`${s}${n}`}function jt(e,t){return t?e>=1?"1.000":e.toFixed(3).replace(/^0/,""):".000"}function Vt(e){return e===0?"\u2013":Number.isInteger(e)?String(e):e.toFixed(1)}var V="America/New_York",Yn=new Intl.DateTimeFormat("en-US",{timeZone:V,weekday:"short",month:"short",day:"numeric"}),Jn=new Intl.DateTimeFormat("en-US",{timeZone:V,weekday:"long",month:"long",day:"numeric"}),er=new Intl.DateTimeFormat("en-US",{timeZone:V,hour:"numeric",minute:"2-digit"}),tr=new Intl.DateTimeFormat("en-CA",{timeZone:V,year:"numeric",month:"2-digit",day:"2-digit"}),Xt=e=>Yn.format(new Date(e)),qt=e=>Jn.format(new Date(e)),Qt=e=>er.format(new Date(e)),K=e=>tr.format(typeof e=="string"?new Date(e):e);function nr(e){let t=[...e];t.length%2&&t.push(null);let o=t.length,s=[];for(let n=0;n<o-1;n++){let c=[];for(let u=0;u<o/2;u++){let r=t[u],i=t[o-1-u];if(!r||!i)continue;let l=u===0?n%2===1:(n+u)%2===1;c.push(l?{home:i,away:r}:{home:r,away:i})}s.push(c),t.splice(1,0,t.pop())}return s}function zt(e,t){let o=nr(e),s=[];for(;s.length<t;)s.push(...o.slice(0,t-s.length));let n=new Map(e.map(u=>[u,0])),c=new Map;return s.map(u=>u.map(({home:r,away:i})=>{let l=[r,i].sort().join("|"),p=c.get(l),f=r;p?f=p===r?i:r:n.get(i)<n.get(r)&&(f=i);let y=f===r?i:r;return n.set(f,n.get(f)+1),c.set(l,f),{home:f,away:y}}))}function _e(e){let[t,o,s]=e.split("-").map(Number);return new Date(Date.UTC(t,o-1,s)).getUTCDay()}function Q(e,t){let[o,s,n]=e.split("-").map(Number);return new Date(Date.UTC(o,s-1,n+t)).toISOString().slice(0,10)}function je(e,t,o){let[s,n,c]=e.split("-").map(Number),[u,r]=t.split(":").map(Number),i=Date.UTC(s,n-1,c,u,r),l=i;for(let p=0;p<2;p++)l=i-rr(new Date(l),o);return new Date(l)}function rr(e,t){let o=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:t,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).formatToParts(e).map(n=>[n.type,n.value]));return Date.UTC(+o.year,+o.month-1,+o.day,+o.hour,+o.minute,+o.second)-Math.floor(e.getTime()/1e3)*1e3}function Zt(e,t){if(!t.gameDays.length)throw new Error("Pick at least one game day.");if(!t.slots.length)throw new Error("Add at least one time and field.");let o=Math.max(1,Math.min(t.maxPerDay,t.slots.length)),s=t.maxPerTeamPerWeek??1/0,n=new Set(t.skipDates??[]),c=e.flat(),u=[],r=new Map,i=p=>Q(p,-((_e(p)+6)%7)),l=t.startDate;for(let p=0;c.length&&p<2e3;p++,l=Q(l,1)){if(!t.gameDays.includes(_e(l))||n.has(l))continue;let f=i(l),y=new Set,B=[];for(let k=0;k<c.length&&B.length<o;){let d=c[k],P=S=>r.get(`${f}|${S}`)??0;if(!y.has(d.home)&&!y.has(d.away)&&P(d.home)<s&&P(d.away)<s){B.push(d),c.splice(k,1);for(let S of[d.home,d.away])y.add(S),r.set(`${f}|${S}`,P(S)+1)}else k++;if(k>o*3)break}B.forEach((k,d)=>u.push({...k,field:t.slots[d].field,scheduledAt:je(l,t.slots[d].time,V).toISOString()}))}if(c.length)throw new Error("Couldn't fit every game. Add game days, times or fields.");return u}function G(e){let t=K(new Date(e)),o=Q(t,-((_e(t)+6)%7));return je(o,"00:00",V).getTime()}var Ve=e=>G(G(e)+192*3600*1e3);function Yt(e){let t=e.filter(c=>!!c).map(c=>Date.parse(c));if(!t.length)return[];let o=G(Math.min(...t)),s=G(Math.max(...t)),n=[];for(let c=o,u=1;c<=s;u++){let r=Ve(c);n.push({n:u,start:c,end:r}),c=r}return n}var Jt=(e,t)=>{let o=typeof t=="string"?Date.parse(t):t;return e.find(s=>o>=s.start&&o<s.end)};var Fe=9,en=e=>[...Array(Fe).fill("ST"),...Array(e<=10?3:1).fill("BN")],tn={ST:"Starter",BN:"Bench"},nn={bat:{R:1,TB:1,RBI:1,BB:1,SB:1,K:-1},pit:{IP:3,K:1,W:2,HD:2,SV:5,H:-1,BB:-1,ER:-2,L:-2}},rn=[["R","Runs scored"],["TB","Total bases"],["RBI","Runs batted in"],["BB","Walks"],["SB","Stolen bases"],["K","Strikeouts"],["H","Hits"],["HR","Home runs"],["HBP","Hit by pitch"],["CS","Caught stealing"]],sn=[["IP","Innings pitched"],["K","Strikeouts"],["W","Wins"],["HD","Holds"],["SV","Saves"],["H","Hits allowed"],["BB","Walks issued"],["ER","Earned runs"],["L","Losses"],["HBP","Hit batters"],["R","Runs allowed"]],Xe=e=>({R:e.R,TB:e.TB,RBI:e.RBI,BB:e.BB,SB:e.SB,K:e.K,H:e.H,HR:e.HR,HBP:e.HBP,CS:e.CS}),qe=e=>({IP:e.OUTS/3,K:e.K,W:e.W,HD:e.HD,SV:e.SV,H:e.H,BB:e.BB,ER:e.ER,L:e.L,HBP:e.HBP,R:e.R}),an=e=>({R:e.r??0,TB:e.tb??0,RBI:e.rbi??0,BB:e.bb??0,K:e.so??0,H:e.h??0,HR:e.hr??0,HBP:e.hbp??0}),on=e=>({IP:(e.outs??0)/3,K:e.p_so??0,W:e.w??0,HD:e.hld??0,SV:e.sv??0,H:e.p_h??0,BB:e.p_bb??0,ER:e.er??0,L:e.l??0,HBP:e.p_hbp??0,R:e.p_r??0}),Ie=(e,t)=>Object.entries(t).reduce((o,[s,n])=>o+(e[s]??0)*n,0),ln=e=>(Math.round(e*10)/10).toFixed(1).replace(/\.0$/,"");function Qe(e,t){if(!e)return null;let o=Date.parse(e);return t!=null&&o<t?null:o}function ze(e,t,o){let s=e.state.bat[t],n=e.state.pit[t];return(s?Ie(Xe(s),o.bat):0)+(n?Ie(qe(n),o.pit):0)}var sr=(e,t)=>Date.parse(e.start_at)<=t&&(e.end_at==null||t<Date.parse(e.end_at));function un(e,t,o,s,n){let c=new Map(e.map(r=>[r,{teamId:r,total:0,players:new Map,byWeek:new Map}])),u=new Map;for(let r of t)u.set(r.player_id,[...u.get(r.player_id)??[],r]);for(let r of o){let i=Qe(r.playedAt,n);if(i==null)continue;let l=G(Date.parse(r.playedAt));for(let p of new Set([...Object.keys(r.state.bat),...Object.keys(r.state.pit)])){let f=u.get(p)?.find(d=>sr(d,i));if(!f||f.slot_index>=Fe)continue;let y=ze(r,p,s),B=c.get(f.team_id);if(!B)continue;let k=B.players.get(p)??{playerId:p,points:0,games:0};k.points+=y,k.games+=1,B.players.set(p,k),B.total+=y,B.byWeek.set(l,(B.byWeek.get(l)??0)+y)}}return c}function cn(e,t){let o=Math.floor(e/t),s=e%t;return o%2?t-1-s:s}var pn=(e,t)=>`${Math.floor(e/t)+1}.${String(e%t+1).padStart(2,"0")}`;function Ze(e,t){let o=t.findIndex((s,n)=>!e[n]&&s==="ST");return o>=0?o:t.findIndex((s,n)=>!e[n]&&s==="BN")}var Ye=e=>e.bat+e.pit;function fn(e,t,o,s){let n=Ze(t,o);if(n<0||!e.length)return null;let c=e[0].id,u=-1/0;for(let r of e){let i=Ye(s.get(r.id)??{bat:0,pit:0});i>u&&(u=i,c=r.id)}return{id:c,slot:n}}var mn=e=>{let t=e.now.bat+e.now.pit,o=e.last.bat+e.last.pit;return t!==0?t+o*.25:o},dn=e=>{let t=(o,s)=>o!==0?o+s*.25:s;return{bat:t(e.now.bat,e.last.bat),pit:t(e.now.pit,e.last.pit)}};var ue=e=>e.toLowerCase().replace(/[^a-z0-9]/g,"");function Je(e,t){let o=ue(t);if(o)return e.find(s=>ue(s.name)===o||ue(s.abbreviation)===o)??e.find(s=>ue(s.name).startsWith(o)&&o.length>=3)}function ar(e,t){let o=e.trim().replace(/^[a-z]+,?\s+(?=[a-z]+\s+\d)/i,""),s=o.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(s)return et(+s[1],+s[2],+s[3]);if(s=o.match(/^(\d{1,2})[/.-](\d{1,2})(?:[/.-](\d{2,4}))?$/),s)return et(s[3]?s[3].length===2?2e3+ +s[3]:+s[3]:t,+s[1],+s[2]);if(s=o.match(/^([a-z]{3,9})\.?\s+(\d{1,2})(?:,?\s+(\d{4}))?$/i),s){let n=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"].indexOf(s[1].slice(0,3).toLowerCase())+1;if(n)return et(s[3]?+s[3]:t,n,+s[2])}return null}function et(e,t,o){let s=new Date(Date.UTC(e,t-1,o));return s.getUTCMonth()!==t-1||s.getUTCDate()!==o?null:s.toISOString().slice(0,10)}function or(e){let t=e.trim().toLowerCase().replace(/\s+/g,"");if(!t)return"";if(t==="noon")return"12:00";let o=t.match(/^(\d{1,2})(?::(\d{2}))?(am|pm|a|p)?$/);if(!o)return null;let s=+o[1],n=o[2]?+o[2]:0;if(o[3]){if(s<1||s>12)return null;o[3].startsWith("p")&&s!==12&&(s+=12),o[3].startsWith("a")&&s===12&&(s=0)}else if(!o[2]||s>23)return null;return n>59?null:`${String(s).padStart(2,"0")}:${String(n).padStart(2,"0")}`}function ir(e){if(e.includes("	"))return e.split("	").map(n=>n.trim());let t=[],o="",s=!1;for(let n of e)n==='"'?s=!s:n===","&&!s?(t.push(o.trim()),o=""):o+=n;return t.push(o.trim()),t}var bn={date:/^(date|day)$/,time:/^(time|start|starttime)$/,field:/^(field|location|park|diamond)$/,away:/^(away|visitor|visitors|visiting|road)(team)?$/,home:/^home(team)?$/};function gn(e,t,o){let s=e.split(/\r?\n/),n=["date","time","field","away","home"],c=[];return s.forEach((u,r)=>{if(!u.trim())return;let i=ir(u),l=i.map(x=>ue(x)),p=l.map(x=>Object.keys(bn).find($=>bn[$].test(x)));if(p.filter(Boolean).length>=2&&!c.length){let x=l.some($=>/^(game|matchup|teams)$/.test($));n=p.map(($,D)=>$??(x&&/^(game|matchup|teams)$/.test(l[D])?"away":""));return}let f=x=>{let $=n.indexOf(x);return $>=0?i[$]??"":""},y=f("away"),B=f("home"),k=[y,B,...i].find(x=>/\s(@|at|vs\.?|v\.?)\s/i.test(x));if(k&&(!B||!Je(t,B))){let[x,$]=k.split(/\s(?:@|at|vs\.?|v\.?)\s/i);y=x,B=$}let d=ar(f("date"),o),P=or(f("time")),S=Je(t,y),I=Je(t,B),E=[!d&&`can't read the date "${f("date")}"`,P==null&&`can't read the time "${f("time")}"`,!S&&`no team called "${y}"`,!I&&`no team called "${B}"`,S&&I&&S.id===I.id&&"a team can't play itself"].filter(Boolean);c.push(E.length?{line:r+1,error:E.join("; ")}:{line:r+1,game:{date:d,time:P,field:f("field"),away:S.id,home:I.id}})}),c}function hn(e,t,o={}){let s=o.maxPerWeek??2,n=d=>o.label?.(d)??t.find(P=>P.id===d)?.name??"A team",c=e.filter(d=>d.status!=="canceled"),u=new Map(t.map(d=>[d.id,{team:d,games:0,home:0,away:0,perWeek:new Map}])),r=new Set,i=[],l=new Map,p=new Map,f=new Map,y=0,B=0;for(let d of c){(!d.home_team_id||!d.away_team_id)&&B++,d.scheduled_at||y++;for(let[P,S]of[[d.home_team_id,"home"],[d.away_team_id,"away"]]){let I=P?u.get(P):void 0;if(I&&(I.games++,I[S]++,d.scheduled_at)){let E=G(d.scheduled_at);r.add(E),I.perWeek.set(E,(I.perWeek.get(E)??0)+1);let x=K(d.scheduled_at),$=l.get(x)??new Map;$.set(P,($.get(P)??0)+1),l.set(x,$)}}if(d.scheduled_at&&d.field){let P=`${d.scheduled_at}|${d.field.trim().toLowerCase()}`;f.set(P,d.field.trim()),p.set(P,(p.get(P)??0)+1)}}for(let[d,P]of l)for(let[S,I]of P)I>1&&i.push(`${n(S)} plays ${I} games on ${d}.`);for(let[d,P]of p){if(P<2)continue;let S=d.split("|")[0];i.push(`${P} games at the same time on ${f.get(d)} (${K(S)}).`)}for(let d of u.values())for(let[P,S]of d.perWeek)S>s&&i.push(`${d.team.name} has ${S} games the week of ${K(new Date(P))} (more than ${s}).`);let k=[...u.values()].map(d=>d.games);k.length&&Math.max(...k)!==Math.min(...k)&&i.push(`Teams don't all have the same number of games (${Math.min(...k)} to ${Math.max(...k)}).`);for(let d of u.values())Math.abs(d.home-d.away)>2&&i.push(`${d.team.name} has ${d.home} home and ${d.away} away games.`);return y&&i.push(`${y} game${y===1?" has":"s have"} no date yet.`),B&&i.push(`${B} game${B===1?" is":"s are"} missing a team.`),{teams:[...u.values()],weeks:[...r].sort((d,P)=>d-P),problems:i}}function yn(e,t,o,s){let n=new Map;for(let u of e)for(let[r,i]of Object.entries(u.state.pit)){if(!i.P&&!i.OUTS)continue;let l=n.get(r)??new Map,p=l.get(u.date)??{pitches:0,outs:0};p.pitches+=i.P,p.outs+=i.OUTS,l.set(u.date,p),n.set(r,l)}let c=Q(t,-6);return[...n].map(([u,r])=>{let l=[...r.keys()].sort().at(-1),p=r.get(l),f=me(p.pitches),y=Q(l,f+1),B=l<t&&y<=t,k=0,d=0,P=0;for(let[S,I]of r)k+=I.pitches,d+=I.outs,S>=c&&S<=t&&(P+=I.pitches);return{playerId:u,pitches:k,outs:d,outings:r.size,lastDate:l,lastPitches:p.pitches,rest:f,eligibleOn:y,availableToday:B,maxPerDay:de(o(u),s),last7:P}})}var Bn={quarterfinal:"Quarterfinal",semifinal:"Semifinal",championship:"Championship"};function tt(e,t,o,s){let n,c=(u,r)=>{(!n||u>n.score)&&(n={score:u,text:r})};for(let[u,r]of Object.entries(e.bat)){if(!r.PA)continue;let i=t==null||s(u)===t?1:.6,l=(r.TB+r.R+r.RBI+r.BB*.5+r.SB*.5)*i,p=[`${r.H}-for-${r.AB}`];for(let[f,y]of[["HR","HR"],["3B","3B"],["2B","2B"]])r[f]&&p.push(r[f]>1?`${r[f]} ${y}`:y);r.RBI&&p.push(`${r.RBI} RBI`),r.R>=2&&p.push(`${r.R} R`),r.SB>=2&&p.push(`${r.SB} SB`),l>=4&&c(l,`${o(u)}: ${p.join(", ")}`)}for(let[u,r]of Object.entries(e.pit)){if(r.OUTS<6)continue;let i=t==null||s(u)===t?1:.6,l=(r.OUTS/3+r.K-r.ER*1.5-r.H*.5)*i,p=[`${fe(r.OUTS)} IP`,`${r.K} K`];r.H<=2&&p.push(r.H===0?"no hits":`${r.H} H`),r.ER===0&&p.push("no earned runs"),l>=5&&c(l,`${o(u)}: ${p.join(", ")}`)}return n?.text}function Sn(e,t,o,s,n,c=4){return e.filter(r=>r.status==="final"&&r.home_team_id&&r.away_team_id&&r.home_score!=null&&r.away_score!=null).sort((r,i)=>(i.scheduled_at??"").localeCompare(r.scheduled_at??"")).slice(0,c).map(r=>{let i=t.get(r.away_team_id)?.name??"Away",l=t.get(r.home_team_id)?.name??"Home",[p,f]=[r.away_score,r.home_score],y=o.get(r.id),B=y?.endReason==="Walk-off!",k=p===f?null:f>p?1:0,[d,P,S,I]=f>p?[l,i,f,p]:[i,l,p,f],E=r.innings&&r.innings>6?` in ${r.innings}`:"",x=k==null?`${i} and ${l} tie ${p}-${p}`:B?`${d} walk off ${P}, ${S}-${I}${E}`:S-I>=8?`${d} roll past ${P}, ${S}-${I}`:S-I===1?`${d} edge ${P}, ${S}-${I}${E}`:`${d} beat ${P}, ${S}-${I}${E}`,$=r.game_type==="playoff"&&r.playoff_round?Bn[r.playoff_round]+(r.series_game?` \xB7 Game ${r.series_game}`:""):"Final",D=n.get(r.id);return{id:r.id,href:`/games/${r.id}`,title:x,kicker:$,when:r.scheduled_at,star:y&&D?tt(y,k,s,D):void 0}})}var ce={innings:6,runCapPerHalfInning:10,runCapInFinalInning:!0,mercyRule:{enabled:!1,runLead:10,afterInnings:4},tiesAllowed:!0,minDefensiveOuts:6,leadoffsAllowed:!1,balks:!1,droppedThirdStrike:!1,pitchLimits:{age9to10:75,age11to12:85}};function kn(e){let t=e??{};return{...ce,...t,mercyRule:{...ce.mercyRule,...t.mercyRule??{}},pitchLimits:{...ce.pitchLimits,...t.pitchLimits??{}}}}return Hn(lr);})();
 
 // ---- data.js
 /* Generated by demo/import-stats.mjs from data/spring-2026/*.csv — do not edit by hand. */
@@ -498,8 +504,10 @@ const Engine = (() => {
   }
   const pick = (r, xs) => xs[Math.floor(r() * xs.length)];
 
-  /** Default destinations: keys "B" (batter), 1, 2, 3 → 1-3 base, 4 scores, "X" out. */
-  function defaultMoves(bases, result) {
+  /** Default destinations: the site's own (keys "B" for the batter, 1-3 for runners; 4 scores, "X" out). */
+  const defaultMoves = HLL.defaultMoves;
+  // eslint-disable-next-line no-unused-vars
+  function oldDefaultMoves(bases, result) {
     const occ = [1, 2, 3].filter((b) => bases[b - 1]);
     const m = {};
     const adv = (n) => occ.forEach((b) => (m[b] = Math.min(4, b + n)));
@@ -720,7 +728,7 @@ const defaults = () => ({
   seenWelcome: false,
   signedIn: false,
   auth: null, // sign-up / password reset flow in progress
-  account: { name: "Jackson Burks", email: "jackson.burks@example.com" },
+  account: { name: "Kelly Burks", email: "kelly.burks@example.com" },
   role: "fan", // fan | scorekeeper | admin
   leagueName: LEAGUE_DEFAULT,
   rules: JSON.parse(JSON.stringify(HLL.DEFAULT_RULES)),
@@ -739,16 +747,16 @@ const defaults = () => ({
   prefs: { schedule: true, fantasy: true, news: true, email: false },
   follows: {}, // pid -> "pending" | "approved" | "declined"
   otherFollows: [
-    { id: "f1", user: "Pat Morgan", pid: "p12", status: "pending" },
+    { id: "f1", user: "John Mazurkiewicz", pid: "p12", status: "pending" },
     { id: "f2", user: "Chris Walsh", pid: "p47", status: "approved" },
     { id: "f3", user: "Dana Lopez", pid: "p88", status: "approved" },
   ],
   champions: [],
   staff: [
-    { id: "u1", name: "Jackson Burks", email: "jackson.burks@example.com", role: "admin" },
+    { id: "u1", name: "Kelly Burks", email: "kelly.burks@example.com", role: "admin" },
     { id: "u2", name: "Coach Taylor", email: "taylor@example.com", role: "scorekeeper" },
     { id: "u3", name: "Coach Rivera", email: "rivera@example.com", role: "scorekeeper" },
-    { id: "u4", name: "Pat Morgan", email: "pat@example.com", role: "member" },
+    { id: "u4", name: "John Mazurkiewicz", email: "john.m@example.com", role: "member" },
   ],
   assign: {}, // gameId -> staff id
   newPlayers: [], // kids the admin added: { id, name, team, jersey, age, pos }
@@ -820,13 +828,19 @@ const dayAt = (dayOffset, h, m) => {
   d.setHours(h, m, 0, 0);
   return d.toISOString();
 };
+/** The game in progress started a little over an hour ago, on the quarter hour. */
+function liveStart() {
+  const d = new Date(NOW - 70 * 60000);
+  d.setMinutes(Math.floor(d.getMinutes() / 15) * 15, 0, 0);
+  return d.toISOString();
+}
 /** The quarterfinals, seeded from the real final standings: one done, one live, one tonight, one rained out and moved. */
 function initialPlayoffs() {
   const rows = pastStandings();
   const seeds = rows.slice(0, 8).map((r) => r.team.id);
   const games = [[1, 8], [4, 5], [2, 7], [3, 6]].map(([a, b], i) => ({
-    id: `po-q${i + 1}`, slot: i + 1, sg: null, round_name: "quarterfinal", home: seeds[a - 1], away: seeds[b - 1], field: `Field ${(i % 2) + 1}`, seed: 1000 + i * 17,
-    date: [dayAt(-1, 17, 30), new Date(NOW - 70 * 60000).toISOString(), dayAt(0, 19, 30), dayAt(2, 17, 30)][i],
+    id: `po-q${i + 1}`, slot: i + 1, sg: null, round_name: "quarterfinal", home: seeds[a - 1], away: seeds[b - 1], field: null, seed: 1000 + i * 17,
+    date: [dayAt(-1, 17, 30), liveStart(), dayAt(0, 19, 30), dayAt(2, 17, 30)][i],
     movedFrom: i === 3 ? dayAt(-1, 19, 30) : null,
   }));
   return { seeds, games, started: [games[0].id] };
@@ -891,7 +905,7 @@ function build() {
   // The guided practice game lives outside the schedule and the stats.
   if (S.practice) {
     const d = S.games.practice;
-    const g = { id: "practice", season: W.season.id, type: "practice", home: S.practice.home, away: S.practice.away, date: S.practice.date, field: "Practice field", seed: 777, status: d ? d.status : "scheduled" };
+    const g = { id: "practice", season: W.season.id, type: "practice", home: S.practice.home, away: S.practice.away, date: S.practice.date, field: null, seed: 777, status: d ? d.status : "scheduled" };
     if (d && d.events) {
       Object.assign(g, { setup: d.setup, events: d.events });
       g.rep = E.replay(g, W.rules, W.names);
@@ -1039,7 +1053,7 @@ function initialNews() {
   const at = (h) => new Date(NOW - h * 3600000).toISOString();
   return [
     { id: "n1", title: "The playoffs are here", category: "announcement", pinned: true, published: true, at: at(50), body: "The top 8 teams from the regular season are in. Quarterfinals and semifinals are one game; the championship is best of 3. The bracket is on the Standings page." },
-    { id: "n2", title: "Field 2 lights are back on", category: "news", pinned: false, published: true, at: at(24 * 5), body: "The lights on Field 2 have been repaired, so 7:30 games are back on as scheduled." },
+    { id: "n2", title: "The field lights are back on", category: "news", pinned: false, published: true, at: at(24 * 5), body: "The lights have been repaired, so 7:30 games are back on as scheduled." },
     { id: "n3", title: "Rained-out quarterfinal is moved", category: "schedule", pinned: false, published: true, at: at(20), body: "Last night's quarterfinal was rained out and moved. The new date is on the Scores page." },
     { id: "n4", title: "End-of-season picnic (draft)", category: "announcement", pinned: false, published: false, at: at(3), body: "Save the date. Details to come." },
   ];
@@ -1269,7 +1283,7 @@ function gameCard(g, { showDate = false, tour = "" } = {}) {
   const row = (t, sc, dim) => `<div class="game-team ${dim ? "dim" : ""}">${badge(t)}<span class="name">${esc(t ? t.name : "TBD")}</span>${show ? `<span class="score">${sc}</span>` : ""}</div>`;
   const moved = g.movedFrom && g.status !== "final" ? `<div class="tiny rain">Rained out ${fmtDay(g.movedFrom)} · moved here</div>` : "";
   return `<a class="card game" href="#/game/${g.id}" ${tour ? `data-tour="${tour}"` : ""}>
-    <div class="game-meta"><span class="ellipsis">${gameLabel(g)}${showDate ? " · " + fmtDay(g.date) : ""} · ${esc(g.field || "")}</span>${status}</div>
+    <div class="game-meta"><span class="ellipsis">${gameLabel(g)}${showDate ? " · " + fmtDay(g.date) : ""}${g.field ? " · " + esc(g.field) : ""}</span>${status}</div>
     ${row(away, as, g.status === "final" && hs > as)}${row(home, hs, g.status === "final" && as > hs)}${moved}
   </a>`;
 }
@@ -1397,7 +1411,8 @@ function myPlayers() {
       const s = lineOf(pid);
       const log = (W.extrasBy[W.season.id].logs[pid] || []).slice(-1)[0];
       const t = teamOf(pid);
-      const last = log ? `Last game ${fmtDay(log.game.date)}: ${log.b ? `${log.b.H}-for-${log.b.AB}${log.b.HR ? `, ${log.b.HR} HR` : ""}${log.b.RBI ? `, ${log.b.RBI} RBI` : ""}` : ""}${log.p ? `${log.b ? " · " : ""}${E.inningsPitched(log.p.OUTS)} IP, ${log.p.K} K` : ""}` : "No games yet this season.";
+      const now = W.games.find((g) => g.status === "live" && t && (g.home === t.id || g.away === t.id));
+      const last = now ? `Playing now: ${esc(W.teamById[now.away].abbr)} at ${esc(W.teamById[now.home].abbr)}, ${now.rep.half ? "bottom" : "top"} of the ${ord(now.rep.inning)}` : log ? `Last game ${fmtDay(log.game.date)}: ${log.b ? `${log.b.H}-for-${log.b.AB}${log.b.HR ? `, ${log.b.HR} HR` : ""}${log.b.RBI ? `, ${log.b.RBI} RBI` : ""}` : ""}${log.p ? `${log.b ? " · " : ""}${E.inningsPitched(log.p.OUTS)} IP, ${log.p.K} K` : ""}` : "No games yet this season.";
       return `<a class="card pad row" href="#/player/${pid}">${badge(t, "md")}<div class="grow"><b>${esc(nameOf(pid))}</b><div class="small muted">${s && s.pa ? `${HLL.fmtRate(HLL.avg(s))} AVG · ${s.hr} HR · ${s.rbi} RBI${s.war != null ? ` · ${HLL.fmt1(s.war)} WAR` : ""}` : esc(t?.name || "")}</div><div class="tiny muted">${last}</div></div><span class="chev">›</span></a>`;
     })
     .join("")}</section>`;
@@ -1601,7 +1616,7 @@ function scoreboard(g, tour = "", rep = g.rep) {
         ? `<span class="inn">${s.half ? "Bot" : "Top"} ${ord(s.inning)}</span><span class="count">${s.balls}-${s.strikes}</span>${outsDots(s.outs)}${diamond(s.bases)}`
         : g.status === "final" || (s && s.status === "final")
           ? `<span class="inn">Final${s && s.endReason ? " · " + esc(s.endReason) : ""}</span><span class="small">${fmtDay(g.date)}</span>`
-          : `<span class="inn">${g.date ? fmtLongDay(g.date) : "Date TBD"}</span><span class="small">${g.date ? fmtTime(g.date) : ""} · ${esc(g.field || "")}</span>`
+          : `<span class="inn">${g.date ? fmtLongDay(g.date) : "Date TBD"}</span><span class="small">${g.date ? fmtTime(g.date) : ""}${g.field ? " · " + esc(g.field) : ""}</span>`
     }</div>
   </div>`;
 }
@@ -1640,31 +1655,43 @@ function playLog(g, { limit = 0, tour = "", rep = g.rep } = {}) {
 
 function boxScore(g) {
   const s = g.rep;
+  const live = s.status !== "final";
+  const list = (ids, n) => ids.map((pid) => [pid, n(pid)]).filter(([, v]) => v > 0).map(([pid, v]) => `${esc(nameOf(pid))}${v > 1 ? " " + v : ""}`).join(", ");
   const side = (t) => {
     const tid = t ? g.home : g.away;
     const ids = [...s.lineup[t].map((x) => x.pid), ...s.bench[t].filter((pid) => s.appeared.has(pid))];
+    const batting = live && s.half === t;
+    const tot = { AB: 0, R: 0, H: 0, RBI: 0, BB: 0, K: 0 };
     const rows = ids
       .map((pid) => {
         const b = s.bat[pid] || { AB: 0, R: 0, H: 0, RBI: 0, BB: 0, K: 0 };
+        for (const k in tot) tot[k] += b[k] || 0;
         const pos = s.lineup[t].find((x) => x.pid === pid)?.pos || "sub";
-        return `<tr><td><a href="#/player/${pid}"><b>${esc(nameOf(pid))}</b></a> <span class="tiny muted">${pos}</span></td><td>${b.AB}</td><td>${b.R}</td><td>${b.H}</td><td>${b.RBI}</td><td>${b.BB}</td><td>${b.K}</td></tr>`;
+        const up = batting && s.batter === pid;
+        const on = batting && s.bases.some((r) => r?.pid === pid);
+        return `<tr class="${up ? "now" : ""}"><td><a href="#/player/${pid}"><b>${esc(nameOf(pid))}</b></a> <span class="tiny muted">${pos}</span>${up ? ' <span class="tag tag-now">At bat</span>' : on ? ' <span class="tag">On base</span>' : ""}</td><td>${b.AB}</td><td>${b.R}</td><td>${b.H}</td><td>${b.RBI}</td><td>${b.BB}</td><td>${b.K}</td></tr>`;
       })
       .join("");
+    const fielders = [...new Set([...s.lineup[t].map((x) => x.pid), ...s.bench[t]])];
+    const bat = (k) => (pid) => s.bat[pid]?.[k] || 0;
+    const notes = [["2B", list(ids, bat("2B"))], ["3B", list(ids, bat("3B"))], ["HR", list(ids, bat("HR"))], ["SB", list(ids, bat("SB"))], ["CS", list(ids, bat("CS"))], ["HBP", list(ids, bat("HBP"))], ["SF", list(ids, bat("SF"))], ["SAC", list(ids, bat("SAC"))], ["E", list(fielders, (pid) => s.fld[pid]?.E || 0)]].filter(([, v]) => v);
     const pitchers = [...new Set(s.pitchersUsed[t])]
       .filter((pid) => s.pit[pid])
       .map((pid) => {
         const p = s.pit[pid];
         const dec = s.decision?.W === pid ? " (W)" : s.decision?.L === pid ? " (L)" : s.decision?.SV === pid ? " (S)" : p.HD ? " (H)" : "";
-        return `<tr><td><b>${esc(nameOf(pid))}</b>${dec}</td><td>${E.inningsPitched(p.OUTS)}</td><td>${p.H}</td><td>${p.R}</td><td>${p.ER}</td><td>${p.BB}</td><td>${p.K}</td><td>${p.P}</td></tr>`;
+        const now = live && s.pitcher === pid && s.half !== t;
+        return `<tr class="${now ? "now" : ""}"><td><b>${esc(nameOf(pid))}</b>${dec}${now ? ' <span class="tag tag-now">Pitching</span>' : ""}</td><td>${E.inningsPitched(p.OUTS)}</td><td>${p.H}</td><td>${p.R}</td><td>${p.ER}</td><td>${p.BB}</td><td>${p.K}</td><td>${p.HR}</td><td>${p.P}-${p.S}</td></tr>`;
       })
       .join("");
     const out = (g.setup?.absent?.[t] || []).map(nameOf);
-    return `<h3 class="h3 row">${badge(W.teamById[tid])}${esc(W.teamById[tid].name)}</h3>
-      <div class="card scroll-x"><table><thead><tr><th>Batting</th><th>AB</th><th>R</th><th>H</th><th>RBI</th><th>BB</th><th>K</th></tr></thead><tbody>${rows}</tbody></table></div>
-      <div class="card scroll-x"><table><thead><tr><th>Pitching</th><th>IP</th><th>H</th><th>R</th><th>ER</th><th>BB</th><th>K</th><th>#P</th></tr></thead><tbody>${pitchers}</tbody></table></div>
+    return `<h3 class="h3 row">${badge(W.teamById[tid])}${esc(W.teamById[tid].name)}<span class="grow"></span><span class="small num">${s.score[t]} R · ${s.hits[t]} H · ${s.errors[t]} E</span></h3>
+      <div class="card scroll-x"><table><thead><tr><th>Batting</th><th>AB</th><th>R</th><th>H</th><th>RBI</th><th>BB</th><th>K</th></tr></thead><tbody>${rows}<tr class="total-row"><td><b>Totals</b></td>${Object.values(tot).map((v) => `<td><b>${v}</b></td>`).join("")}</tr></tbody></table></div>
+      ${notes.length ? `<p class="small box-notes">${notes.map(([k, v]) => `<span><b>${k}:</b> ${v}</span>`).join("")}</p>` : ""}
+      <div class="card scroll-x"><table><thead><tr><th>Pitching</th><th>IP</th><th>H</th><th>R</th><th>ER</th><th>BB</th><th>K</th><th>HR</th><th>P-S</th></tr></thead><tbody>${pitchers}</tbody></table></div>
       ${out.length ? `<p class="small muted">Not at this game: ${out.map(esc).join(", ")}</p>` : ""}`;
   };
-  return `<div class="stack">${side(0)}${side(1)}</div>`;
+  return `<div class="stack" data-tour="box-score">${live ? '<p class="small muted">Live: updates with every pitch.</p>' : ""}${side(0)}${side(1)}</div>`;
 }
 
 /** A game's fielding: innings at each position, putouts, assists, errors. */
@@ -1704,7 +1731,7 @@ function viewGame(r) {
     ${live && staff ? `<a class="btn btn-green btn-block" href="#/score/${g.id}">Open scorekeeper screen</a>` : ""}
     ${live ? `<p class="small muted">Updates as the scorekeeper enters each pitch. Open this demo in two browser tabs, score in one and watch the other.</p>` : ""}
     </div><div class="col">
-    <div class="seg">${[["plays", "Plays"], ["box", "Box score"], ["spray", "Spray"], ["defense", "Defense"]].map(([k, l]) => `<a href="#/game/${g.id}?tab=${k}" class="${tab === k ? "on" : ""}">${l}</a>`).join("")}</div>
+    <div class="seg" data-tour="game-tabs">${[["plays", "Plays"], ["box", live ? "Live box score" : "Box score"], ["spray", "Spray"], ["defense", "Defense"]].map(([k, l]) => `<a href="#/game/${g.id}?tab=${k}" class="${tab === k ? "on" : ""}">${l}</a>`).join("")}</div>
     ${tab === "box" ? boxScore(g) : tab === "spray" ? `<div class="card pad">${fieldSvg({ dots: spray })}</div>` : tab === "defense" ? gameDefense(g) : playLog(g, { tour: "plays" })}
     </div></div>`;
 }
@@ -1814,7 +1841,7 @@ function viewStats(r) {
   const tabs = `<div class="tabs-inline" data-tour="stat-tabs">${STAT_TABS.map(([k, l]) => `<a href="${withQuery({ type: k === "bat" ? null : k, sort: null, dir: null })}" class="${view === k ? "on" : ""}">${l}</a>`).join("")}</div>`;
   const csvFile = { pit: "pitching", apit: "pitching", fld: "fielding" }[view] || "hitting";
   const tools = `<div class="row wrap"><a class="btn btn-secondary btn-sm" href="#/records" data-tour="records-link">All-time records</a><a class="btn btn-secondary btn-sm" href="#/recap${season.id !== W.season.id ? "?season=" + season.id : ""}">Season recap</a><a class="btn btn-secondary btn-sm" href="#/innings">Innings by position</a><button class="btn btn-secondary btn-sm" data-act="csv" data-file="${csvFile}" data-season="${season.id}" data-tour="csv">Download CSV</button></div>`;
-  const head = `<div class="page-head"><h1 class="h1">Stats</h1><p class="muted">${esc(season.name)}${season.id === PAST.id ? ` · regular season from the league's spreadsheets${["fld", "abat", "apit", "war"].includes(view) ? ` · these come from the ${scored.length} playoff game${scored.length === 1 ? "" : "s"} scored pitch by pitch so far` : ""}` : ` · from ${scored.length} games scored pitch by pitch`}</p></div>${seasonPicker(season.id, { sort: null, dir: null })}${tabs}${tools}`;
+  const head = `<div class="page-head"><h1 class="h1">Stats</h1><p class="muted">${esc(season.name)}${season.id === PAST.id ? ` · final regular season${["fld", "abat", "apit", "war"].includes(view) ? ` · these are example stats` : ""}` : ` · from ${scored.length} games scored pitch by pitch`}</p></div>${seasonPicker(season.id, { sort: null, dir: null })}${tabs}${tools}`;
   const needsPitchData = ["fld", "abat", "apit", "war"].includes(view) && !scored.length;
   if (needsPitchData)
     return `${head}<p class="card pad muted">${view === "war" ? "WAR" : view === "fld" ? "Fielding" : "Advanced stats"} come from games scored pitch by pitch on the site, and none have been played yet this season.</p>`;
@@ -2055,7 +2082,7 @@ function viewScore(r) {
   const item = (g, label, cls) => {
     const who = S.staff.find((u) => u.id === S.assign[g.id]);
     const tag = who ? `<span class="tag ${who.email === S.account.email ? "tag-good" : ""}">${who.email === S.account.email ? "Assigned to you" : "Assigned to " + esc(who.name)}</span>` : "";
-    return `<a class="card pad row" href="#/score/${g.id}"><div class="grow"><b>${esc(W.teamById[g.away].name)} @ ${esc(W.teamById[g.home].name)}</b><p class="small muted">${fmtDay(g.date)} · ${fmtTime(g.date)} · ${esc(g.field)}</p>${tag}</div><span class="btn btn-sm ${cls}">${label}</span></a>`;
+    return `<a class="card pad row" href="#/score/${g.id}"><div class="grow"><b>${esc(W.teamById[g.away].name)} @ ${esc(W.teamById[g.home].name)}</b><p class="small muted">${fmtDay(g.date)} · ${fmtTime(g.date)}${g.field ? " · " + esc(g.field) : ""}</p>${tag}</div><span class="btn btn-sm ${cls}">${label}</span></a>`;
   };
   return `<h1 class="h1">Scorekeeping</h1>
     <p class="muted">Games to score. Works in any phone browser with no app to install, and keeps working if the signal drops. The admin can assign each game to a scorekeeper so two people don't score the same game.</p>
@@ -2119,6 +2146,12 @@ function viewScoring(gid) {
       <button class="sk-btn sk-foul" data-act="sk-pitch" data-r="F">Foul<small>${s.strikes === 2 ? "stays 2 strikes" : ""}</small></button>
       <button class="sk-btn sk-play" data-act="sk-inplay" data-tour="sk-inplay">Ball in play</button>
     </div>
+    <div class="sk-grid sk-grid-4" data-tour="sk-rare">
+      <button class="sk-btn sk-mini" data-act="sk-pitch" data-r="FT">Foul tip</button>
+      <button class="sk-btn sk-mini" data-act="sk-pitch" data-r="FB">Foul bunt</button>
+      <button class="sk-btn sk-mini" data-act="sk-ibb">Intentional walk</button>
+      <button class="sk-btn sk-mini sk-strong" data-act="sk-more">More…</button>
+    </div>
     <div class="sk-grid" data-tour="sk-more">
       <button class="sk-btn sk-mini" data-act="sk-hbp">Hit by pitch</button>
       <button class="sk-btn sk-mini" data-act="sk-runners" ${hasRunners ? "" : "disabled"}>Runners</button>
@@ -2134,10 +2167,17 @@ function viewScoring(gid) {
 
 function eventLabel(ev) {
   switch (ev.t) {
-    case "pitch": return { B: "Ball", CS: "Strike looking", SS: "Strike swinging", F: "Foul" }[ev.r];
+    case "pitch": return ev.d3 ? "Dropped third strike" : { B: "Ball", CS: "Strike looking", SS: "Strike swinging", F: "Foul", FT: "Foul tip", FB: "Foul bunt" }[ev.r];
     case "hbp": return "Hit by pitch";
+    case "ibb": return "Intentional walk";
+    case "ci": return "Catcher's interference";
+    case "bout": return "Batter out";
+    case "cr": return "Courtesy runner";
+    case "remove": return "Player left the game";
+    case "order": return "Batting order fix";
+    case "note": return "Note";
     case "play": return E.RESULTS[ev.r].label;
-    case "runner": return { SB: "Stolen base", CS: "Caught stealing", WP: "Wild pitch", PB: "Passed ball", PK: "Pickoff" }[ev.k];
+    case "runner": return RUNNER_KINDS[ev.k];
     case "sub": return "Substitution";
     case "pos": return "Position change";
     case "end": return "End game";
@@ -2347,17 +2387,11 @@ function inPlaySheet() {
   }
   if (SK.step === "result") {
     const outCode = E.OUT_FOR[SK.bb];
-    const ok = {
-      DP: s.bases[0] && s.outs < 2 && SK.bb === "G",
-      SF: s.bases[2] && s.outs < 2 && (SK.bb === "F" || SK.bb === "L"),
-      SAC: s.bases.some(Boolean) && s.outs < 2 && SK.bb === "B",
-      FC: s.bases.some(Boolean),
-    };
-    const btn = (k, cls = "", label = E.RESULTS[k].label) => `<button class="${cls}" data-act="sk-result" data-r="${k}" ${k in ok && !ok[k] ? "disabled" : ""}>${label}</button>`;
+    const btn = (k, cls = "", label = E.RESULTS[k].label) => `<button class="${cls}" data-act="sk-result" data-r="${k}" ${HLL.resultPossible(k, s.bases, s.outs) ? "" : "disabled"}>${label}</button>`;
     return `<h2 class="h2">What happened?</h2><p class="small muted" style="margin:4px 0 12px">${E.BB_TYPES[SK.bb]} to ${E.FIELD_NAME[E.nearestFielder(...SK.loc)]}.</p>
-      <p class="small bold muted">HIT</p><div class="res-grid" style="margin:6px 0 14px">${["1B", "2B", "3B", "HR"].map((k) => btn(k, "hit")).join("")}</div>
-      <p class="small bold muted">OUT</p><div class="res-grid" style="margin:6px 0 14px">${btn(outCode, "out")}${btn("DP", "out")}${btn("SF", "out")}${btn("SAC", "out")}</div>
-      <p class="small bold muted">SAFE ON</p><div class="res-grid" style="margin-top:6px">${btn("E")}${btn("FC")}</div>
+      <p class="small bold muted">HIT</p><div class="res-grid" style="margin:6px 0 14px">${["1B", "2B", "3B", "HR", "GRD", "IPHR"].map((k) => btn(k, "hit")).join("")}</div>
+      <p class="small bold muted">OUT</p><div class="res-grid" style="margin:6px 0 14px">${[...new Set([outCode, "GO", "FO", "LO", "PO", "BO", "IF", "DP", "TP", "SF", "SAC"])].map((k) => btn(k, "out")).join("")}</div>
+      <p class="small bold muted">SAFE ON</p><div class="res-grid" style="margin-top:6px">${btn("E")}${btn("FC")}${btn("RHB")}</div>
       <div class="row" style="margin-top:14px"><button class="btn btn-secondary grow" data-act="sk-back">Back</button></div>`;
   }
   if (SK.step === "fielders") {
@@ -2398,6 +2432,7 @@ function guessFielders(result, loc) {
   const first = E.nearestFielder(...loc);
   if (result === "GO" || result === "BO" || result === "SAC") return first === 3 ? [3] : [first, 3];
   if (result === "DP") return [first, first === 4 ? 6 : 4, 3];
+  if (result === "TP") return first === 5 ? [5, 4, 3] : [first, first === 4 ? 6 : 4, 3];
   if (result === "FC") return [first, first === 6 || first === 5 ? 4 : 6];
   return [first];
 }
@@ -2450,7 +2485,13 @@ function runnerSheet() {
   if (SK.kind === "play") rows.push(["B", s.batter]);
   const label = { B: "Batter", 1: "On 1st", 2: "On 2nd", 3: "On 3rd" };
   const dests = [[1, "1st"], [2, "2nd"], [3, "3rd"], [4, "Home"], ["X", "Out"]];
-  const title = SK.kind === "play" ? `${E.RESULTS[SK.result].label}${SK.fielders.length && !E.RESULTS[SK.result].hit ? ` (${SK.result === "E" ? "E" : ""}${SK.fielders.join("-")})` : ""}` : { SB: "Stolen base", CS: "Caught stealing", WP: "Wild pitch", PB: "Passed ball", PK: "Pickoff" }[SK.runnerKind];
+  const title = SK.kind === "play" ? `${E.RESULTS[SK.result].label}${SK.fielders.length && !E.RESULTS[SK.result].hit ? ` (${SK.result === "E" ? "E" : ""}${SK.fielders.join("-")})` : ""}` : RUNNER_KINDS[SK.runnerKind];
+  const extra =
+    SK.kind === "play"
+      ? `<p class="small bold muted" style="margin-top:12px">ERRORS ON THE PLAY (OPTIONAL)</p><div class="chips" style="margin-top:6px">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button class="chip ${(SK.errors || []).includes(n) ? "on" : ""}" data-act="sk-perr" data-n="${n}">E${n} ${E.posOf(n)}</button>`).join("")}</div><p class="tiny muted">A throwing or fielding error that let runners take extra bases. Runs that score are unearned.</p>`
+      : SK.runnerKind === "E"
+        ? `<p class="small bold muted" style="margin-top:12px">ERROR BY</p><div class="chips" style="margin-top:6px">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button class="chip ${SK.f === n ? "on" : ""}" data-act="sk-rerr" data-n="${n}">${E.posOf(n)}</button>`).join("")}</div>`
+        : "";
   return `<h2 class="h2">Where did everyone end up?</h2><p class="small muted" style="margin:4px 0 8px">${esc(title)}. We filled in the usual result, so tap to change anything.</p>
     <div class="card pad" style="padding-top:4px;padding-bottom:4px">${rows
       .map(([from, pid]) => {
@@ -2460,9 +2501,19 @@ function runnerSheet() {
           <div class="dest">${dests.map(([d, l]) => `<button data-act="sk-move" data-from="${from}" data-to="${d}" class="${cur === d ? "on" : ""} ${d === "X" ? "out" : d === 4 ? "home" : ""}" ${d !== "X" && d < min ? "disabled" : ""}>${l}</button>`).join("")}</div></div>`;
       })
       .join("")}</div>
+    ${extra}
     ${SK.err ? `<p class="notice bad" style="margin-top:10px">${esc(SK.err)}</p>` : ""}
     <div class="row" style="margin-top:14px"><button class="btn btn-secondary" data-act="sk-back">Back</button><button class="btn btn-green grow" data-act="sk-save">Save play</button></div>`;
 }
+ACT["sk-perr"] = (el) => {
+  const n = Number(el.dataset.n);
+  SK.errors = (SK.errors || []).includes(n) ? SK.errors.filter((x) => x !== n) : [...(SK.errors || []), n];
+  paintSheet();
+};
+ACT["sk-rerr"] = (el) => {
+  SK.f = Number(el.dataset.n);
+  paintSheet();
+};
 ACT["sk-move"] = (el) => {
   const from = el.dataset.from === "B" ? "B" : Number(el.dataset.from);
   const to = el.dataset.to === "X" ? "X" : Number(el.dataset.to);
@@ -2472,22 +2523,21 @@ ACT["sk-move"] = (el) => {
 };
 ACT["sk-save"] = () => {
   const s = currentGame().rep;
-  const occupied = {};
-  const froms = [...[1, 2, 3].filter((b) => s.bases[b - 1]), ...(SK.kind === "play" ? ["B"] : [])];
-  for (const f of froms) {
-    const to = SK.moves[f] ?? (f === "B" ? 1 : f);
-    if (to !== "X" && to !== 4) {
-      if (occupied[to]) {
-        SK.err = "Two runners can't be on the same base.";
-        return paintSheet();
-      }
-      occupied[to] = true;
-    }
+  const problem = HLL.movesProblem(s.bases, s.outs, SK.moves, SK.kind === "play", SK.kind === "play" ? SK.result : undefined);
+  if (problem) {
+    SK.err = problem;
+    return paintSheet();
   }
   if (SK.kind === "play") {
     const f = SK.fielders.length ? (SK.result === "E" ? "E" : "") + SK.fielders.join("-") : "";
-    pushEvent({ t: "play", r: SK.result, f, m: SK.moves, bb: SK.bb, loc: SK.loc, hh: !!SK.hh });
-  } else pushEvent({ t: "runner", k: SK.runnerKind, m: SK.moves });
+    pushEvent({ t: "play", r: SK.result, f, m: SK.moves, bb: SK.bb, loc: SK.loc, hh: !!SK.hh, ...(SK.errors?.length ? { e: SK.errors } : {}) });
+  } else {
+    if (SK.runnerKind === "E" && !SK.f) {
+      SK.err = "Pick who made the error.";
+      return paintSheet();
+    }
+    pushEvent({ t: "runner", k: SK.runnerKind, m: SK.moves, ...(SK.runnerKind === "E" ? { f: String(SK.f) } : {}) });
+  }
 };
 
 /* ---- runner events between pitches */
@@ -2497,25 +2547,35 @@ ACT["sk-runners"] = () => {
     if (!SK) return "";
     if (!SK.runnerKind) {
       return `<h2 class="h2">Runner play</h2><p class="small muted" style="margin:4px 0 12px">Something happened between pitches?</p>
-        <div class="res-grid">${[["SB", "Stolen base"], ["WP", "Wild pitch"], ["PB", "Passed ball"], ["CS", "Caught stealing"], ["PK", "Picked off"]].map(([k, l]) => `<button data-act="sk-rkind" data-k="${k}">${l}</button>`).join("")}</div>
+        <div class="res-grid">${Object.entries(RUNNER_KINDS).map(([k, l]) => `<button data-act="sk-rkind" data-k="${k}">${l}</button>`).join("")}</div>
         <button class="btn btn-secondary btn-block" style="margin-top:14px" data-act="close-sheet">Cancel</button>`;
     }
     return runnerSheet();
   });
 };
-ACT["sk-rkind"] = (el) => {
-  const s = currentGame().rep;
-  const k = el.dataset.k;
-  SK.runnerKind = k;
+const RUNNER_KINDS = { SB: "Stolen base", WP: "Wild pitch", PB: "Passed ball", CS: "Caught stealing", PK: "Picked off", BK: "Balk", DI: "Defensive indifference", E: "Advances on an error", ADV: "Advances on the throw", OBS: "Obstruction", APP: "Out on appeal", LE: "Out: left base early", INT: "Out: runner interference" };
+function runnerDefault(s, k) {
   const occ = [3, 2, 1].filter((b) => s.bases[b - 1]);
   const m = {};
   occ.forEach((b) => (m[b] = b));
-  if (k === "WP" || k === "PB") occ.forEach((b) => (m[b] = b + 1));
-  else if (k === "SB") {
+  if (k === "WP" || k === "PB" || k === "BK") occ.forEach((b) => (m[b] = Math.min(4, b + 1)));
+  else if (["CS", "PK", "APP", "LE", "INT"].includes(k)) m[occ[0]] = "X";
+  else {
     const lead = occ.find((b) => b === 3 || !s.bases[b]);
     if (lead) m[lead] = lead + 1;
-  } else m[occ[0]] = "X";
-  SK.moves = m;
+  }
+  return m;
+}
+ACT["sk-rkind"] = (el) => {
+  const s = currentGame().rep;
+  if (!SK || SK.kind !== "runner") {
+    SK = { kind: "runner", runnerKind: null, moves: {} };
+    openSheet(() => (SK ? runnerSheet() : ""));
+  }
+  SK.runnerKind = el.dataset.k;
+  SK.f = null;
+  SK.err = null;
+  SK.moves = runnerDefault(s, el.dataset.k);
   paintSheet();
 };
 
@@ -2569,11 +2629,165 @@ ACT["sk-end"] = () => {
   openSheet(
     () => `<h2 class="h2">End the game now?</h2><p class="muted" style="margin:6px 0 14px">Use this for time limits or weather. Games also end on their own after ${W.rules.innings} innings, on a walk-off, or by the mercy rule.</p>
     <div class="card pad center"><p class="h1 num">${esc(W.teamById[g.away].abbr)} ${a} – ${h} ${esc(W.teamById[g.home].abbr)}</p>${a === h ? `<p class="small muted">This would be a tie.</p>` : ""}</div>
-    ${tieBlocked ? `<p class="notice bad" style="margin-top:12px">Playoff games can't end in a tie.</p>` : `<button class="btn btn-danger btn-block" style="margin-top:14px" data-act="sk-doend">Yes, it's final</button>`}
+    ${tieBlocked ? `<p class="notice bad" style="margin-top:12px">Playoff games can't end in a tie.</p>` : `<div class="stack-s" style="margin-top:14px">${["Time limit", "Called for weather", "Called for darkness", "Suspended"].map((r) => `<button class="btn btn-danger btn-block" data-act="sk-doend" data-reason="${r}">End game: ${r.toLowerCase()}</button>`).join("")}</div>`}
+    <p class="small bold muted" style="margin-top:14px">FORFEIT (RECORDED AS 6-0)</p>
+    <div class="stack-s" style="margin-top:6px">${[0, 1].map((t) => `<button class="btn btn-secondary btn-block" data-act="sk-forfeit" data-t="${t}">${esc(W.teamById[t ? g.home : g.away].name)} forfeit</button>`).join("")}</div>
     <button class="btn btn-secondary btn-block" style="margin-top:10px" data-act="close-sheet">Keep scoring</button>`,
   );
 };
-ACT["sk-doend"] = () => pushEvent({ t: "end", reason: "Time limit" });
+ACT["sk-doend"] = (el) => pushEvent({ t: "end", reason: el.dataset.reason || "Time limit" });
+ACT["sk-forfeit"] = (el) => pushEvent({ t: "end", reason: "Forfeit", forfeit: Number(el.dataset.t) });
+ACT["sk-ibb"] = () => pushEvent({ t: "ibb" }, "Intentional walk.");
+
+/* ---- everything else: the rare stuff */
+function moreSheet() {
+  const s = currentGame().rep;
+  const on = s.bases.some(Boolean);
+  const b = (act, label, extra = "", disabled = false) => `<button class="list-item" data-act="${act}" ${extra} ${disabled ? "disabled" : ""}><b class="grow">${label}</b><span class="chev">›</span></button>`;
+  return `<h2 class="h2">Everything else</h2><p class="small muted" style="margin:4px 0 12px">Anything that can happen in a game. Balls in play (ground-rule doubles, infield flies, triple plays, a runner hit by the ball) are under Ball in play, and errors that let runners move up are on each play's runner step.</p>
+    <p class="small bold muted">THE BATTER</p><div class="card list" style="margin:6px 0 14px">${b("sk-ci", "Catcher's interference")}${b("sk-d3", "Strike three not caught (dropped third strike)", "", s.strikes < 2)}${b("sk-bout", "Batter is out (interference, out of order…)")}</div>
+    ${s.strikes < 2 ? '<p class="tiny muted" style="margin:-8px 0 12px">A dropped third strike can be recorded once there are two strikes.</p>' : ""}
+    <p class="small bold muted">RUNNERS</p><div class="card list" style="margin:6px 0 14px">${on ? ["BK", "DI", "E", "ADV", "OBS", "APP", "LE", "INT"].map((k) => b("sk-rkind", RUNNER_KINDS[k], `data-k="${k}"`)).join("") + b("sk-cr", "Pinch or courtesy runner") : '<p class="pad small muted">Nobody on base.</p>'}</div>
+    <p class="small bold muted">THE GAME</p><div class="card list" style="margin-top:6px">${b("sk-remove", "Player leaves the game (injury, ejection…)")}${b("sk-order", "Fix who's batting")}${b("sk-note", "Add a note (rain delay, protest…)")}${b("sk-end", "End the game early or forfeit")}</div>
+    <button class="btn btn-secondary btn-block" style="margin-top:12px" data-act="close-sheet">Close</button>`;
+}
+ACT["sk-more"] = () => {
+  SK = null;
+  openSheet(moreSheet);
+};
+ACT["sk-ci"] = () => pushEvent({ t: "ci" }, "Catcher's interference: batter to first, error on the catcher.");
+ACT["sk-bout"] = () =>
+  openSheet(
+    () => `<h2 class="h2">Batter is out</h2><p class="small muted" style="margin:4px 0 12px">${esc(nameOf(currentGame().rep.batter))} is out. It counts as an at-bat; the catcher gets the putout.</p>
+    <div class="card list">${["Interference", "Batting out of order", "Illegal bat", "Hit by own batted ball", "Stepped out of the box", "Other"].map((w) => `<button class="list-item" data-act="sk-bout-go" data-why="${w}"><b class="grow">${w}</b></button>`).join("")}</div>
+    <button class="btn btn-secondary btn-block" style="margin-top:12px" data-act="sk-more">Back</button>`,
+  );
+ACT["sk-bout-go"] = (el) => pushEvent({ t: "bout", why: el.dataset.why });
+
+let D3 = null;
+ACT["sk-d3"] = () => {
+  D3 = { r: "SS", reach: "WP", fielders: [2], moves: { B: 1 } };
+  openSheet(d3Sheet);
+};
+function d3Sheet() {
+  const s = currentGame().rep;
+  const allowed = !s.bases[0] || s.outs === 2;
+  const out = D3.reach === "out";
+  const moves = out ? { ...D3.moves, B: "X" } : { B: 1, ...D3.moves };
+  const problem = allowed ? HLL.movesProblem(s.bases, s.outs, moves, true) : null;
+  const rows = [];
+  [3, 2, 1].forEach((b) => s.bases[b - 1] && rows.push([b, s.bases[b - 1].pid]));
+  if (!out) rows.push(["B", s.batter]);
+  const dests = [[1, "1st"], [2, "2nd"], [3, "3rd"], [4, "Home"], ["X", "Out"]];
+  return `<h2 class="h2">Dropped third strike</h2>
+    ${allowed ? "" : '<p class="notice warn" style="margin:8px 0">With a runner on first and fewer than two outs, the batter is out on strike three even if it isn\'t caught. Use the strike buttons instead.</p>'}
+    <p class="small bold muted" style="margin-top:10px">STRIKE THREE WAS</p><div class="res-grid" style="margin-top:6px">${[["CS", "Looking"], ["SS", "Swinging"], ["FT", "Foul tip"], ["FB", "Foul bunt"]].map(([k, l]) => `<button class="${D3.r === k ? "hit" : ""}" data-act="d3-set" data-k="r" data-v="${k}">${l}</button>`).join("")}</div>
+    <p class="small bold muted" style="margin-top:12px">WHAT HAPPENED</p><div class="res-grid" style="margin-top:6px">${[["WP", "Wild pitch"], ["PB", "Passed ball"], ["E", "Error"], ["FC", "Fielder's choice"], ["out", "Thrown out"]].map(([k, l]) => `<button class="${D3.reach === k ? "hit" : ""}" data-act="d3-set" data-k="reach" data-v="${k}">${l}</button>`).join("")}</div>
+    ${D3.reach === "E" || out ? `<p class="small bold muted" style="margin-top:12px">${out ? "FIELDERS, IN ORDER (2 THEN 3 FOR 2-3)" : "ERROR BY"}</p><div class="chips" style="margin-top:6px">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button class="chip ${D3.fielders.includes(n) ? "on" : ""}" data-act="d3-f" data-n="${n}">${E.posOf(n)}</button>`).join("")}<button class="chip" data-act="d3-fclear">Clear</button></div>` : ""}
+    <div class="card pad" style="margin-top:12px;padding-top:4px;padding-bottom:4px">${rows
+      .map(([from, pid]) => {
+        const cur = moves[from] ?? (from === "B" ? 1 : from);
+        const min = from === "B" ? 1 : from;
+        return `<div class="runner-row"><div class="row between"><b>${esc(nameOf(pid))}</b><span class="small muted">${from === "B" ? "Batter" : `On ${["", "1st", "2nd", "3rd"][from]}`}</span></div><div class="dest">${dests.map(([d, l]) => `<button data-act="d3-move" data-from="${from}" data-to="${d}" class="${cur === d ? "on" : ""} ${d === "X" ? "out" : d === 4 ? "home" : ""}" ${d !== "X" && d < min ? "disabled" : ""}>${l}</button>`).join("")}</div></div>`;
+      })
+      .join("")}</div>
+    ${problem ? `<p class="notice bad" style="margin-top:10px">${esc(problem)}</p>` : ""}
+    <p class="tiny muted" style="margin-top:8px">It's a strikeout for the batter and the pitcher either way${out ? "" : ", but not an out, so a pitcher can strike out four in an inning"}.</p>
+    <div class="row" style="margin-top:12px"><button class="btn btn-secondary" data-act="sk-more">Back</button><button class="btn btn-green grow" data-act="d3-save" ${!allowed || problem ? "disabled" : ""}>Save</button></div>`;
+}
+ACT["d3-set"] = (el) => {
+  D3[el.dataset.k] = el.dataset.v;
+  if (el.dataset.k === "reach") D3.fielders = el.dataset.v === "out" ? [2, 3] : [2];
+  paintSheet();
+};
+ACT["d3-f"] = (el) => {
+  const n = Number(el.dataset.n);
+  D3.fielders = D3.reach === "out" ? [...D3.fielders, n] : [n];
+  paintSheet();
+};
+ACT["d3-fclear"] = () => {
+  D3.fielders = [];
+  paintSheet();
+};
+ACT["d3-move"] = (el) => {
+  const from = el.dataset.from === "B" ? "B" : Number(el.dataset.from);
+  D3.moves = { ...D3.moves, [from]: el.dataset.to === "X" ? "X" : Number(el.dataset.to) };
+  paintSheet();
+};
+ACT["d3-save"] = () => {
+  const out = D3.reach === "out";
+  const m = out ? { ...D3.moves, B: "X" } : { B: 1, ...D3.moves };
+  pushEvent({ t: "pitch", r: D3.r, d3: { reach: D3.reach, f: D3.fielders.join("-") || undefined, m } }, "Strikeout recorded.");
+};
+
+let CR = null;
+ACT["sk-cr"] = () => {
+  CR = { base: null };
+  openSheet(() => {
+    const s = currentGame().rep;
+    const t = s.half;
+    const occ = [1, 2, 3].filter((b) => s.bases[b - 1]);
+    const runner = CR.base ? s.bases[CR.base - 1] : null;
+    const slot = runner ? s.lineup[t].findIndex((x) => x.pid === runner.pid) : -1;
+    const others = s.lineup[t].map((x) => x.pid).filter((pid) => !s.bases.some((r) => r?.pid === pid) && pid !== s.batter);
+    return `<h2 class="h2">Pinch or courtesy runner</h2><div class="chips" style="margin:10px 0">${occ.map((b) => `<button class="chip ${CR.base === b ? "on" : ""}" data-act="cr-base" data-b="${b}">${esc(nameOf(s.bases[b - 1].pid))} on ${["", "1st", "2nd", "3rd"][b]}</button>`).join("")}</div>
+      ${runner ? `<p class="small bold muted">PINCH RUNNER (A SUBSTITUTION)</p><div class="chips" style="margin:6px 0 12px">${s.bench[t].map((pid) => `<button class="chip" data-act="cr-pinch" data-pid="${pid}" data-slot="${slot}">${esc(nameOf(pid))}</button>`).join("") || '<span class="small muted">Nobody on the bench.</span>'}</div>
+        <p class="small bold muted">COURTESY RUNNER (${esc(nameOf(runner.pid))} STAYS IN THE GAME)</p><div class="chips" style="margin-top:6px">${[...s.bench[t], ...others].map((pid) => `<button class="chip" data-act="cr-go" data-pid="${pid}">${esc(nameOf(pid))}</button>`).join("")}</div><p class="tiny muted" style="margin-top:6px">Usually for the pitcher or catcher, so they can get ready for the next inning.</p>` : '<p class="small muted">Pick the runner first.</p>'}
+      <button class="btn btn-secondary btn-block" style="margin-top:12px" data-act="sk-more">Back</button>`;
+  });
+};
+ACT["cr-base"] = (el) => {
+  CR.base = Number(el.dataset.b);
+  paintSheet();
+};
+ACT["cr-pinch"] = (el) => pushEvent({ t: "sub", team: currentGame().rep.half, slot: Number(el.dataset.slot), pid: el.dataset.pid }, "Pinch runner in.");
+ACT["cr-go"] = (el) => pushEvent({ t: "cr", base: CR.base, pid: el.dataset.pid }, "Courtesy runner in.");
+
+let RM = null;
+ACT["sk-remove"] = () => {
+  RM = { team: 1 - currentGame().rep.half, slot: null };
+  openSheet(() => {
+    const g = currentGame();
+    const s = g.rep;
+    const l = s.lineup[RM.team];
+    const who = RM.slot != null ? l[RM.slot] : null;
+    return `<h2 class="h2">Player leaves the game</h2><div class="seg" style="margin:10px 0">${[0, 1].map((x) => `<button class="${x === RM.team ? "on" : ""}" data-act="rm-team" data-t="${x}">${esc(W.teamById[x ? g.home : g.away].name)}</button>`).join("")}</div>
+      <p class="small muted">If there's someone on the bench, use Lineup &amp; substitutions. This is for when nobody replaces the player: the batting order skips their spot.</p>
+      <div class="chips" style="margin:10px 0">${l.map((x, i) => `<button class="chip ${RM.slot === i ? "on" : ""}" data-act="rm-slot" data-i="${i}">${esc(nameOf(x.pid))} (${x.pos})</button>`).join("")}</div>
+      ${who ? (who.pos === "P" ? '<p class="notice warn">That\'s the pitcher. Make a pitching change first.</p>' : `${l.length <= 8 ? '<p class="notice warn">That leaves fewer than 8 players. Check your league\'s rule.</p>' : ""}<div class="stack-s" style="margin-top:8px">${["Injury", "Illness", "Ejected", "Left early"].map((w) => `<button class="btn btn-danger btn-block" data-act="rm-go" data-why="${w}">${esc(nameOf(who.pid))} leaves: ${w.toLowerCase()}</button>`).join("")}</div>`) : ""}
+      <button class="btn btn-secondary btn-block" style="margin-top:12px" data-act="sk-more">Back</button>`;
+  });
+};
+ACT["rm-team"] = (el) => {
+  RM = { team: Number(el.dataset.t), slot: null };
+  paintSheet();
+};
+ACT["rm-slot"] = (el) => {
+  RM.slot = Number(el.dataset.i);
+  paintSheet();
+};
+ACT["rm-go"] = (el) => pushEvent({ t: "remove", team: RM.team, slot: RM.slot, why: el.dataset.why }, "The batting order will skip that spot.");
+ACT["sk-order"] = () =>
+  openSheet(() => {
+    const s = currentGame().rep;
+    return `<h2 class="h2">Who's batting?</h2><p class="small muted" style="margin:4px 0 12px">If the wrong batter came up, or someone got skipped by mistake, pick who's actually up.</p>
+      <div class="card list">${s.lineup[s.half].map((x, i) => `<button class="list-item ${x.pid === s.batter ? "mine" : ""}" data-act="order-go" data-i="${i}"><span class="rank">${i + 1}</span><b class="grow">${esc(nameOf(x.pid))}</b></button>`).join("")}</div>
+      <button class="btn btn-secondary btn-block" style="margin-top:12px" data-act="sk-more">Back</button>`;
+  });
+ACT["order-go"] = (el) => pushEvent({ t: "order", team: currentGame().rep.half, slot: Number(el.dataset.i) }, "Batting order fixed.");
+ACT["sk-note"] = () =>
+  openSheet(
+    () => `<h2 class="h2">Add a note</h2><div class="chips" style="margin:10px 0">${["Rain delay.", "Play resumes.", "Injury timeout.", "Game under protest.", "Lights on."].map((t) => `<button class="chip" data-act="note-pick" data-t="${t}">${t}</button>`).join("")}</div>
+    <textarea class="input" id="note-text" rows="3" placeholder="Shows up in the play-by-play"></textarea>
+    <div class="row" style="margin-top:12px"><button class="btn btn-secondary" data-act="sk-more">Back</button><button class="btn btn-primary grow" data-act="note-go">Add to the play-by-play</button></div>`,
+  );
+ACT["note-pick"] = (el) => {
+  document.getElementById("note-text").value = el.dataset.t;
+};
+ACT["note-go"] = () => {
+  const t = document.getElementById("note-text").value.trim();
+  if (t) pushEvent({ t: "note", text: t });
+};
 
 // ---- app-fantasy.js
 /* ---------------------------------------------------------------- fantasy: the site's rules
@@ -2716,7 +2930,7 @@ function finishDraft(L, at) {
   L.draft.status = "done";
   L.draft.doneAt = iso(at);
   L.rows = L.draft.picks.map((p) => ({ team_id: p.team, player_id: p.pid, slot_index: p.slot, start_at: iso(at), end_at: null }));
-  logMove(L, at, "The draft is done. Lineups lock every Monday at 12:00 am.");
+  logMove(L, at, "The draft is done. Set your lineup any time before your players' games start.");
 }
 function startDraft(L, at = Date.now()) {
   L.draft.status = "drafting";
@@ -2814,10 +3028,16 @@ function freeSlot(L, teamId) {
   return st >= 0 ? st : slots.findIndex((_, i) => !used.has(i));
 }
 
+/** A player whose team's game today has already started (or finished). */
+function lockedToday(L, pid) {
+  const team = teamIdOf(pid, L.season);
+  const today = todayKey();
+  return (W.gamesBy[L.season] || []).some((g) => (g.home === team || g.away === team) && dayKey(g.date) === today && g.status !== "canceled" && (g.status === "live" || g.status === "final" || Date.parse(g.date) <= Date.now()));
+}
+
 /* ---------------------------------------------------------------- pages */
 const leagueById = (id) => S.fantasy.leagues.find((l) => l.id === id);
 const isCommish = (L) => L.commissioner === S.account.name;
-const weekLabel = (t) => `Mon ${new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`;
 
 function viewFantasy(r) {
   if (r.parts[1]) return viewFantasyLeague(r);
@@ -2868,17 +3088,16 @@ function teamTab(L, r) {
   const proj = projections(L);
   const rows = rosterNow(L, team.id);
   const slots = slotsOf(L);
-  const lock = HLL.nextWeekStart(NOW);
   const over = seasonOver(L);
   const line = (row) => {
     const pid = row.player_id;
     const pts = sc?.players.get(pid)?.points || 0;
     const moving = S.fMove === pid && mine;
-    return `<div class="list-item ${moving ? "picked" : ""}"><span class="slot">${slots[row.slot_index] === "ST" ? "ST" : "BN"}</span>${badge(teamOf(pid, L.season))}<div class="grow"><a href="#/player/${pid}"><b>${esc(nameOf(pid))}</b></a><div class="tiny muted">${esc(posLabel(W.playerById[pid]))} · ${fmtPts(proj.get(pid)?.now.bat + proj.get(pid)?.now.pit || 0)} pts this season</div></div><b class="num" title="Points while in your starting lineup">${fmtPts(pts)}</b>
+    return `<div class="list-item ${moving ? "picked" : ""}"><span class="slot">${slots[row.slot_index] === "ST" ? "ST" : "BN"}</span>${badge(teamOf(pid, L.season))}<div class="grow"><a href="#/player/${pid}"><b>${esc(nameOf(pid))}</b></a><div class="tiny muted">${esc(posLabel(W.playerById[pid]))} · ${fmtPts(proj.get(pid)?.now.bat + proj.get(pid)?.now.pit || 0)} pts this season${lockedToday(L, pid) ? ' · <b class="warn-text">Game started today</b>' : ""}</div></div><b class="num" title="Points while in your starting lineup">${fmtPts(pts)}</b>
       ${mine && !over ? `<button class="btn btn-sm btn-secondary" data-act="f-move" data-l="${L.id}" data-pid="${pid}">${S.fMove ? (moving ? "Cancel" : "Here") : "Move"}</button>` : ""}</div>`;
   };
   return `<div class="row wrap"><div class="chips grow">${L.teams.map((t) => `<a class="chip ${t.id === team.id ? "on" : ""}" href="${withQuery({ team: t.mine ? null : t.id })}">${esc(t.name)}</a>`).join("")}</div></div>
-    ${mine && !over ? `<p class="notice" data-tour="fantasy-lock">Lineups lock every Monday at 12:00 am. Changes you make now count starting ${weekLabel(lock)}. Everyone in your 9 starting spots scores both hitting and pitching points; the bench doesn't score.</p>` : ""}
+    ${mine && !over ? `<p class="notice" data-tour="fantasy-lock">Swap starters and bench players any time, as long as neither one's game today has already started. Each game counts for whoever is starting the player when it begins. Everyone in your 9 starting spots scores both hitting and pitching points; the bench doesn't score.</p>` : ""}
     <div class="card list" data-tour="fantasy-myteam"><div class="list-item small bold muted">Starters</div>${rows.filter((x) => x.slot_index < HLL.STARTERS).map(line).join("")}
       <div class="list-item small bold muted">Bench</div>${rows.filter((x) => x.slot_index >= HLL.STARTERS).map(line).join("") || '<p class="pad small muted">Empty</p>'}
       <div class="list-item total-row"><span class="grow">Season total</span><b class="num">${fmtPts(sc?.total || 0)}</b></div></div>
@@ -2892,7 +3111,7 @@ function standingsTab(L) {
   return `<div class="card scroll-x" data-tour="fantasy-standings"><table><thead><tr><th>Team</th>${weeks.map((w) => `<th class="${cur?.n === w.n ? "sorted" : ""}">W${w.n}</th>`).join("")}<th>Total</th><th>Back</th></tr></thead><tbody>${st
     .map((x, i) => `<tr class="${x.team.mine ? "mine" : ""}"><td><span class="rank">${i + 1}</span> <a href="#/fantasy/${L.id}/team?team=${x.team.id}"><b>${esc(x.team.name)}</b></a><div class="tiny muted">${esc(x.team.owner)}</div></td>${weeks.map((w) => `<td class="${cur?.n === w.n ? "sorted" : ""}">${fmtPts(x.score?.byWeek.get(w.start) || 0)}</td>`).join("")}<td><b>${fmtPts(x.total)}</b></td><td class="muted">${i ? fmtPts(st[0].total - x.total) : "–"}</td></tr>`)
     .join("")}</tbody></table></div>
-    <p class="small muted">${L.season === PAST.id ? "Season totals for each team's starters. In a season scored on the site, points are counted game by game, week by week." : `Points by week. ${cur ? `Week ${cur.n} is in progress.` : ""} Each game counts for whoever had the player in a starting spot when that week's lineups locked.`}</p>`;
+    <p class="small muted">${L.season === PAST.id ? "Season totals for each team's starters. During a season, points are counted game by game." : `Points by week. ${cur ? `Week ${cur.n} is in progress.` : ""} Each game counts for whoever had the player in a starting spot when that week's lineups locked.`}</p>`;
 }
 
 function playersTab(L, r) {
@@ -3021,7 +3240,7 @@ function settingsTab(L) {
     <div class="col">${sectionHead("Pitching")}<div class="card list">${HLL.PIT_STATS.map(([k, l]) => row("pit", k, l)).join("")}</div></div></div>
     ${edit ? `<button class="btn btn-secondary" data-act="f-reset-scoring" data-l="${L.id}">Reset to default scoring</button>` : ""}
     ${sectionHead("League")}
-    <div class="card list small"><div class="list-item"><span class="grow">Format</span><b>Points, season total</b></div><div class="list-item"><span class="grow">Teams</span><b>${L.size}</b></div><div class="list-item"><span class="grow">Roster</span><b>${HLL.STARTERS} starters + ${slotsOf(L).length - HLL.STARTERS} bench</b></div><div class="list-item"><span class="grow">Lineups lock</span><b>Mondays, 12:00 am</b></div><div class="list-item"><span class="grow">Draft</span><b>Snake${L.keepers ? `, ${L.keepers} keeper${L.keepers > 1 ? "s" : ""}` : ""}</b></div>${L.code ? `<div class="list-item"><span class="grow">League code</span><b>${esc(L.code)}</b></div>` : ""}</div>
+    <div class="card list small"><div class="list-item"><span class="grow">Format</span><b>Points, season total</b></div><div class="list-item"><span class="grow">Teams</span><b>${L.size}</b></div><div class="list-item"><span class="grow">Roster</span><b>${HLL.STARTERS} starters + ${slotsOf(L).length - HLL.STARTERS} bench</b></div><div class="list-item"><span class="grow">Lineups</span><b>Swap any time before a player's game starts</b></div><div class="list-item"><span class="grow">Draft</span><b>Snake${L.keepers ? `, ${L.keepers} keeper${L.keepers > 1 ? "s" : ""}` : ""}</b></div>${L.code ? `<div class="list-item"><span class="grow">League code</span><b>${esc(L.code)}</b></div>` : ""}</div>
     ${sectionHead("Your team")}
     <div class="card pad row"><input class="input grow" id="f-rename" value="${esc(myTeam(L).name)}" aria-label="Team name"><button class="btn btn-secondary" data-act="f-rename" data-l="${L.id}">Rename</button></div>
     <button class="btn btn-danger" data-act="f-leave" data-l="${L.id}">${edit ? "Delete league" : "Leave league"}</button>`;
@@ -3099,9 +3318,17 @@ ACT["f-move"] = (el) => {
     S.fMove = null;
     return fsave();
   }
+  const rows = rosterNow(L, myTeam(L).id);
+  const slotOf = (x) => rows.find((r) => r.player_id === x)?.slot_index;
+  const crossing = (slotOf(S.fMove) < HLL.STARTERS) !== (slotOf(pid) < HLL.STARTERS);
+  const locked = [S.fMove, pid].find((x) => lockedToday(L, x));
+  if (crossing && locked) {
+    S.fMove = null;
+    return fsave(`${nameOf(locked)}'s game today has already started, so he can't move in or out of the lineup until tomorrow.`);
+  }
   swapRows(L, myTeam(L).id, S.fMove, pid, Date.now());
   S.fMove = null;
-  fsave(`Lineup saved. It counts starting ${weekLabel(HLL.nextWeekStart(NOW))}.`);
+  fsave("Lineup saved. It counts from each player's next game.");
 };
 let addPid = null;
 ACT["f-add"] = (el) => {
@@ -3340,13 +3567,13 @@ function viewAbout() {
     ${sec("For scorekeepers and the league", [
       "<b>Pitch-by-pitch scoring</b> on any phone, even with no signal: each pitch, where the ball went, how hard it was hit. Mistakes can be undone.",
       "<b>Pitch counts and rest days</b> worked out from every pitch, using Little League's rules.",
-      "<b>Admin tools</b>: news, the schedule (paste it from a spreadsheet), rainouts, final scores, rules, rosters, playoffs, staff, family approvals, backups and starting the next season.",
+      "<b>Admin tools</b>: news, the schedule (paste it from a spreadsheet), rainouts, rules, rosters, playoffs, staff, family approvals, backups and starting the next season.",
       "<b>Spreadsheet downloads</b> of stats, standings, the schedule and rosters.",
     ])}
     ${sec("About this demo", [
       `Players and teams are the league's real ${PAST.name} rosters, and ${PAST.name} stats are the real numbers from the season spreadsheets.`,
 "The playoffs are simulated from each kid's real hitting, so live scoring, spray charts, advanced stats and WAR have games to show. Everything runs on the same code as the real site.",
-      "Everything you do is saved only in this browser. Admin → Home → Reset the demo starts over.",
+      "Everything you do is saved only in this browser.",
     ])}
     ${sec("Cost", [
       "<b>$0 a month</b> for a league our size, on the free plans of Vercel (the website) and Supabase (the database).",
@@ -3373,19 +3600,13 @@ function openGames() {
   return W.games.filter((g) => g.status !== "final" && g.status !== "canceled").sort((a, b) => a.date.localeCompare(b.date));
 }
 function adminHome() {
-  const due = W.games.filter((g) => g.status === "scheduled" && Date.parse(g.date) < NOW);
-  const regLeft = W.games.filter((g) => g.type === "regular" && g.status !== "final").length;
-  const champ = champion();
+  // Every game is scored live, so this just shows today's games and how they're going.
+  const todays = W.games.filter((g) => dayKey(g.date) === todayKey() && g.status !== "canceled");
   const check = (ok, label) => `<div class="list-item"><span class="${ok ? "ok-dot" : "todo-dot"}">${ok ? "✓" : "•"}</span><span class="grow">${label}</span></div>`;
   return `<div class="page-head"><h1 class="h1">${esc(W.season.name)}</h1><p class="muted">${W.games.length ? `${W.games.filter((g) => g.status === "final").length} of ${W.games.length} games played` : "No schedule yet"}</p></div>
-    <section class="card pad stack demo-box" data-tour="admin-demo">
-      <div><b>Demo controls</b><p class="small muted">Only in the demo, to move the season along.</p></div>
-      ${champ ? `<p class="notice good">${esc(W.teamById[champ].name)} won the championship. <a class="link" href="#/admin/seasons">Start the next season</a></p>` : openGames().length ? `<div class="row wrap"><button class="btn btn-primary grow" data-act="sim-next">Simulate the next game</button>${regLeft ? `<button class="btn btn-secondary grow" data-act="sim-regular">Finish the regular season</button>` : ""}<button class="btn btn-secondary grow" data-act="sim-all">Finish the whole season</button></div>` : regLeft === 0 && W.games.length && !S.playoffs ? `<button class="btn btn-primary" data-act="sim-next">Set the playoffs</button>` : `<p class="small muted">No games to play. ${S.turnover ? "Generate or import a schedule on the Games tab." : ""}</p>`}
-      <button class="btn btn-danger btn-block" data-act="reset">Reset the demo</button>
-    </section>
-    <section class="stack" data-tour="admin-today">${sectionHead(`Needs a final score (${due.length})`)}
-      <div class="card list">${due.map((g) => `<div class="list-item"><div class="grow"><b>${esc(W.teamById[g.away].abbr)} at ${esc(W.teamById[g.home].abbr)}</b><div class="small muted">${gameLabel(g)} · ${fmtDay(g.date)} ${fmtTime(g.date)}</div></div><button class="btn btn-sm btn-secondary" data-act="quick-score" data-id="${g.id}">Enter score</button></div>`).join("") || `<p class="pad small muted">Every game that's been played has a score.</p>`}</div>
-      <p class="small muted">If nobody scored a game live, type in the final and the standings update. It counts in the standings but not in stats.</p></section>
+    <section class="stack" data-tour="admin-today">${sectionHead(`Today's games (${todays.length})`)}
+      <div class="card list">${todays.map((g) => `<a class="list-item" href="#/${g.status === "final" ? "game" : "score"}/${g.id}"><div class="grow"><b>${esc(W.teamById[g.away].abbr)} at ${esc(W.teamById[g.home].abbr)}</b><div class="small muted">${gameLabel(g)} · ${fmtTime(g.date)}</div></div><span class="tag ${g.status === "live" ? "tag-live" : ""}">${g.status === "final" ? `Final ${g.score[0]}-${g.score[1]}` : g.status === "live" ? "Live" : "Score it"}</span></a>`).join("") || `<p class="pad small muted">No games today.</p>`}</div>
+      <p class="small muted">Every game is scored live, pitch by pitch, so standings and stats update by themselves.</p></section>
     ${sectionHead("Setup checklist")}<div class="card list">${check(true, `${W.teams.length} teams`)}${check(W.players.length > 0, `${W.players.length} players on rosters`)}${check(W.games.length > 0, W.games.length ? `${W.games.length} games on the schedule` : "Make the schedule (Games)")}${check(true, "Game rules set")}${check(S.staff.some((u) => u.role === "scorekeeper"), `${S.staff.filter((u) => u.role === "scorekeeper").length} scorekeepers`)}</div>`;
 }
 
@@ -3420,8 +3641,8 @@ function adminGames(r) {
         const open = list.filter((g) => g.status === "scheduled");
         return `<section class="stack-s"><div class="row between"><h3 class="h3">${fmtLongDay(list[0].date)}</h3>${open.length ? `<div class="row" ${k === dayKey(openGames().find((g) => g.status === "scheduled")?.date || "") ? 'data-tour="admin-rain"' : ""}><button class="btn btn-sm btn-secondary" data-act="rain-day" data-day="${k}">Rain out</button><button class="btn btn-sm btn-secondary" data-act="move-day" data-day="${k}">Move day</button></div>` : ""}</div>
           <div class="card list">${list
-            .map((g) => `<div class="list-item wrap"><span class="small muted" style="width:62px">${fmtTime(g.date)}</span><div class="grow"><b>${esc(W.teamById[g.away].abbr)} at ${esc(W.teamById[g.home].abbr)}</b> <span class="small muted">${esc(g.field)} · ${gameLabel(g)}</span>${g.movedFrom ? ` <span class="tag">Moved from ${fmtDay(g.movedFrom)}</span>` : ""}</div>
-              ${g.status === "final" ? `<b class="num">${g.score[0]}-${g.score[1]}</b>` : g.status === "live" ? `<span class="tag tag-live">Live</span>` : `<select class="input input-sm" data-change="assign" data-id="${g.id}" aria-label="Scorekeeper"><option value="">No scorekeeper</option>${staff.map((u) => `<option value="${u.id}" ${S.assign[g.id] === u.id ? "selected" : ""}>${esc(u.name)}</option>`).join("")}</select><button class="btn btn-sm btn-secondary" data-act="quick-score" data-id="${g.id}">Final</button>`}</div>`)
+            .map((g) => `<div class="list-item wrap"><span class="small muted" style="width:62px">${fmtTime(g.date)}</span><div class="grow"><b>${esc(W.teamById[g.away].abbr)} at ${esc(W.teamById[g.home].abbr)}</b> <span class="small muted">${gameLabel(g)}</span>${g.movedFrom ? ` <span class="tag">Moved from ${fmtDay(g.movedFrom)}</span>` : ""}</div>
+              ${g.status === "final" ? `<b class="num">${g.score[0]}-${g.score[1]}</b>` : g.status === "live" ? `<span class="tag tag-live">Live</span>` : `<select class="input input-sm" data-change="assign" data-id="${g.id}" aria-label="Scorekeeper"><option value="">No scorekeeper</option>${staff.map((u) => `<option value="${u.id}" ${S.assign[g.id] === u.id ? "selected" : ""}>${esc(u.name)}</option>`).join("")}</select>`}</div>`)
             .join("")}</div></section>`;
       })
       .join("") || `<p class="card pad muted">No games yet. Paste your schedule from a spreadsheet, or generate one.</p>`}`;
@@ -3441,7 +3662,10 @@ function sampleSchedule() {
   d.setDate(d.getDate() + 3);
   const md = `${d.getMonth() + 1}/${d.getDate()}`;
   const t = W.teams;
-  return `Date\tTime\tField\tAway\tHome\n${md}\t5:30 PM\tField 1\t${t[0].name}\t${t[1].name}\n${md}\t5:30 PM\tField 2\t${t[2].abbr}\t${t[3].abbr}\n${md}\t7:30 PM\tField 1\t${t[4].name}\t${t[0].name}\n${md}\t7:30 PM\tField 3\t${t[5].name} @ ${t[6].name}\t\n${md}\t8pm\tField 2\tYankees\t${t[7].name}`;
+  const d2 = new Date(d);
+  d2.setDate(d2.getDate() + 1);
+  const md2 = `${d2.getMonth() + 1}/${d2.getDate()}`;
+  return `Date\tTime\tAway\tHome\n${md}\t5:30 PM\t${t[0].name}\t${t[1].name}\n${md}\t7:30 PM\t${t[2].abbr}\t${t[3].abbr}\n${md2}\t5:30 PM\t${t[4].name}\t${t[0].name}\n${md2}\t7:30 PM\t${t[5].name} @ ${t[6].name}\t\n${md2}\t8pm\tYankees\t${t[7].name}`;
 }
 function adminImport() {
   const text = S.importText ?? "";
@@ -3562,10 +3786,10 @@ function adminSeasons(r) {
   const champ = champion();
   const done = W.games.length && W.games.every((g) => g.status === "final" || g.status === "canceled");
   return `<div class="page-head"><h1 class="h1">Seasons</h1></div>
-    <div class="card list">${W.seasons.map((s) => `<div class="list-item"><div class="grow"><b>${esc(s.name)}</b><div class="tiny muted">${s.id === PAST.id ? "Stats from the season spreadsheets" : s.id === W.season.id ? "Current season" : "Scored on the site"}</div></div>${s.id === W.season.id ? '<span class="tag tag-good">Current</span>' : ""}</div>`).join("")}</div>
+    <div class="card list">${W.seasons.map((s) => `<div class="list-item"><div class="grow"><b>${esc(s.name)}</b><div class="tiny muted">${s.id === W.season.id ? "Current season" : "Past season"}</div></div>${s.id === W.season.id ? '<span class="tag tag-good">Current</span>' : ""}</div>`).join("")}</div>
     ${S.turnover ? `<p class="notice good">${esc(NEXT.name)} has started. Career stats from ${esc(PAST.name)} are kept on every player page and in the records.</p>`
       : `<section class="card pad stack-s" data-tour="admin-turnover"><h2 class="h2">Start ${esc(NEXT.name)}</h2><p class="small muted">Rosters carry over and every kid's age goes up a year. You'll review each team first; kids turning 13 are flagged. Stats and records from every past season stay. Fantasy leagues don't restart on their own; each commissioner can bring theirs back.</p>
-        ${done && champ ? "" : `<p class="notice warn">${esc(W.season.name)} isn't finished yet${champ ? "" : " (no champion yet)"}. You can still start the next season, but use the demo controls on Admin → Home to finish it first.</p>`}
+        ${done && champ ? "" : `<p class="notice warn">${esc(W.season.name)} isn't finished yet${champ ? "" : " (no champion yet)"}. You can still start the next season now; usually you'd wait until the championship is over.</p>`}
         <a class="btn btn-primary" href="#/admin/seasons/next">Review rosters</a></section>`}`;
 }
 function adminTurnover() {
@@ -3667,19 +3891,13 @@ ACT["imp-save"] = () => {
   toast(`Added ${list.length} games to the schedule.`);
 };
 ACT["gen-schedule"] = () => {
-  const rounds = HLL.seasonRounds(W.teams.map((t) => t.id), 14);
-  const start = HLL.nextWeekStart(NOW);
-  S.nextGames = rounds.flatMap((round, ri) =>
-    round.map((g, gi) => {
-      const d = new Date(start + (Math.floor(ri / 2) * 7 + (ri % 2 ? 5 : 1)) * DAY);
-      d.setHours(ri % 2 ? (gi < 3 ? 9 : 11) : gi < 3 ? 17 : 19, 30, 0, 0);
-      return { id: `n${ri}-${gi}`, season: NEXT.id, type: "regular", round: ri, date: d.toISOString(), field: `Field ${(gi % 3) + 1}`, home: g.home, away: g.away, seed: 9000 + ri * 10 + gi };
-    }),
-  );
+  const start = new Date(HLL.nextWeekStart(NOW) + 12 * 3600000).toISOString().slice(0, 10);
+  const planned = HLL.spreadDates(HLL.seasonRounds(W.teams.map((t) => t.id), 14), { startDate: start, gameDays: [1, 2, 3, 4, 5, 6], slots: ["17:30", "19:30"].map((time) => ({ time, field: "" })), maxPerDay: 2, maxPerTeamPerWeek: 2 });
+  S.nextGames = planned.map((g, i) => ({ id: `n${i}`, season: NEXT.id, type: "regular", round: i, date: g.scheduledAt, field: null, home: g.home, away: g.away, seed: 9000 + i }));
   save();
   build();
   render();
-  toast(`${S.nextGames.length} games scheduled: 14 per team, two a week, Tuesdays and Saturdays.`);
+  toast(`${S.nextGames.length} games scheduled: 14 per team, two a night, at most two a week per team.`);
 };
 let addGameDraft = null;
 ACT["add-game"] = () => {
@@ -3689,7 +3907,6 @@ ACT["add-game"] = () => {
     <div class="field" style="margin-top:10px"><label for="ag-away">Away</label><select class="input" id="ag-away">${W.teams.map((t) => `<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select></div>
     <div class="field" style="margin-top:10px"><label for="ag-home">Home</label><select class="input" id="ag-home">${W.teams.map((t, i) => `<option value="${t.id}" ${i === 1 ? "selected" : ""}>${esc(t.name)}</option>`).join("")}</select></div>
     <div class="row" style="margin-top:10px"><input class="input grow" type="date" id="ag-date" value="${dayKey(new Date(NOW + 3 * DAY).toISOString())}"><input class="input" type="time" id="ag-time" value="17:30"></div>
-    <input class="input" style="margin-top:10px" id="ag-field" value="Field 1" aria-label="Field">
     <button class="btn btn-primary btn-block" style="margin-top:12px" data-act="ag-save">Add game</button><button class="btn btn-secondary btn-block" style="margin-top:8px" data-act="close-sheet">Cancel</button>`,
   );
 };
@@ -3697,7 +3914,7 @@ ACT["ag-save"] = () => {
   const away = document.getElementById("ag-away").value;
   const home = document.getElementById("ag-home").value;
   if (away === home) return toast("A team can't play itself.");
-  const g = { id: `add${Date.now()}`, season: W.season.id, type: "regular", imported: true, round: 99, date: new Date(`${document.getElementById("ag-date").value}T${document.getElementById("ag-time").value}`).toISOString(), field: document.getElementById("ag-field").value, home, away, seed: Date.now() % 1e6 };
+  const g = { id: `add${Date.now()}`, season: W.season.id, type: "regular", imported: true, round: 99, date: new Date(`${document.getElementById("ag-date").value}T${document.getElementById("ag-time").value}`).toISOString(), field: null, home, away, seed: Date.now() % 1e6 };
   if (S.turnover) S.nextGames.push(g);
   else S.added.push(g);
   save();
@@ -3799,61 +4016,7 @@ ACT["turnover"] = () => {
   toast(`${NEXT.name} has started. Next: make the schedule.`);
 };
 
-/* ---- final scores, simulation and the playoffs */
-let quickGame = null;
-let quick = [0, 0];
-ACT["quick-score"] = (el) => {
-  quickGame = el.dataset.id;
-  quick = [0, 0];
-  openSheet(() => {
-    const g = W.gameById[quickGame];
-    const side = (i, t) => `<div class="list-item"><div class="row grow">${badge(t, "md")}<b>${esc(t.name)}</b></div><div class="stepper"><button data-act="qs" data-i="${i}" data-d="-1">−</button><output>${quick[i]}</output><button data-act="qs" data-i="${i}" data-d="1">+</button></div></div>`;
-    return `<h2 class="h2">Final score</h2><p class="small muted" style="margin:4px 0 12px">${gameLabel(g)} · ${fmtDay(g.date)}</p><div class="card list">${side(0, W.teamById[g.away])}${side(1, W.teamById[g.home])}</div>
-      <button class="btn btn-primary btn-block" style="margin-top:14px" data-act="qs-save">Save final score</button><button class="btn btn-secondary btn-block" style="margin-top:8px" data-act="close-sheet">Cancel</button>`;
-  });
-};
-ACT["qs"] = (el) => {
-  const i = Number(el.dataset.i);
-  quick[i] = Math.max(0, quick[i] + Number(el.dataset.d));
-  paintSheet();
-};
-ACT["qs-save"] = () => {
-  const g = W.gameById[quickGame];
-  if (quick[0] === quick[1] && (g.type === "playoff" || !W.rules.tiesAllowed)) return toast("This game can't end in a tie.");
-  S.games[quickGame] = { setup: null, events: null, status: "final", manual: [...quick] };
-  save();
-  build();
-  if (g.type === "playoff") advancePlayoffs();
-  save();
-  build();
-  closeSheet();
-  render();
-  toast("Final score saved. The standings are updated.");
-};
-
-/** Plays the next unfinished game to the end (demo only). */
-function simNext() {
-  const g = openGames()[0];
-  if (!g) {
-    return null;
-  }
-  const d = S.games[g.id];
-  const opts = { tiesAllowed: g.type !== "playoff" && W.rules.tiesAllowed };
-  if (g.events && g.setup) {
-    // A game someone started scoring (or the one in progress): play out the rest from where it is.
-    const events = E.simulate(g.setup, g.seed, W.rules, null, [...g.events, ...(S.pending[g.id] || [])], PROFILES, opts).events;
-    S.games[g.id] = { setup: g.setup, events, status: "final", manual: null };
-    delete S.pending[g.id];
-  } else if (!d) S.played[g.id] = true;
-  save();
-  build();
-  if (g.type === "playoff") {
-    advancePlayoffs();
-    save();
-    build();
-  }
-  return W.gameById[g.id];
-}
+/* ---- the playoffs */
 function lockSeeds() {
   const seeds = W.standings.slice(0, 8).map((r) => r.team.id);
   const last = W.games.filter((g) => g.type === "regular").reduce((m, g) => (g.date > m ? g.date : m), "");
@@ -3865,7 +4028,7 @@ function lockSeeds() {
   };
   S.playoffs = {
     seeds,
-    games: [[1, 8], [4, 5], [2, 7], [3, 6]].map(([a, b], i) => ({ id: `po-q${i + 1}`, slot: i + 1, sg: null, round_name: "quarterfinal", home: seeds[a - 1], away: seeds[b - 1], field: `Field ${(i % 2) + 1}`, seed: 1000 + i * 17, date: at(2 + Math.floor(i / 2), i % 2 ? 19 : 17) })),
+    games: [[1, 8], [4, 5], [2, 7], [3, 6]].map(([a, b], i) => ({ id: `po-q${i + 1}`, slot: i + 1, sg: null, round_name: "quarterfinal", home: seeds[a - 1], away: seeds[b - 1], field: null, seed: 1000 + i * 17, date: at(2 + Math.floor(i / 2), i % 2 ? 19 : 17) })),
   };
   save();
   build();
@@ -3904,14 +4067,14 @@ function advancePlayoffs() {
     const wb = w(b);
     if (wa && wb && !find(slot)) {
       const [home, away] = byBetter(wa, wb);
-      po.games.push({ id: `po-s${slot - 4}`, slot, sg: null, round_name: "semifinal", home, away, date: at(2, slot === 5 ? 17 : 19), field: "Field 1", seed: 2000 + slot });
+      po.games.push({ id: `po-s${slot - 4}`, slot, sg: null, round_name: "semifinal", home, away, date: at(2, slot === 5 ? 17 : 19), field: null, seed: 2000 + slot });
     }
   });
   const f1 = w(5);
   const f2 = w(6);
   if (f1 && f2 && !find(7, 1)) {
     const [hi, lo] = byBetter(f1, f2);
-    [[1, hi, lo, 2], [2, lo, hi, 3], [3, hi, lo, 4]].forEach(([sg, home, away, d]) => po.games.push({ id: `po-f${sg}`, slot: 7, sg, round_name: "championship", home, away, date: at(d, 17), field: "Field 1", seed: 3000 + sg }));
+    [[1, hi, lo, 2], [2, lo, hi, 3], [3, hi, lo, 4]].forEach(([sg, home, away, d]) => po.games.push({ id: `po-f${sg}`, slot: 7, sg, round_name: "championship", home, away, date: at(d, 17), field: null, seed: 3000 + sg }));
   }
   const wins = {};
   po.games.filter((g) => g.slot === 7).forEach((g) => {
@@ -3921,24 +4084,6 @@ function advancePlayoffs() {
   const decided = Object.values(wins).some((n) => n >= 2);
   po.games.filter((g) => g.slot === 7 && untouched(g)).forEach((g) => (g.canceled = decided));
 }
-ACT["sim-next"] = () => {
-  const g = simNext();
-  render();
-  const champ = champion();
-  if (!g) return toast(S.playoffs ? "The playoff bracket is set." : "Nothing left to play.");
-  toast(champ ? `${W.teamById[champ].name} win the championship.` : `${W.teamById[g.away].abbr} ${g.score[0]}, ${W.teamById[g.home].abbr} ${g.score[1]}. Final.`);
-};
-ACT["sim-regular"] = () => {
-  for (let i = 0; i < 200 && W.games.some((g) => g.type === "regular" && g.status !== "final"); i++) simNext();
-  render();
-  toast("The regular season is done. Lock the playoff seeds on Admin → Playoffs, or keep simulating.");
-};
-ACT["sim-all"] = () => {
-  for (let i = 0; i < 300 && !champion(); i++) if (!simNext() && S.playoffs && !openGames().length) break;
-  render();
-  const champ = champion();
-  toast(champ ? `${W.teamById[champ].name} win the championship.` : "Done.");
-};
 ACT["po-lock"] = () => {
   lockSeeds();
   render();
@@ -4441,7 +4586,8 @@ function walkRefresh() {
 /* ---------------------------------------------------------------- guided tours: every feature, a step at a time */
 /** A kid with lots of balls in play (for spray charts and player pages). */
 const sprayStar = () => Object.entries(W.extrasBy[PAST.id]?.bip || {}).sort((a, b) => b[1].length - a[1].length)[0]?.[0] || "p0";
-const tourKid = () => sprayStar();
+/** The demo parent (Kelly Burks) follows Jackson Burks. */
+const tourKid = () => W.allPlayers.find((p) => p.name === "Jackson Burks")?.id || sprayStar();
 
 const SECTIONS = {
   site: {
@@ -4454,6 +4600,7 @@ const SECTIONS = {
       { route: "home", sel: "headlines", title: "Automatic headlines", body: "Every final gets a headline and a player of the game, written from the play-by-play. Nobody has to type them." },
       { route: "home", sel: "live-card", title: "Live games", body: "When a game is being scored, anyone can follow it pitch by pitch." },
       { route: `game/${SHOWCASE}`, sel: "board", title: "Scoreboard", body: "Score, inning, count, outs and runners, updated with every pitch the scorekeeper enters." },
+      { route: `game/${SHOWCASE}?tab=box`, sel: "box-score", title: "Live box score", body: "Everyone's line so far, updated with every pitch, with who's batting and pitching highlighted, plus doubles, homers, steals and errors." },
       { route: `game/${SHOWCASE}`, sel: "plays", title: "Play-by-play", body: "Every plate appearance is written out automatically. The box score, spray chart and defense are in the other tabs." },
       { route: "schedule", sel: "rainout", title: "Rainouts", body: "When the admin rains out a day, the games move to a new date, the schedule shows it, and families get a notification." },
       { route: "standings", sel: "standings", title: "Standings", body: "The real final standings. During a season they update after every final; ties are broken by head-to-head, run differential and runs allowed." },
@@ -4469,14 +4616,14 @@ const SECTIONS = {
       { route: "stats", sel: "leaders", title: "League leaders", body: "The top players in each category, including WAR." },
       { route: "stats", sel: "qualify", title: "Who qualifies", body: `Averages and percentages need ${HLL.QUAL_PA} plate appearances per game the team has played (MLB's rule, scaled to 6 innings), or 10 innings over a season for pitchers. Counting stats like hits and strikeouts show everyone.` },
       { route: "stats", sel: "stat-table", title: "Sortable stats", body: "The top 25 in any stat. Click a column to sort, click again to reverse." },
-      { route: "stats", sel: "season-picker", title: "Every season", body: `Every season is kept. ${PAST.name} came from the league's spreadsheets; the next season is scored on the site, and career stats keep adding up.` },
-      { route: "stats?type=abat", sel: "adv-table", title: "Advanced stats", body: "Quality at-bats, wOBA, pitches per plate appearance, hard-hit %, batting with runners in scoring position and more, from every pitch. Here they come from the playoff games." },
+      { route: "stats", sel: "season-picker", title: "Every season", body: "Every season is kept, so you can look back at any of them, and career stats keep adding up from one season to the next." },
+      { route: "stats?type=abat", sel: "adv-table", title: "Advanced stats", body: "Quality at-bats, wOBA, pitches per plate appearance, hard-hit %, batting with runners in scoring position and more, from every pitch. These are example stats." },
       { route: "stats?type=abat", sel: "glossary", title: "What they mean", body: "Hover any column, or open this list, for a plain-English explanation of every stat." },
       { route: "stats?type=apit", sel: "adv-table", title: "Advanced pitching", body: "Strike %, first-pitch strikes, batters finished in 3 pitches or fewer, leadoff outs, 1-2-3 innings and FIP." },
       { route: "stats?type=war", sel: "war-table", title: "WAR", body: "Wins above replacement, and where it came from: batting, baserunning, fielding, position and pitching, measured against this league." },
       { route: () => `player/${tourKid()}`, sel: "player-cards", title: "Player pages", body: "This season at a glance, including WAR." },
       { route: () => `player/${tourKid()}`, sel: "career", title: "Career stats", body: "Every season the kid has played, plus career totals. Rosters and stats carry over year to year." },
-      { route: () => `player/${tourKid()}`, sel: "spray", title: "Spray charts", body: "Every ball in play, where the scorekeeper tapped it. Red dots are hits, gray are outs." },
+      { route: () => `player/${sprayStar()}`, sel: "spray", title: "Spray charts", body: "Every ball in play, where the scorekeeper tapped it. Red dots are hits, gray are outs." },
       { route: "records", sel: "records", title: "All-time records", body: "Best single seasons, career leaders and team records, across every season on the site." },
       { route: "recap", sel: "recap", title: "Season recap", body: "Champions, final standings, the best players and fantasy winners for any season." },
       { route: "stats", sel: "csv", title: "Download a spreadsheet", body: "Hitting, pitching, fielding, standings, the schedule and rosters, as CSV files for Excel or Google Sheets. The hitting and pitching files show who qualifies." },
@@ -4510,6 +4657,7 @@ const SECTIONS = {
       { route: `score/${SHOWCASE}`, sel: "sk-board", title: "Scoring screen", body: "Made for a phone at the field. This game is in the bottom of the 4th." },
       { route: `score/${SHOWCASE}`, sel: "sk-pitch", title: "Every pitch", body: "Ball, strike or foul. Four balls is a walk and three strikes is a strikeout, automatically.", tryIt: "Try it: click Ball." },
       { route: `score/${SHOWCASE}`, sel: "sk-inplay", title: "Ball in play", body: "Tap where the ball went, choose how it was hit, check Hard hit if it was smoked, then pick the result and confirm the runners.", tryIt: "Try it: click Ball in play." },
+      { route: `score/${SHOWCASE}`, sel: "sk-rare", title: "Anything that can happen", body: "Foul tips, foul bunts and intentional walks are right here. More… has everything else: catcher's interference, dropped third strikes, batter interference, balks, obstruction, appeal plays, pinch and courtesy runners, a player leaving with no sub, notes and forfeits. Ground-rule doubles, infield flies and triple plays are under Ball in play." },
       { route: `score/${SHOWCASE}`, sel: "sk-pitcher", title: "Pitch counts", body: "Tracked against Little League's limits for the pitcher's age, with a warning 10 pitches before the limit." },
       { route: `score/${SHOWCASE}`, sel: "sk-offline", title: "No signal? No problem", body: "If the phone loses signal, keep scoring. Plays are saved on the phone and sent when the signal comes back. Try the switch." },
       { route: `score/${SHOWCASE}`, sel: "sk-undo", title: "Undo", body: "Undo removes the last entry, and every stat is rebuilt from the play-by-play." },
@@ -4523,7 +4671,7 @@ const SECTIONS = {
     role: "fan",
     steps: [
       { route: "fantasy", sel: "fantasy-leagues", title: "Your leagues", body: "Points leagues with our own players. Join public leagues, private ones with a code, or start your own." },
-      { route: "fantasy/L1/team", sel: "fantasy-lock", title: "Lineups lock weekly", body: "Set your 9 starters and bench any time; the lineup locks every Monday at 12:00 am for the week. Starters score both hitting and pitching points." },
+      { route: "fantasy/L1/team", sel: "fantasy-lock", title: "Setting your lineup", body: "Swap starters and bench players any time, as long as neither one's game today has already started. Each game counts for whoever is starting the player when it begins. Starters score both hitting and pitching points." },
       { route: "fantasy/L1/team", sel: "fantasy-myteam", title: "Your team", body: "Tap Move on two players to swap them between the lineup and the bench." },
       { route: "fantasy/L1/standings", sel: "fantasy-standings", title: "Standings", body: "Every team's points. During a season scored on the site, points are also shown week by week." },
       { route: "fantasy/L1/players", sel: "fantasy-fa", title: "Free agents", body: "Add anyone nobody has. If your roster is full, pick someone to drop." },
@@ -4540,8 +4688,7 @@ const SECTIONS = {
     role: "admin",
     steps: [
       { route: "admin", sel: "admin-tabs", title: "Admin tools", body: "Everything for running the league, in one place." },
-      { route: "admin", sel: "admin-demo", title: "Demo controls", body: "Only in the demo: play out the next game, the regular season or the whole season, or reset everything." },
-      { route: "admin", sel: "admin-today", title: "Final scores", body: "If nobody scored a game live, type in the final and the standings update." },
+      { route: "admin", sel: "admin-today", title: "Today's games", body: "Every game is scored live, so this shows today's games and how they're going. Tap one to score it." },
       { route: "admin/news", sel: "admin-news", title: "Post news", body: "Write a post, pin it, or save it as a draft. Publishing notifies families." },
       { route: "admin/games", sel: "admin-games-tools", title: "The schedule", body: "Paste the whole schedule from a spreadsheet, add single games, and check it for double-booked teams and fields." },
       { route: "admin/games", sel: "admin-rain", title: "Rain out a day", body: "One tap moves every game that day to a new date. Families are told right away." },
