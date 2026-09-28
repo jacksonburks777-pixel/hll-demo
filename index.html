@@ -705,15 +705,13 @@ const Engine = (() => {
 // ---- app-core.js
 /* ---------------------------------------------------------------- core: state, world, helpers */
 const E = Engine;
-const STORE_KEY = "hll-demo-v4";
-const SIM_KEY = "hll-demo-sim-v4";
+const STORE_KEY = "hll-demo-v5";
+const SIM_KEY = "hll-demo-sim-v5";
 const LEAGUE_DEFAULT = "Hoboken Little League";
+// Spring 2026: the real season from the league's spreadsheets. Its playoffs are played on the site.
 const PAST = { id: "spring-2026", name: "Spring 2026", year: 2026, kind: "sheets" };
-const CUR = { id: "fall-2026", name: "Fall 2026", year: 2026, kind: "sim" };
 const NEXT = { id: "spring-2027", name: "Spring 2027", year: 2027, kind: "new" };
-const TODAY_ROUND = 10; // rounds 0-9 are done, round 10 is today
-const RAIN_ROUND = 4; // this day got rained out and was moved to after the last round
-const SHOWCASE = "g10-0"; // the game in progress when the demo opens
+const SHOWCASE = "po-q2"; // the playoff game in progress when the demo opens
 const NOW = Date.now();
 const DAY = 86400000;
 
@@ -816,38 +814,22 @@ const BASE_PLAYERS = LEAGUE_DATA.players.map((p, i) => {
 const TEAMS = LEAGUE_DATA.teams.map((t) => ({ ...t }));
 const PROFILES = Object.fromEntries(BASE_PLAYERS.map((p) => [p.id, E.profileFor(p.bat)]));
 
-/** Round r of the Fall 2026 schedule: every 3-4 days, round 10 is today. */
-function roundDate(r, gi) {
+const dayAt = (dayOffset, h, m) => {
   const d = new Date(NOW);
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + Math.floor((r - TODAY_ROUND) * 3.5));
-  if (r === TODAY_ROUND) {
-    if (gi === 0) return new Date(NOW - 70 * 60000).toISOString();
-    const t = new Date(NOW + (gi < 3 ? 60 : 150) * 60000);
-    t.setMinutes(Math.round(t.getMinutes() / 15) * 15, 0, 0);
-    return t.toISOString();
-  }
-  d.setHours(gi < 3 ? 17 : 19, 30, 0, 0);
+  d.setDate(d.getDate() + dayOffset);
+  d.setHours(h, m, 0, 0);
   return d.toISOString();
-}
-
-/** The Fall 2026 schedule before anything happens in the demo. */
-function fallSchedule() {
-  const games = [];
-  const rounds = HLL.seasonRounds(TEAMS.map((t) => t.id), 14);
-  const r = E.rng(2026);
-  rounds.forEach((round, ri) =>
-    round.forEach((g, gi) => {
-      let date = roundDate(ri, gi);
-      let movedFrom = null;
-      if (ri === RAIN_ROUND) {
-        movedFrom = date;
-        date = roundDate(rounds.length + 1, gi);
-      }
-      games.push({ id: `g${ri}-${gi}`, season: CUR.id, type: "regular", round: ri, date, movedFrom, field: `Field ${(gi % 3) + 1}`, home: g.home, away: g.away, seed: Math.floor(r() * 1e9) });
-    }),
-  );
-  return games;
+};
+/** The quarterfinals, seeded from the real final standings: one done, one live, one tonight, one rained out and moved. */
+function initialPlayoffs() {
+  const rows = pastStandings();
+  const seeds = rows.slice(0, 8).map((r) => r.team.id);
+  const games = [[1, 8], [4, 5], [2, 7], [3, 6]].map(([a, b], i) => ({
+    id: `po-q${i + 1}`, slot: i + 1, sg: null, round_name: "quarterfinal", home: seeds[a - 1], away: seeds[b - 1], field: `Field ${(i % 2) + 1}`, seed: 1000 + i * 17,
+    date: [dayAt(-1, 17, 30), new Date(NOW - 70 * 60000).toISOString(), dayAt(0, 19, 30), dayAt(2, 17, 30)][i],
+    movedFrom: i === 3 ? dayAt(-1, 19, 30) : null,
+  }));
+  return { seeds, games, started: [games[0].id] };
 }
 
 let W = null;
@@ -855,8 +837,8 @@ let W = null;
 function build() {
   const nextStarted = !!S.turnover;
   W = { rules: HLL.parseRules(S.rules) };
-  W.season = nextStarted ? NEXT : CUR;
-  W.seasons = nextStarted ? [PAST, CUR, NEXT] : [PAST, CUR];
+  W.season = nextStarted ? NEXT : PAST;
+  W.seasons = nextStarted ? [PAST, NEXT] : [PAST];
   W.league = S.leagueName;
   W.teams = TEAMS;
   W.teamById = Object.fromEntries(TEAMS.map((t) => [t.id, t]));
@@ -867,8 +849,7 @@ function build() {
   W.playerById = Object.fromEntries(all.map((p) => [p.id, p]));
   W.names = Object.fromEntries(all.map((p) => [p.id, p.name]));
   W.rosterBy = {
-    [PAST.id]: new Map(BASE_PLAYERS.map((p) => [p.id, p.team])),
-    [CUR.id]: new Map(all.map((p) => [p.id, S.playerTeam[p.id] || p.team])),
+    [PAST.id]: new Map(all.map((p) => [p.id, S.playerTeam[p.id] || p.team])),
   };
   if (nextStarted) W.rosterBy[NEXT.id] = new Map(all.filter((p) => S.turnover.keep[p.id]).map((p) => [p.id, S.playerTeam[p.id] || p.team]));
   const ageIn = (p, season) => (p.age == null ? null : p.age + (season.year - 2026));
@@ -878,7 +859,8 @@ function build() {
   W.current = Object.fromEntries(W.players.map((p) => [p.id, p]));
 
   // Games in every season on the site.
-  W.gamesBy = { [CUR.id]: buildGames(CUR, fallGames()) };
+  if (!S.playoffs) S.playoffs = initialPlayoffs();
+  W.gamesBy = { [PAST.id]: buildGames(PAST, springGames()) };
   if (nextStarted) W.gamesBy[NEXT.id] = buildGames(NEXT, S.nextGames.map((g) => ({ ...g, season: NEXT.id })));
   W.games = W.gamesBy[W.season.id];
   W.gameById = {};
@@ -886,10 +868,13 @@ function build() {
   saveSims();
 
   // Standings, stats, spray charts per season.
+  // Spring 2026: standings and stats from the spreadsheets; the playoffs scored on the site
+  // give the spray charts, advanced stats, WAR, fielding and innings.
+  const springGamesList = W.gamesBy[PAST.id];
   W.standingsBy = { [PAST.id]: pastStandings() };
   W.statsBy = { [PAST.id]: pastStats() };
-  W.scoredBy = { [PAST.id]: [] };
-  W.extrasBy = { [PAST.id]: { bip: {}, logs: {}, def: {} } };
+  W.scoredBy = { [PAST.id]: scoredOf(springGamesList) };
+  W.extrasBy = { [PAST.id]: E.seasonExtras(springGamesList) };
   for (const season of W.seasons.slice(1)) {
     const games = W.gamesBy[season.id];
     W.standingsBy[season.id] = standingsFor(games.filter((g) => g.type === "regular"));
@@ -901,6 +886,7 @@ function build() {
   W.standings = W.standingsBy[W.season.id];
   W.teamGamesBy = Object.fromEntries(Object.entries(W.standingsBy).map(([id, rows]) => [id, new Map(rows.map((r) => [r.team.id, r.gp]))]));
   W.weeks = HLL.seasonWeeks(W.games.filter((g) => g.type === "regular").map((g) => g.date));
+  W.sheetSeason = W.season.id === PAST.id;
 
   // The guided practice game lives outside the schedule and the stats.
   if (S.practice) {
@@ -920,11 +906,9 @@ function build() {
   if (!S.fantasy) S.fantasy = initialFantasy();
 }
 
-/** Fall 2026: the base schedule plus the admin's changes. */
-function fallGames() {
-  const base = fallSchedule().concat(S.added.filter((g) => g.season === CUR.id));
-  const po = S.playoffs ? S.playoffs.games.map((g) => ({ ...g, season: CUR.id, type: "playoff" })) : [];
-  return [...base, ...po];
+/** Spring 2026 on the site: the playoffs, plus any games the admin added. */
+function springGames() {
+  return [...S.added.filter((g) => g.season === PAST.id), ...S.playoffs.games.map((g) => ({ ...g, season: PAST.id, type: "playoff" }))];
 }
 
 /** Status, play-by-play and score for each game. */
@@ -940,14 +924,14 @@ function buildGames(season, list) {
       return g;
     }
     const opts = { tiesAllowed: !playoff && W.rules.tiesAllowed };
-    const autoDone = season.id === CUR.id && g.type === "regular" && !g.imported && g.round < TODAY_ROUND && g.round !== RAIN_ROUND && !mv;
+    const autoDone = (S.playoffs?.started || []).includes(g.id) && !mv;
     if (d) {
       Object.assign(g, { setup: d.setup, events: d.events, status: d.status, manual: d.manual || null });
     } else if (S.played[g.id] || autoDone) {
       g.setup = E.setupFor(g, playersForGame(g));
       g.events = simEvents(`${g.id}:${g.seed}:${setupSig(g.setup)}`, () => E.simulate(g.setup, g.seed, HLL.DEFAULT_RULES, null, [], PROFILES, opts).events);
       g.status = "final";
-    } else if (g.id === SHOWCASE && season.id === CUR.id && !mv) {
+    } else if (g.id === SHOWCASE && season.id === PAST.id && !mv) {
       g.setup = E.setupFor(g, playersForGame(g));
       g.events = simEvents(`${g.id}:partial:${setupSig(g.setup)}`, () => E.simulate(g.setup, g.seed, HLL.DEFAULT_RULES, (s) => s.inning === 4 && s.half === 1 && s.outs === 1, [], PROFILES).events);
       g.status = "live";
@@ -1041,12 +1025,12 @@ function notify(kind, text, href = "") {
 }
 const unread = () => S.notes.filter((n) => !n.read).length;
 function initialNotes() {
-  const rained = fallSchedule().find((g) => g.movedFrom);
+  const rained = initialPlayoffs().games.find((g) => g.movedFrom);
   const at = (h) => new Date(NOW - h * 3600000).toISOString();
   return [
     { id: "n1", at: at(20), kind: "fantasy", text: "Mike Chen offered you a trade in Hoboken Sluggers.", href: "fantasy/L1/trades", read: false, emailed: false },
     { id: "n2", at: at(50), kind: "news", text: "New post: Picture day is this Saturday", href: "news/n1", read: false, emailed: false },
-    { id: "n3", at: at(24 * 12), kind: "schedule", text: `Rained out: games on ${fmtDay(rained.movedFrom)} were moved to ${fmtDay(rained.date)}.`, href: "schedule", read: true, emailed: false },
+    { id: "n3", at: at(24 * 12), kind: "schedule", text: `Rained out: the ${fmtDay(rained.movedFrom)} quarterfinal was moved to ${fmtDay(rained.date)}.`, href: "schedule", read: true, emailed: false },
   ];
 }
 
@@ -1054,9 +1038,9 @@ function initialNotes() {
 function initialNews() {
   const at = (h) => new Date(NOW - h * 3600000).toISOString();
   return [
-    { id: "n1", title: "Picture day is this Saturday", category: "announcement", pinned: true, published: true, at: at(50), body: "Team and individual photos are Saturday morning at Field 1. Check your team's time slot with your manager, and wear full uniforms." },
+    { id: "n1", title: "The playoffs are here", category: "announcement", pinned: true, published: true, at: at(50), body: "The top 8 teams from the regular season are in. Quarterfinals and semifinals are one game; the championship is best of 3. The bracket is on the Standings page." },
     { id: "n2", title: "Field 2 lights are back on", category: "news", pinned: false, published: true, at: at(24 * 5), body: "The lights on Field 2 have been repaired, so 7:30 games are back on as scheduled." },
-    { id: "n3", title: "Make-up games are on the schedule", category: "schedule", pinned: false, published: true, at: at(24 * 11), body: "The games we lost to rain have been moved to the week after the last regular-season round. Everything is on the Scores page." },
+    { id: "n3", title: "Rained-out quarterfinal is moved", category: "schedule", pinned: false, published: true, at: at(20), body: "Last night's quarterfinal was rained out and moved. The new date is on the Scores page." },
     { id: "n4", title: "End-of-season picnic (draft)", category: "announcement", pinned: false, published: false, at: at(3), body: "Save the date. Details to come." },
   ];
 }
@@ -1215,7 +1199,7 @@ function header(active) {
     <a class="bell" href="#/notifications" data-tour="bell" aria-label="${n ? `Notifications, ${n} new` : "Notifications"}">${svg(ICONS.bell)}${n ? `<b>${n}</b>` : ""}</a>
     <button class="acct-btn" data-act="account" data-tour="role"><span class="avatar">${esc(initials(S.account.name))}</span><span class="acct-name">${esc(S.account.name.split(" ")[0])}${roleLabel}</span></button>
     <button class="help-btn" data-act="help" aria-label="Help and tours" data-tour="help">?</button>
-  </div><div class="demo-strip">Demo · ${PAST.name} is the league's real numbers; ${CUR.name} is simulated from them · <button class="link" data-act="about">About</button></div></header>`;
+  </div><div class="demo-strip">Demo · ${PAST.name} is the league's real numbers; the playoffs are simulated · <button class="link" data-act="about">About</button></div></header>`;
 }
 const initials = (n) => n.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
@@ -1314,7 +1298,7 @@ function viewWelcome() {
     <div class="center stack-s">
       <p class="eyebrow">League website demo</p>
       <h1 class="h1">${esc(W.league)}</h1>
-      <p class="muted">Scores, standings, stats, news and fantasy baseball for the whole league, on any phone or computer. Everything here uses our real players: ${PAST.name} is their real numbers, and ${CUR.name} is a season simulated from them so every feature has something to show.</p>
+      <p class="muted">Scores, standings, stats, news and fantasy baseball for the whole league, on any phone or computer. Everything here uses our real players and their real ${PAST.name} numbers. The playoffs are simulated from them, so live scoring has games to show.</p>
     </div>
     <div class="card list">
       <div class="feature"><b>News, scores and standings</b><p class="small muted">League news, live games, rainouts and a playoff bracket.</p></div>
@@ -1428,7 +1412,7 @@ function viewHome() {
   const heads = autoHeadlines(4);
   const nowWeek = HLL.weekOf(W.weeks, NOW);
   const first = W.games.find((g) => g.type === "regular");
-  const sub = !W.games.length ? "The schedule hasn't been posted yet." : first && Date.parse(first.date) > NOW ? `Opening day is ${fmtLongDay(first.date)}` : nowWeek ? `Week ${nowWeek.n} of ${W.weeks.length}` : W.games.every((g) => g.status === "final" || g.status === "canceled") ? "Season complete" : "Regular season";
+  const sub = W.sheetSeason ? (champ ? "Season complete" : "Regular season final · playoffs underway") : !W.games.length ? "The schedule hasn't been posted yet." : first && Date.parse(first.date) > NOW ? `Opening day is ${fmtLongDay(first.date)}` : nowWeek ? `Week ${nowWeek.n} of ${W.weeks.length}` : W.games.every((g) => g.status === "final" || g.status === "canceled") ? "Season complete" : "Regular season";
   const hasWar = statsOf().some((s) => s.war != null);
   return `<div class="page-head"><p class="eyebrow">${esc(W.season.name)}</p><h1 class="h1">${champ ? `${esc(W.teamById[champ].name)} are the champions` : esc(W.league)}</h1><p class="muted">${sub}</p></div>
     ${champ ? `<a class="champ" href="#/recap" data-tour="champ-banner"><p class="eyebrow">${esc(W.season.name)} champions</p><p class="h1">${esc(W.teamById[champ].name)}</p><p class="small">See the season recap ›</p></a>` : ""}
@@ -1464,11 +1448,11 @@ function viewSchedule(r) {
     weeks.set(w, [...(weeks.get(w) || []), g]);
   });
   const today = todayKey();
-  const rainedOut = W.games.filter((g) => g.movedFrom && g.type === "regular");
-  return `<div class="page-head"><h1 class="h1">Scores & schedule</h1><p class="muted">${esc(W.season.name)} · ${W.weeks.length || 0} weeks · most teams play twice a week</p></div>
+  const rainedOut = W.games.filter((g) => g.movedFrom && g.status !== "final");
+  return `<div class="page-head"><h1 class="h1">Scores & schedule</h1><p class="muted">${W.sheetSeason ? `${esc(W.season.name)} playoffs. The regular season is complete; see the <a class="link" href="#/standings">final standings</a>.` : `${esc(W.season.name)} · ${W.weeks.length || 0} weeks · most teams play twice a week`}</p></div>
     <div class="row wrap"><div class="chips grow"><a class="chip ${team ? "" : "on"}" href="${withQuery({ team: null })}">All teams</a>${W.teams.map((t) => `<a class="chip ${team === t.id ? "on" : ""}" href="${withQuery({ team: t.id })}">${badge(t)}${esc(t.abbr)}</a>`).join("")}</div>
       <a class="btn btn-secondary btn-sm" href="#/pitchers">Who can pitch</a><button class="btn btn-secondary btn-sm" data-act="csv" data-file="schedule">Download CSV</button></div>
-    ${rainedOut.length && !team ? `<p class="notice warn" data-tour="rainout">Rained out ${fmtDay(rainedOut[0].movedFrom)}: those ${rainedOut.length} games were moved to ${fmtDay(rainedOut[0].date)}.</p>` : ""}
+    ${rainedOut.length && !team ? `<p class="notice warn" data-tour="rainout">Rained out ${fmtDay(rainedOut[0].movedFrom)}: ${rainedOut.length === 1 ? "the game was" : `those ${rainedOut.length} games were`} moved to ${fmtDay(rainedOut[0].date)}.</p>` : ""}
     ${[...weeks.entries()]
       .map(([w, gs]) => {
         const days = new Map();
@@ -1742,7 +1726,7 @@ function seriesWins() {
 }
 
 function viewPlayoffs() {
-  if (!S.playoffs) {
+  if (!S.playoffs || !W.sheetSeason) {
     const left = W.games.filter((g) => g.type === "regular" && g.status !== "final").length;
     return `<div class="page-head"><h1 class="h1">Playoffs</h1><p class="muted">The top 8 teams make the playoffs. Quarterfinals and semifinals are one game; the championship is best of 3.</p></div>
       <div class="card pad stack-s" data-tour="bracket"><b>The bracket is set when the regular season ends.</b><p class="small muted">${left} regular-season game${left === 1 ? "" : "s"} left. Then the admin locks the seeds and the quarterfinals appear here: 1 vs 8, 4 vs 5, 2 vs 7, 3 vs 6.</p></div>
@@ -1830,10 +1814,10 @@ function viewStats(r) {
   const tabs = `<div class="tabs-inline" data-tour="stat-tabs">${STAT_TABS.map(([k, l]) => `<a href="${withQuery({ type: k === "bat" ? null : k, sort: null, dir: null })}" class="${view === k ? "on" : ""}">${l}</a>`).join("")}</div>`;
   const csvFile = { pit: "pitching", apit: "pitching", fld: "fielding" }[view] || "hitting";
   const tools = `<div class="row wrap"><a class="btn btn-secondary btn-sm" href="#/records" data-tour="records-link">All-time records</a><a class="btn btn-secondary btn-sm" href="#/recap${season.id !== W.season.id ? "?season=" + season.id : ""}">Season recap</a><a class="btn btn-secondary btn-sm" href="#/innings">Innings by position</a><button class="btn btn-secondary btn-sm" data-act="csv" data-file="${csvFile}" data-season="${season.id}" data-tour="csv">Download CSV</button></div>`;
-  const head = `<div class="page-head"><h1 class="h1">Stats</h1><p class="muted">${esc(season.name)}${season.id === PAST.id ? " · from the league's spreadsheets" : ` · from ${scored.length} games scored pitch by pitch`}</p></div>${seasonPicker(season.id, { sort: null, dir: null })}${tabs}${tools}`;
+  const head = `<div class="page-head"><h1 class="h1">Stats</h1><p class="muted">${esc(season.name)}${season.id === PAST.id ? ` · regular season from the league's spreadsheets${["fld", "abat", "apit", "war"].includes(view) ? ` · these come from the ${scored.length} playoff game${scored.length === 1 ? "" : "s"} scored pitch by pitch so far` : ""}` : ` · from ${scored.length} games scored pitch by pitch`}</p></div>${seasonPicker(season.id, { sort: null, dir: null })}${tabs}${tools}`;
   const needsPitchData = ["fld", "abat", "apit", "war"].includes(view) && !scored.length;
   if (needsPitchData)
-    return `${head}<p class="card pad muted">${view === "war" ? "WAR" : view === "fld" ? "Fielding" : "Advanced stats"} come from games scored pitch by pitch on the site. ${esc(season.name)} was imported from spreadsheets, which don't have that detail. Pick ${esc(CUR.name)} above.</p>`;
+    return `${head}<p class="card pad muted">${view === "war" ? "WAR" : view === "fld" ? "Fielding" : "Advanced stats"} come from games scored pitch by pitch on the site, and none have been played yet this season.</p>`;
   if (view === "fld") return head + fieldingView(season, scored, r);
   if (view === "abat" || view === "apit") return head + advancedView(view, scored, r);
   if (view === "war") return head + warView(scored, r);
@@ -2000,7 +1984,7 @@ function viewRecap(r) {
   const fz = (S.fantasy?.leagues || []).filter((L) => L.season === season.id && L.rows?.length);
   return `<div class="page-head"><p class="eyebrow">Season recap</p><h1 class="h1">${esc(season.name)}</h1><p class="muted">Champions, final standings, the best players and fantasy winners.</p></div>
     ${seasonPicker(season.id)}
-    ${champ ? `<div class="champ" data-tour="recap"><p class="eyebrow">Champions</p><p class="h1">${esc(W.teamById[champ].name)}</p></div>` : `<p class="card pad small muted" data-tour="recap">${season.id === PAST.id ? "The Spring 2026 playoffs were before the site; add the champion on the admin Seasons page." : "The champion shows here once the playoffs finish."}</p>`}
+    ${champ ? `<div class="champ" data-tour="recap"><p class="eyebrow">Champions</p><p class="h1">${esc(W.teamById[champ].name)}</p></div>` : `<p class="card pad small muted" data-tour="recap">${season.id === PAST.id ? "The champion shows here once the playoffs finish." : "The champion shows here once the playoffs finish."}</p>`}
     <div class="cols"><div class="col">${sectionHead("Final standings")}${standingsTable(rows, { compact: true })}</div>
     <div class="col">${sectionHead("League leaders")}${leadersGrid(cats, 3, season.id)}
     ${fz.length ? `${sectionHead("Fantasy champions")}<div class="card list">${fz.map((L) => { const st = fantasyStandings(L); return `<a class="list-item" href="#/fantasy/${L.id}"><b class="grow">${esc(st[0].team.name)}</b><span class="small muted">${esc(L.name)} · ${fmtPts(st[0].total)} pts</span></a>`; }).join("")}</div>` : ""}</div></div>`;
@@ -2614,10 +2598,11 @@ function newLeague({ id, name, season, size, myIndex, isPublic, code = null, see
 }
 
 /* ---- points */
-const lastSeason = (L) => (L.season === CUR.id ? PAST.id : L.season === NEXT.id ? CUR.id : null);
+const lastSeason = (L) => (L.season === NEXT.id ? PAST.id : null);
 /** Points so far this season, game by game (the same way team points are counted). */
 function seasonPoints(L) {
-  const scored = W.scoredBy[L.season] || [];
+  // Spring 2026's season came from spreadsheets (only its playoffs were scored on the site), so use its season totals.
+  const scored = L.season === PAST.id ? [] : W.scoredBy[L.season] || [];
   if (!scored.length) return new Map(statsOf(L.season).map((s) => [s.player_id, { bat: HLL.points(HLL.fromImportedBat(s), L.scoring.bat), pit: HLL.points(HLL.fromImportedPit(s), L.scoring.pit) }]));
   const out = new Map();
   for (const g of scored) {
@@ -2686,7 +2671,7 @@ function endRow(L, pid, at) {
 function logMove(L, at, text) {
   L.log.unshift({ at: iso(at), text });
 }
-const seasonOver = (L) => L.season === PAST.id || (L.season === W.season.id ? W.games.length > 0 && W.games.every((g) => g.status === "final" || g.status === "canceled") && !!champion() : L.season !== W.season.id);
+const seasonOver = (L) => (L.season === W.season.id ? W.games.length > 0 && W.games.every((g) => g.status === "final" || g.status === "canceled") && !!champion() : true);
 
 /* ---- draft */
 const totalPicks = (L) => L.size * slotsOf(L).length;
@@ -2754,21 +2739,16 @@ function startDraft(L, at = Date.now()) {
 
 /* ---- the leagues the demo starts with */
 function initialFantasy() {
-  const w = W.weeks;
-  const t0 = w.length ? w[0].start - 2 * DAY : NOW - 40 * DAY;
+  const t0 = NOW - 70 * DAY;
   // Hoboken Sluggers: drafted before the season, a few weeks of moves.
-  const L1 = newLeague({ id: "L1", name: "Hoboken Sluggers", season: CUR.id, size: 8, myIndex: 3, isPublic: true, seed: 3, myTeam: "Burks Bombers", commissioner: "Dan Russo" });
+  const L1 = newLeague({ id: "L1", name: "Hoboken Sluggers", season: PAST.id, size: 8, myIndex: 3, isPublic: true, seed: 3, myTeam: "Burks Bombers", commissioner: "Dan Russo" });
   L1.draft.order = L1.teams.map((t) => t.id);
   L1.draft.status = "drafting";
   cpuPicks(L1, { me: true, at: t0 });
   seedMoves(L1);
   // Coaches' Pool: you're the commissioner and the draft hasn't started.
-  const L2 = newLeague({ id: "L2", name: "Coaches' Pool", season: CUR.id, size: 6, myIndex: 2, isPublic: false, code: "COACH6", seed: 5, myTeam: "Hoboken Heat" });
-  // Dugout Dads: last season's league, finished. Bring it back with keepers.
-  const L3 = newLeague({ id: "L3", name: "Dugout Dads", season: PAST.id, size: 6, myIndex: 0, isPublic: false, code: "DADS26", seed: 7, myTeam: "Burks Bombers" });
-  L3.draft.status = "drafting";
-  cpuPicks(L3, { me: true, at: NOW - 200 * DAY });
-  return { leagues: [L1, L2, L3], open: [{ id: "O1", name: "Weekend Warriors", size: 8, filled: 5 }, { id: "O2", name: "Bleacher Parents", size: 6, filled: 3 }] };
+  const L2 = newLeague({ id: "L2", name: "Coaches' Pool", season: PAST.id, size: 6, myIndex: 2, isPublic: false, code: "COACH6", seed: 5, myTeam: "Hoboken Heat" });
+  return { leagues: [L1, L2], open: [{ id: "O1", name: "Weekend Warriors", size: 8, filled: 5 }, { id: "O2", name: "Bleacher Parents", size: 6, filled: 3 }] };
 }
 
 /** A few weeks of moves in Hoboken Sluggers, so the activity log, history and a pending trade have something to show. */
@@ -2912,7 +2892,7 @@ function standingsTab(L) {
   return `<div class="card scroll-x" data-tour="fantasy-standings"><table><thead><tr><th>Team</th>${weeks.map((w) => `<th class="${cur?.n === w.n ? "sorted" : ""}">W${w.n}</th>`).join("")}<th>Total</th><th>Back</th></tr></thead><tbody>${st
     .map((x, i) => `<tr class="${x.team.mine ? "mine" : ""}"><td><span class="rank">${i + 1}</span> <a href="#/fantasy/${L.id}/team?team=${x.team.id}"><b>${esc(x.team.name)}</b></a><div class="tiny muted">${esc(x.team.owner)}</div></td>${weeks.map((w) => `<td class="${cur?.n === w.n ? "sorted" : ""}">${fmtPts(x.score?.byWeek.get(w.start) || 0)}</td>`).join("")}<td><b>${fmtPts(x.total)}</b></td><td class="muted">${i ? fmtPts(st[0].total - x.total) : "–"}</td></tr>`)
     .join("")}</tbody></table></div>
-    <p class="small muted">${L.season === PAST.id ? "Season totals for each team's final starters." : `Points by week. ${cur ? `Week ${cur.n} is in progress.` : ""} Each game counts for whoever had the player in a starting spot when that week's lineups locked.`}</p>`;
+    <p class="small muted">${L.season === PAST.id ? "Season totals for each team's starters. In a season scored on the site, points are counted game by game, week by week." : `Points by week. ${cur ? `Week ${cur.n} is in progress.` : ""} Each game counts for whoever had the player in a starting spot when that week's lineups locked.`}</p>`;
 }
 
 function playersTab(L, r) {
@@ -3031,9 +3011,9 @@ function settingsTab(L) {
     return `<div class="list-item"><span class="grow">${label}${k === "IP" ? ' <span class="tiny muted">(per inning)</span>' : ""}</span>${edit ? `<input class="input pts-input" type="number" step="0.5" value="${v}" data-change="f-score" data-l="${L.id}" data-g="${group}" data-k="${k}" aria-label="${label} points">` : `<b class="num">${v > 0 ? "+" : ""}${v}</b>`}</div>`;
   };
   const over = seasonOver(L);
-  const next = L.season === PAST.id ? CUR : L.season === CUR.id && S.turnover ? NEXT : null;
+  const next = L.season === PAST.id && S.turnover ? NEXT : null;
   const renewed = S.fantasy.leagues.some((x) => x.renewedFrom === L.id);
-  return `${over && edit && next && !renewed ? `<section class="card pad stack-s" data-tour="fantasy-renew"><h2 class="h2">Bring the league back for ${esc(next.name)}</h2><p class="small muted">Everyone in the league is added automatically, with the same team names. You decide how many keepers each team gets.</p>
+  return `${!(over && edit && next && !renewed) ? `<section class="card pad stack-s" data-tour="fantasy-renew"><b>Next season</b><p class="small muted">Leagues don't restart on their own. When the season is over, the commissioner can bring the league back: everyone in it is added automatically, and the commissioner picks how many keepers each team gets.</p></section>` : ""}${over && edit && next && !renewed ? `<section class="card pad stack-s" data-tour="fantasy-renew"><h2 class="h2">Bring the league back for ${esc(next.name)}</h2><p class="small muted">Everyone in the league is added automatically, with the same team names. You decide how many keepers each team gets.</p>
       <div class="field"><label for="f-keepn">Keepers per team</label><select class="input" id="f-keepn">${[0, 1, 2, 3].map((n) => `<option value="${n}" ${n === 2 ? "selected" : ""}>${n}</option>`).join("")}</select></div>
       <button class="btn btn-primary" data-act="f-renew" data-l="${L.id}">Bring it back</button></section>` : ""}
     <p class="small muted">${edit ? "You're the commissioner, so you can change how many points each stat is worth. Changes apply to the whole league right away, including past weeks." : `Only the commissioner (${esc(L.commissioner)}) can change scoring.`}</p>
@@ -3218,7 +3198,7 @@ ACT["f-leave"] = (el) => {
 };
 ACT["f-renew"] = (el) => {
   const old = leagueById(el.dataset.l);
-  const next = old.season === PAST.id ? CUR : NEXT;
+  const next = NEXT;
   const n = Number(document.getElementById("f-keepn").value);
   const id = `L${Date.now()}`;
   const L = { ...JSON.parse(JSON.stringify(old)), id, season: next.id, renewedFrom: old.id, keepers: n, draft: { status: "pre", order: [...old.draft.order], picks: [], doneAt: null }, rows: [], trades: [], log: [] };
@@ -3365,7 +3345,7 @@ function viewAbout() {
     ])}
     ${sec("About this demo", [
       `Players and teams are the league's real ${PAST.name} rosters, and ${PAST.name} stats are the real numbers from the season spreadsheets.`,
-      `${CUR.name} is simulated from each kid's real hitting, so live scoring, advanced stats, WAR and fantasy have games to show. It runs on the same code as the real site.`,
+"The playoffs are simulated from each kid's real hitting, so live scoring, spray charts, advanced stats and WAR have games to show. Everything runs on the same code as the real site.",
       "Everything you do is saved only in this browser. Admin → Home → Reset the demo starts over.",
     ])}
     ${sec("Cost", [
@@ -3499,6 +3479,7 @@ function adminPlayers(r) {
 
 /* ---- playoffs */
 function adminPlayoffs() {
+  if (!W.sheetSeason) return `<div class="page-head"><h1 class="h1">Playoffs</h1></div><p class="notice">The top 8 are seeded when the ${esc(W.season.name)} regular season ends. (In the demo, the playoffs are shown in ${esc(PAST.name)}.)</p>`;
   const left = W.games.filter((g) => g.type === "regular" && g.status !== "final").length;
   const seeds = S.playoffs ? S.playoffs.seeds : W.standings.slice(0, 8).map((r) => r.team.id);
   return `<div class="page-head"><h1 class="h1">Playoffs</h1><p class="muted">Top 8 · 1 vs 8, 4 vs 5, 2 vs 7, 3 vs 6 · the championship is best of 3</p></div>
@@ -3582,7 +3563,7 @@ function adminSeasons(r) {
   const done = W.games.length && W.games.every((g) => g.status === "final" || g.status === "canceled");
   return `<div class="page-head"><h1 class="h1">Seasons</h1></div>
     <div class="card list">${W.seasons.map((s) => `<div class="list-item"><div class="grow"><b>${esc(s.name)}</b><div class="tiny muted">${s.id === PAST.id ? "Stats from the season spreadsheets" : s.id === W.season.id ? "Current season" : "Scored on the site"}</div></div>${s.id === W.season.id ? '<span class="tag tag-good">Current</span>' : ""}</div>`).join("")}</div>
-    ${S.turnover ? `<p class="notice good">${esc(NEXT.name)} has started. Career stats from ${esc(PAST.name)} and ${esc(CUR.name)} are kept on every player page and in the records.</p>`
+    ${S.turnover ? `<p class="notice good">${esc(NEXT.name)} has started. Career stats from ${esc(PAST.name)} are kept on every player page and in the records.</p>`
       : `<section class="card pad stack-s" data-tour="admin-turnover"><h2 class="h2">Start ${esc(NEXT.name)}</h2><p class="small muted">Rosters carry over and every kid's age goes up a year. You'll review each team first; kids turning 13 are flagged. Stats and records from every past season stay. Fantasy leagues don't restart on their own; each commissioner can bring theirs back.</p>
         ${done && champ ? "" : `<p class="notice warn">${esc(W.season.name)} isn't finished yet${champ ? "" : " (no champion yet)"}. You can still start the next season, but use the demo controls on Admin → Home to finish it first.</p>`}
         <a class="btn btn-primary" href="#/admin/seasons/next">Review rosters</a></section>`}`;
@@ -3808,7 +3789,7 @@ ACT["turnover"] = () => {
   const keep = S.keepDraft || Object.fromEntries(W.players.map((p) => [p.id, true]));
   if (!confirm(`Start ${NEXT.name} with ${Object.values(keep).filter(Boolean).length} kids?`)) return;
   const champ = champion();
-  if (champ) (S.champions ||= []).unshift({ team: champ, season: CUR.name });
+  if (champ) (S.champions ||= []).unshift({ team: champ, season: PAST.name });
   S.turnover = { keep };
   S.keepDraft = null;
   S.nextGames = [];
@@ -3854,7 +3835,6 @@ ACT["qs-save"] = () => {
 function simNext() {
   const g = openGames()[0];
   if (!g) {
-    if (!S.playoffs && W.games.length && W.season.id === CUR.id) lockSeeds();
     return null;
   }
   const d = S.games[g.id];
@@ -4460,7 +4440,7 @@ function walkRefresh() {
 // ---- app-tour.js
 /* ---------------------------------------------------------------- guided tours: every feature, a step at a time */
 /** A kid with lots of balls in play (for spray charts and player pages). */
-const sprayStar = () => Object.entries(W.extrasBy[CUR.id]?.bip || {}).sort((a, b) => b[1].length - a[1].length)[0]?.[0] || "p0";
+const sprayStar = () => Object.entries(W.extrasBy[PAST.id]?.bip || {}).sort((a, b) => b[1].length - a[1].length)[0]?.[0] || "p0";
 const tourKid = () => sprayStar();
 
 const SECTIONS = {
@@ -4476,7 +4456,7 @@ const SECTIONS = {
       { route: `game/${SHOWCASE}`, sel: "board", title: "Scoreboard", body: "Score, inning, count, outs and runners, updated with every pitch the scorekeeper enters." },
       { route: `game/${SHOWCASE}`, sel: "plays", title: "Play-by-play", body: "Every plate appearance is written out automatically. The box score, spray chart and defense are in the other tabs." },
       { route: "schedule", sel: "rainout", title: "Rainouts", body: "When the admin rains out a day, the games move to a new date, the schedule shows it, and families get a notification." },
-      { route: "standings", sel: "standings", title: "Standings", body: "Updated after every final. Ties are broken by head-to-head, run differential and runs allowed. Past seasons are one tap away." },
+      { route: "standings", sel: "standings", title: "Standings", body: "The real final standings. During a season they update after every final; ties are broken by head-to-head, run differential and runs allowed." },
       { route: "playoffs", sel: "bracket", title: "Playoffs", body: "The top 8 make it: 1 vs 8, 4 vs 5, 2 vs 7, 3 vs 6. The bracket fills in as games finish." },
       { route: () => `team/${W.teams[0].id}`, sel: "roster", title: "Teams", body: "Every team's roster, schedule, stats and innings by position." },
     ],
@@ -4489,8 +4469,8 @@ const SECTIONS = {
       { route: "stats", sel: "leaders", title: "League leaders", body: "The top players in each category, including WAR." },
       { route: "stats", sel: "qualify", title: "Who qualifies", body: `Averages and percentages need ${HLL.QUAL_PA} plate appearances per game the team has played (MLB's rule, scaled to 6 innings), or 10 innings over a season for pitchers. Counting stats like hits and strikeouts show everyone.` },
       { route: "stats", sel: "stat-table", title: "Sortable stats", body: "The top 25 in any stat. Click a column to sort, click again to reverse." },
-      { route: "stats", sel: "season-picker", title: "Every season", body: `${PAST.name} came from the league's spreadsheets; ${CUR.name} is scored on the site. Every season is kept.` },
-      { route: "stats?type=abat", sel: "adv-table", title: "Advanced stats", body: "Quality at-bats, wOBA, pitches per plate appearance, hard-hit %, batting with runners in scoring position and more, all from the pitch-by-pitch." },
+      { route: "stats", sel: "season-picker", title: "Every season", body: `Every season is kept. ${PAST.name} came from the league's spreadsheets; the next season is scored on the site, and career stats keep adding up.` },
+      { route: "stats?type=abat", sel: "adv-table", title: "Advanced stats", body: "Quality at-bats, wOBA, pitches per plate appearance, hard-hit %, batting with runners in scoring position and more, from every pitch. Here they come from the playoff games." },
       { route: "stats?type=abat", sel: "glossary", title: "What they mean", body: "Hover any column, or open this list, for a plain-English explanation of every stat." },
       { route: "stats?type=apit", sel: "adv-table", title: "Advanced pitching", body: "Strike %, first-pitch strikes, batters finished in 3 pitches or fewer, leadoff outs, 1-2-3 innings and FIP." },
       { route: "stats?type=war", sel: "war-table", title: "WAR", body: "Wins above replacement, and where it came from: batting, baserunning, fielding, position and pitching, measured against this league." },
@@ -4545,13 +4525,13 @@ const SECTIONS = {
       { route: "fantasy", sel: "fantasy-leagues", title: "Your leagues", body: "Points leagues with our own players. Join public leagues, private ones with a code, or start your own." },
       { route: "fantasy/L1/team", sel: "fantasy-lock", title: "Lineups lock weekly", body: "Set your 9 starters and bench any time; the lineup locks every Monday at 12:00 am for the week. Starters score both hitting and pitching points." },
       { route: "fantasy/L1/team", sel: "fantasy-myteam", title: "Your team", body: "Tap Move on two players to swap them between the lineup and the bench." },
-      { route: "fantasy/L1/standings", sel: "fantasy-standings", title: "Standings", body: "Points by week and for the season." },
+      { route: "fantasy/L1/standings", sel: "fantasy-standings", title: "Standings", body: "Every team's points. During a season scored on the site, points are also shown week by week." },
       { route: "fantasy/L1/players", sel: "fantasy-fa", title: "Free agents", body: "Add anyone nobody has. If your roster is full, pick someone to drop." },
       { route: "fantasy/L1/trades", sel: "fantasy-trades", title: "Trades", body: "Propose trades and answer offers. Mike Chen sent you one; accept or decline it. The commissioner can cancel any trade." },
       { route: "fantasy/L1/activity", sel: "fantasy-activity", title: "Activity", body: "Every add, drop, trade and lineup move, for the whole league to see." },
       { route: "fantasy/L2/draft", sel: "fantasy-draft", title: "Snake draft", body: "You're the commissioner here: start the draft, pick when you're on the clock, or autodraft. The order reverses each round." },
       { route: "fantasy/L2/settings", sel: "fantasy-settings", title: "Commissioner scoring", body: "The commissioner sets what each stat is worth. Standings update right away." },
-      { route: "fantasy/L3/settings", sel: "fantasy-renew", title: "Next season", body: "Leagues don't restart on their own. The commissioner brings a league back: everyone's in automatically, and the commissioner picks how many keepers each team gets." },
+      { route: "fantasy/L2/settings", sel: "fantasy-renew", title: "Next season", body: "Leagues don't restart on their own. The commissioner brings a league back: everyone's in automatically, and the commissioner picks how many keepers each team gets." },
     ],
   },
   admin: {
@@ -4742,6 +4722,9 @@ window.addEventListener("hashchange", () => {
 });
 
 // Let the "setting up" screen paint before the season is simulated (first visit only takes a second or two).
+// Opening the demo from its plain address always starts on the welcome page (with the tour buttons).
+// Links to a specific page (with #/...) still open that page.
+if (!location.hash || location.hash === "#" || location.hash === "#/") history.replaceState(null, "", "#/welcome");
 setTimeout(() => {
   build();
   render();
