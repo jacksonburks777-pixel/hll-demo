@@ -434,6 +434,9 @@ details summary { cursor: pointer; }
   .offline-bar .switch-inline { white-space: normal; }
 }
 
+.tour-progress { flex: 1; height: 5px; background: var(--line); border-radius: 99px; overflow: hidden; margin-right: 12px; }
+.tour-progress i { display: block; height: 100%; background: var(--red); }
+
 </style>
 </head>
 <body>
@@ -1316,11 +1319,11 @@ function viewWelcome() {
     <div class="card list">
       <div class="feature"><b>News, scores and standings</b><p class="small muted">League news, live games, rainouts and a playoff bracket.</p></div>
       <div class="feature"><b>Live scoring</b><p class="small muted">Scorekeepers score pitch by pitch from a phone, even with no signal.</p></div>
-      <div class="feature"><b>Stats like GameChanger</b><p class="small muted">Leaders, advanced stats, WAR, career records and spray charts.</p></div>
+      <div class="feature"><b>Stats</b><p class="small muted">Leaders, advanced stats, WAR, career records and spray charts.</p></div>
       <div class="feature"><b>Families</b><p class="small muted">Follow your kid, get notifications and emails.</p></div>
       <div class="feature"><b>Fantasy baseball</b><p class="small muted">Drafts, weekly lineups, free agents and trades.</p></div>
     </div>
-    <button class="btn btn-primary btn-block" data-act="help">Pick a guided tour</button>
+    <button class="btn btn-primary btn-block" data-act="start-tour">Take the full tour</button>
     <button class="btn btn-secondary btn-block" data-act="walk-start">Score a practice game (guided)</button>
     <button class="btn btn-secondary btn-block" data-act="explore">Explore on my own</button>
     <button class="link center" data-act="about">Costs & plan</button>
@@ -1872,7 +1875,7 @@ function advancedView(view, scored, r) {
   const games = scoredGamesFor(scored);
   if (view === "abat") {
     const cols = HLL.ADV_BAT;
-    return `<p class="small muted">GameChanger-style stats from every pitch. Percentages rank players with at least ${HLL.QUAL_PA} plate appearances per game their team has played; counting stats show everyone. Hover a column name, or open the list below.</p>
+    return `<p class="small muted">Stats from every pitch. Percentages rank players with at least ${HLL.QUAL_PA} plate appearances per game their team has played; counting stats show everyone. Hover a column name, or open the list below.</p>
       ${advTable(adv.bat, cols, { sort: r.q.sort || "QABP", dir: r.q.dir, qualifies: (x) => x.PA >= HLL.minPa(HLL.gamesFor(games, x.team_id)) })}${glossary(cols)}`;
   }
   const cols = HLL.advPitColumns(HLL.fipConstant(adv.pit));
@@ -3350,12 +3353,12 @@ function viewAbout() {
       "<b>News and headlines</b>: posts from the league, plus headlines written automatically from every result.",
       "<b>Scores, standings and playoffs</b> that update as games finish, with rainouts and moved games shown.",
       "<b>Live games</b>, pitch by pitch, for anyone who can't be at the field.",
-      "<b>Stats like GameChanger</b>: leaders, advanced stats (QAB, wOBA, FIP…), WAR, spray charts, career stats and all-time records. Every season is kept.",
+      "<b>Stats</b>: leaders, advanced stats (QAB, wOBA, FIP…), WAR, spray charts, career stats and all-time records. Every season is kept.",
       "<b>Follow your kid</b>: their games on your home page, and notifications (and emails) for rainouts, news and fantasy.",
       "<b>Fantasy baseball</b> with our own players: snake drafts, weekly lineups, free agents, trades and keepers.",
     ])}
     ${sec("For scorekeepers and the league", [
-      "<b>GameChanger-style scoring</b> on any phone, even with no signal: each pitch, where the ball went, how hard it was hit. Mistakes can be undone.",
+      "<b>Pitch-by-pitch scoring</b> on any phone, even with no signal: each pitch, where the ball went, how hard it was hit. Mistakes can be undone.",
       "<b>Pitch counts and rest days</b> worked out from every pitch, using Little League's rules.",
       "<b>Admin tools</b>: news, the schedule (paste it from a spreadsheet), rainouts, final scores, rules, rosters, playoffs, staff, family approvals, backups and starting the next season.",
       "<b>Spreadsheet downloads</b> of stats, standings, the schedule and rosters.",
@@ -4460,7 +4463,7 @@ function walkRefresh() {
 const sprayStar = () => Object.entries(W.extrasBy[CUR.id]?.bip || {}).sort((a, b) => b[1].length - a[1].length)[0]?.[0] || "p0";
 const tourKid = () => sprayStar();
 
-const TOURS = {
+const SECTIONS = {
   site: {
     title: "The league site",
     blurb: "News, live games, scores, rainouts, standings, playoffs",
@@ -4487,7 +4490,7 @@ const TOURS = {
       { route: "stats", sel: "qualify", title: "Who qualifies", body: `Averages and percentages need ${HLL.QUAL_PA} plate appearances per game the team has played (MLB's rule, scaled to 6 innings), or 10 innings over a season for pitchers. Counting stats like hits and strikeouts show everyone.` },
       { route: "stats", sel: "stat-table", title: "Sortable stats", body: "The top 25 in any stat. Click a column to sort, click again to reverse." },
       { route: "stats", sel: "season-picker", title: "Every season", body: `${PAST.name} came from the league's spreadsheets; ${CUR.name} is scored on the site. Every season is kept.` },
-      { route: "stats?type=abat", sel: "adv-table", title: "Advanced stats", body: "Like GameChanger: quality at-bats, wOBA, pitches per plate appearance, hard-hit %, batting with runners in scoring position and more, all from the pitch-by-pitch." },
+      { route: "stats?type=abat", sel: "adv-table", title: "Advanced stats", body: "Quality at-bats, wOBA, pitches per plate appearance, hard-hit %, batting with runners in scoring position and more, all from the pitch-by-pitch." },
       { route: "stats?type=abat", sel: "glossary", title: "What they mean", body: "Hover any column, or open this list, for a plain-English explanation of every stat." },
       { route: "stats?type=apit", sel: "adv-table", title: "Advanced pitching", body: "Strike %, first-pitch strikes, batters finished in 3 pitches or fewer, leadoff outs, 1-2-3 innings and FIP." },
       { route: "stats?type=war", sel: "war-table", title: "WAR", body: "Wins above replacement, and where it came from: batting, baserunning, fielding, position and pitching, measured against this league." },
@@ -4575,17 +4578,25 @@ const TOURS = {
     ],
   },
 };
+/** One big tour: every section in order. Each step remembers its section and who's signed in. */
+const TOURS = {
+  full: {
+    title: "Full tour",
+    steps: Object.entries(SECTIONS).flatMap(([id, sec]) => sec.steps.map((st) => ({ ...st, section: sec.title, sectionId: id, role: st.role || sec.role || "fan" }))),
+  },
+};
+const sectionStart = (id) => TOURS.full.steps.findIndex((st) => st.sectionId === id);
 const nextScheduled = () => W.games.find((g) => g.status === "scheduled" && g.home && g.away)?.id || SHOWCASE;
 
 let T = null; // { id, i }
 const tourHost = () => document.getElementById("tour");
 
-function startTour(id) {
+function startTour(id, at = 0) {
   closeSheet();
   S.seenWelcome = true;
   S.signedIn = true;
   save();
-  T = { id, i: 0 };
+  T = { id, i: at };
   showStep();
 }
 
@@ -4615,9 +4626,9 @@ function tourRefresh() {
   const el = document.querySelector(`[data-tour="${step.sel}"]`);
   const last = T.i === tour.steps.length - 1;
   host.innerHTML = `<div class="tour-spot" hidden></div><div class="tour-tip" role="dialog" aria-live="polite">
-    <div class="row between"><span class="step">${esc(tour.title)} · ${T.i + 1} of ${tour.steps.length}</span><button class="link" data-act="tour-end">Close</button></div>
+    <div class="row between"><span class="step">${esc(step.section || tour.title)} · ${T.i + 1} of ${tour.steps.length}</span><button class="link" data-act="tour-end">Close</button></div>
     <h3>${esc(step.title)}</h3><p>${esc(step.body)}</p>${step.tryIt ? `<p class="try">${esc(step.tryIt)}</p>` : ""}
-    <div class="row between" style="margin-top:14px"><div class="tour-dots">${tour.steps.map((_, i) => `<i class="${i === T.i ? "on" : ""}"></i>`).join("")}</div>
+    <div class="row between" style="margin-top:14px"><div class="tour-progress"><i style="width:${Math.round(((T.i + 1) / tour.steps.length) * 100)}%"></i></div>
     <div class="row">${T.i ? `<button class="btn btn-sm btn-secondary" data-act="tour-prev">Back</button>` : ""}<button class="btn btn-sm btn-primary" data-act="tour-next">${last ? "Finish" : "Next"}</button></div></div></div>`;
   if (el) {
     // Tall targets: show their top part with the tip underneath instead of covering them.
@@ -4669,7 +4680,7 @@ ACT["tour-next"] = () => {
   } else {
     T = null;
     tourRefresh();
-    openSheet(() => tourMenu("Tour finished", "Pick another tour, or keep exploring."));
+    openSheet(() => tourMenu("Tour finished", "That's every feature. Try the practice game, or keep exploring."));
   }
 };
 ACT["tour-prev"] = () => {
@@ -4680,15 +4691,18 @@ ACT["tour-end"] = () => {
   T = null;
   tourRefresh();
 };
-ACT["start-tour"] = (el) => startTour(el.dataset.tourId);
-ACT["help"] = () => openSheet(() => tourMenu("Guided tours", "Together they cover every feature on the site. Each takes a few minutes, and you can close one any time."));
+ACT["start-tour"] = (el) => startTour("full", el.dataset.section ? sectionStart(el.dataset.section) : 0);
+ACT["help"] = () => openSheet(() => tourMenu("Guided tours", "The full tour walks through every feature on the site. You can close it any time, or jump to one part."));
 
 function tourMenu(title, sub) {
   return `<h2 class="h2">${title}</h2><p class="small muted" style="margin:4px 0 12px">${sub}</p>
-    <div class="card list">${Object.entries(TOURS)
-      .map(([id, t]) => `<button class="list-item" data-act="start-tour" data-tour-id="${id}"><div class="grow"><b>${esc(t.title)}</b><div class="small muted">${esc(t.blurb)} · ${t.steps.length} steps</div></div><span class="link">Start</span></button>`)
-      .join("")}<button class="list-item" data-act="walk-start"><div class="grow"><b>Score a practice game</b><div class="small muted">A guided full game covering every scorekeeping button · ${WALK.length} steps</div></div><span class="link">Start</span></button></div>
-    <div class="row" style="margin-top:12px"><button class="btn btn-secondary grow" data-act="about-close">Costs & plan</button><button class="btn btn-secondary grow" data-act="close-sheet">Keep exploring</button></div>`;
+    <div class="card list">
+      <button class="list-item" data-act="start-tour"><div class="grow"><b>The full tour</b><div class="small muted">Every feature, start to finish · ${TOURS.full.steps.length} steps</div></div><span class="link">Start</span></button>
+      <button class="list-item" data-act="walk-start"><div class="grow"><b>Score a practice game</b><div class="small muted">A guided full game covering every scorekeeping button · ${WALK.length} steps</div></div><span class="link">Start</span></button>
+    </div>
+    <p class="eyebrow" style="margin-top:14px">Or jump to one part of the tour</p>
+    <div class="chips" style="margin-top:6px">${Object.entries(SECTIONS).map(([id, sec]) => `<button class="chip" data-act="start-tour" data-section="${id}" title="${esc(sec.blurb)}">${esc(sec.title)}</button>`).join("")}</div>
+    <div class="row" style="margin-top:14px"><button class="btn btn-secondary grow" data-act="about-close">Costs & plan</button><button class="btn btn-secondary grow" data-act="close-sheet">Keep exploring</button></div>`;
 }
 ACT["about-close"] = () => {
   closeSheet();
