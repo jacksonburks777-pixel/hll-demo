@@ -713,7 +713,7 @@ const Engine = (() => {
 // ---- app-core.js
 /* ---------------------------------------------------------------- core: state, world, helpers */
 const E = Engine;
-const STORE_KEY = "hll-demo-v5";
+const STORE_KEY = "hll-demo-v6";
 const SIM_KEY = "hll-demo-sim-v5";
 const LEAGUE_DEFAULT = "Hoboken Little League";
 // Spring 2026: the real season from the league's spreadsheets. Its playoffs are played on the site.
@@ -774,6 +774,10 @@ function loadState() {
   } catch {}
   return defaults();
 }
+// Data saved by older versions of the demo is cleared, so everyone sees the current names and schedule.
+try {
+  for (const k of ["hll-demo-v3", "hll-demo-v4", "hll-demo-v5", "hll-demo-sim-v4"]) localStorage.removeItem(k);
+} catch {}
 let S = loadState();
 let bc = null;
 try {
