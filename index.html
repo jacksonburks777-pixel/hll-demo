@@ -443,6 +443,23 @@ tr.now td { background: #fffbeb; }
 .tag-now { background: #fde68a; color: #78350f; }
 .box-notes span { display: inline-block; margin-right: 12px; }
 
+/* ---- draft room */
+.draft-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.draft-head.on-clock { border-color: var(--green); box-shadow: 0 0 0 2px rgba(21, 128, 61, 0.25); }
+.draft-clock-box { display: flex; flex-direction: column; align-items: flex-end; }
+.draft-clock { font-family: var(--head); font-size: 40px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.draft-clock.urgent { color: var(--red); }
+.draft-tools { gap: 10px; }
+.pick-ticker { display: flex; gap: 14px; overflow-x: auto; white-space: nowrap; font-size: 13px; padding: 6px 2px; scrollbar-width: none; }
+.draft-board table { border-collapse: separate; border-spacing: 0; }
+.draft-board th { min-width: 118px; font-size: 12px; text-align: left; vertical-align: bottom; }
+.draft-board th.mine { background: #eef2ff; }
+.board-cell { min-width: 118px; height: 54px; vertical-align: top; border-left: 4px solid transparent; font-size: 12.5px; }
+.board-cell b, .board-cell span { display: block; }
+.board-cell.now { background: #dcfce7; outline: 2px solid var(--green); outline-offset: -2px; }
+.board-cell.keeper { background: #fffbeb; }
+.draft-avail td.nowrap { white-space: nowrap; }
+
 </style>
 </head>
 <body>
@@ -2917,7 +2934,7 @@ function nextPick(L) {
 }
 const teamOnClock = (L) => {
   const n = nextPick(L);
-  return n == null ? null : L.draft.order[HLL.pickOwner(n, L.size)];
+  return n == null ? null : L.draft.order[ownerIndex(L, n)];
 };
 function filledFor(L, teamId) {
   const filled = slotsOf(L).map(() => false);
@@ -2926,9 +2943,10 @@ function filledFor(L, teamId) {
 }
 function makePick(L, pid, at = Date.now()) {
   const n = nextPick(L);
-  const team = L.draft.order[HLL.pickOwner(n, L.size)];
+  const team = L.draft.order[ownerIndex(L, n)];
   const slot = HLL.openSlot(filledFor(L, team), slotsOf(L));
-  L.draft.picks.push({ n, team, pid, slot });
+  L.draft.picks.push({ n, team, pid, slot, at: iso(at) });
+  L.draft.clockFor = null;
   if (nextPick(L) == null) finishDraft(L, at);
 }
 function cpuPicks(L, { me = false, at = Date.now() } = {}) {
@@ -2959,7 +2977,8 @@ function startDraft(L, at = Date.now()) {
     pids.forEach((pid, k) => {
       const round = slots - pids.length + k;
       const pos = L.draft.order.indexOf(teamId);
-      const n = round * L.size + (round % 2 ? L.size - 1 - pos : pos);
+      let n = round * L.size;
+      while (ownerIndex(L, n) !== pos) n++;
       L.draft.picks.push({ n, team: teamId, pid, slot: -1, keeper: true });
     });
   // Keepers take the last open spots on the roster.
@@ -3077,6 +3096,7 @@ function viewFantasy(r) {
     <section class="stack" data-tour="fantasy-create">${sectionHead("Find a league")}
       <div class="card list">${fz.open.map((o) => `<div class="list-item"><div class="grow"><b>${esc(o.name)}</b><div class="small muted">Public · ${o.filled} of ${o.size} teams</div></div><button class="btn btn-sm btn-secondary" data-act="f-join" data-id="${o.id}">Join</button></div>`).join("") || `<p class="pad muted">No open leagues.</p>`}</div>
       <div class="row"><button class="btn btn-primary grow" data-act="f-create">Create a league</button><button class="btn btn-secondary grow" data-act="f-code">Join with code</button></div>
+      <button class="btn btn-secondary btn-block" data-act="f-mock" data-tour="fantasy-mock">Practice with a mock draft</button>
     </section>`;
 }
 
@@ -3094,7 +3114,7 @@ function viewFantasyLeague(r) {
   const body = (views[tab] || draftTab)(L, r);
   const over = seasonOver(L);
   return `<a class="link back" href="#/fantasy">‹ Fantasy</a>
-    <div class="page-head"><h1 class="h1">${esc(me.name)}</h1><p class="muted">${esc(L.name)} · ${esc(seasonById(L.season).name)} · ${L.size} teams · ${L.public ? "Public" : `Private · code ${esc(L.code)}`} · Commissioner: ${esc(L.commissioner)}</p></div>
+    <div class="page-head"><h1 class="h1">${esc(me.name)}</h1><p class="muted">${esc(L.name)} · ${esc(seasonById(L.season).name)} · ${L.size} teams · ${leagueSettings(L).type === "h2h" ? "Head-to-head" : "Points"} · ${L.public ? "Public" : L.code ? `Private · code ${esc(L.code)}` : "Private"} · Commissioner: ${esc(L.commissioner)}</p></div>
     ${over && drafted ? `<p class="notice warn">The ${esc(seasonById(L.season).name)} season is over, so moves are closed. ${isCommish(L) ? `<a class="link" href="#/fantasy/${L.id}/settings">Bring the league back</a> for next season.` : "The commissioner can bring the league back next season."}</p>` : ""}
     <div class="tabs-inline">${tabs.map(([k, l]) => `<a href="#/fantasy/${L.id}/${k}" class="${tab === k || (k === "trades" && tab === "trade") ? "on" : ""}">${l}</a>`).join("")}</div>${body}`;
 }
@@ -3124,6 +3144,7 @@ function teamTab(L, r) {
 }
 
 function standingsTab(L) {
+  if (leagueSettings(L).type === "h2h") return h2hStandings(L);
   const st = fantasyStandings(L);
   const weeks = L.season === PAST.id ? [] : W.weeks.filter((w) => w.start <= NOW);
   const cur = HLL.weekOf(W.weeks, NOW);
@@ -3131,6 +3152,23 @@ function standingsTab(L) {
     .map((x, i) => `<tr class="${x.team.mine ? "mine" : ""}"><td><span class="rank">${i + 1}</span> <a href="#/fantasy/${L.id}/team?team=${x.team.id}"><b>${esc(x.team.name)}</b></a><div class="tiny muted">${esc(x.team.owner)}</div></td>${weeks.map((w) => `<td class="${cur?.n === w.n ? "sorted" : ""}">${fmtPts(x.score?.byWeek.get(w.start) || 0)}</td>`).join("")}<td><b>${fmtPts(x.total)}</b></td><td class="muted">${i ? fmtPts(st[0].total - x.total) : "–"}</td></tr>`)
     .join("")}</tbody></table></div>
     <p class="small muted">${L.season === PAST.id ? "Season totals for each team's starters. During a season, points are counted game by game." : `Points by week. ${cur ? `Week ${cur.n} is in progress.` : ""} Each game counts for whoever had the player in a starting spot when that week's lineups locked.`}</p>`;
+}
+
+function h2hStandings(L) {
+  const scores = leagueScores(L);
+  const { rec, matchups, weeks } = h2hRecords(L, scores);
+  // Weekly matchups need points week by week (a season scored game by game on the site).
+  if (!weeks.length || ![...scores.values()].some((x) => x.byWeek.size))
+    return `<p class="notice">This is a head-to-head league: each week you play one other team, and the standings are your win-loss record. Weekly matchups need a season scored game by game on the site; ${esc(seasonById(L.season).name)} came from the league's records, so here are total points instead.</p>${pointsTable(L)}`;
+  const rows = L.teams.map((team) => ({ team, ...rec.get(team.id), pts: scores.get(team.id)?.total || 0 })).sort((a, b) => b.w + b.t / 2 - (a.w + a.t / 2) || b.pts - a.pts);
+  const cur = matchups.filter((m) => m.week === weeks.at(-1).n);
+  return `<div class="card scroll-x" data-tour="fantasy-standings"><table><thead><tr><th>Team</th><th>W</th><th>L</th><th>T</th><th>Points for</th></tr></thead><tbody>${rows.map((x, i) => `<tr class="${x.team.mine ? "mine" : ""} ${i === leagueSettings(L).playoffTeams ? "cut" : ""}"><td><span class="rank">${i + 1}</span> <b>${esc(x.team.name)}</b></td><td>${x.w}</td><td>${x.l}</td><td>${x.t}</td><td>${fmtPts(x.pts)}</td></tr>`).join("")}</tbody></table></div>
+    ${sectionHead(`Week ${weeks.at(-1).n} matchups`)}<div class="card list">${cur.map((m) => `<div class="list-item"><b class="grow">${esc(teamById(L, m.x).name)}</b><span class="num">${fmtPts(m.px)} – ${fmtPts(m.py)}</span><b class="grow" style="text-align:right">${esc(teamById(L, m.y).name)}</b></div>`).join("")}</div>
+    <p class="small muted">The top ${leagueSettings(L).playoffTeams} make the playoffs.</p>`;
+}
+function pointsTable(L) {
+  const st = fantasyStandings(L);
+  return `<div class="card scroll-x"><table><thead><tr><th>Team</th><th>Total</th></tr></thead><tbody>${st.map((x, i) => `<tr class="${x.team.mine ? "mine" : ""}"><td><span class="rank">${i + 1}</span> <b>${esc(x.team.name)}</b></td><td><b>${fmtPts(x.total)}</b></td></tr>`).join("")}</tbody></table></div>`;
 }
 
 function playersTab(L, r) {
@@ -3147,11 +3185,12 @@ function playersTab(L, r) {
       .map((p) => {
         const o = ownerOf(L, p.id);
         const pr = proj.get(p.id);
-        const right = o ? `<span class="small muted ellipsis" style="max-width:36%">${esc(teamById(L, o).name)}</span>` : over ? "" : `<button class="btn btn-sm btn-secondary" data-act="f-add" data-pid="${p.id}" data-l="${L.id}">Add</button>`;
-        return `<div class="list-item">${badge(teamOf(p.id, L.season))}<div class="grow"><a href="#/player/${p.id}"><b>${esc(p.name)}</b></a><div class="tiny muted">${esc(posLabel(p))} · ${fmtPts(pr.now.bat + pr.now.pit)} pts this season · ${fmtPts(pr.last.bat + pr.last.pit)} last season</div></div>${right}</div>`;
+        const waiver = L.waivers?.[p.id] && Date.parse(L.waivers[p.id]) > Date.now() ? L.waivers[p.id] : null;
+        const right = o ? `<span class="small muted ellipsis" style="max-width:36%">${esc(teamById(L, o).name)}</span>` : over ? "" : waiver ? `<span class="tag">Waivers until ${fmtDay(waiver)}</span>` : `<button class="btn btn-sm btn-secondary" data-act="f-add" data-pid="${p.id}" data-l="${L.id}">Add</button>`;
+        return `<div class="list-item">${badge(teamOf(p.id, L.season))}<div class="grow"><a href="#/player/${p.id}"><b>${esc(p.name)}</b></a><div class="tiny muted">${esc(posLabel(p))} · ${fmtPts(pr.now.bat + pr.now.pit)} pts this season${lastSeason(L) ? ` · ${fmtPts(pr.last.bat + pr.last.pit)} last season` : ""}</div></div>${right}</div>`;
       })
       .join("") || `<p class="pad muted">Nobody matches.</p>`}</div>
-    <p class="small muted">Free agents can be added any time; they start scoring the next Monday. If your roster is full, you pick someone to drop.</p>`;
+    <p class="small muted">Free agents can be added any time; they score from their next game. If your roster is full, you pick someone to drop.</p>`;
 }
 
 function tradeLine(L, tr) {
@@ -3164,13 +3203,15 @@ function tradesTab(L) {
   const incoming = L.trades.filter((t) => t.status === "pending" && t.to === me);
   const outgoing = L.trades.filter((t) => t.status === "pending" && t.from === me);
   const others = L.trades.filter((t) => t.status === "pending" && t.from !== me && t.to !== me);
-  const past = L.trades.filter((t) => t.status !== "pending");
+  const waiting = L.trades.filter((t) => t.status === "review" || t.status === "vote");
+  const past = L.trades.filter((t) => !["pending", "review", "vote"].includes(t.status));
   const over = seasonOver(L);
   const card = (t, btns) => `<div class="card pad stack-s"><p class="small">${tradeLine(L, t)}</p><div class="row between"><span class="tiny muted">${fmtWhen(t.at)}${t.status !== "pending" ? ` · ${t.status}` : ""}</span><div class="row">${btns}</div></div></div>`;
-  return `<div class="row between"><p class="small muted grow">Trades go through when the other team accepts. The commissioner can cancel any trade. Traded players score for their new team starting the next Monday.</p>${over ? "" : `<a class="btn btn-primary btn-sm" href="#/fantasy/${L.id}/trade">Propose a trade</a>`}</div>
+  return `<div class="row between"><p class="small muted grow">${{ none: "Trades go through when the other team accepts.", commish: "Accepted trades go through once the commissioner approves them.", vote: "Accepted trades go to a one-day league vote." }[leagueSettings(L).tradeReview]}${L.settings.tradeDeadline ? ` Trade deadline: ${fmtDay(L.settings.tradeDeadline)}.` : ""} The commissioner can cancel any trade. Traded players score for their new team from their next game.</p>${over || pastDeadline(L) ? "" : `<a class="btn btn-primary btn-sm" href="#/fantasy/${L.id}/trade">Propose a trade</a>`}</div>
     <section class="stack" data-tour="fantasy-trades">${sectionHead("Offers to you")}${incoming.map((t) => card(t, `<button class="btn btn-sm btn-secondary" data-act="f-trade-answer" data-l="${L.id}" data-id="${t.id}" data-yes="0">Decline</button><button class="btn btn-sm btn-green" data-act="f-trade-answer" data-l="${L.id}" data-id="${t.id}" data-yes="1">Accept</button>`)).join("") || `<p class="card pad small muted">No offers right now.</p>`}</section>
     ${sectionHead("Your offers")}${outgoing.map((t) => card(t, `<button class="btn btn-sm btn-secondary" data-act="f-trade-cancel" data-l="${L.id}" data-id="${t.id}">Cancel</button><button class="btn btn-sm btn-secondary" data-act="f-trade-cpu" data-l="${L.id}" data-id="${t.id}">Demo: have them answer</button>`)).join("") || `<p class="card pad small muted">None.</p>`}
     ${others.length && isCommish(L) ? `${sectionHead("Other offers (commissioner)")}${others.map((t) => card(t, `<button class="btn btn-sm btn-danger" data-act="f-trade-cancel" data-l="${L.id}" data-id="${t.id}">Cancel trade</button>`)).join("")}` : ""}
+    ${waiting.length ? `${sectionHead(L.settings.tradeReview === "vote" ? "Waiting for the league vote" : "Waiting for the commissioner")}${waiting.map((t) => card(t, isCommish(L) || t.status === "vote" ? `<button class="btn btn-sm btn-danger" data-act="f-trade-review" data-l="${L.id}" data-id="${t.id}" data-yes="0">${t.status === "vote" ? "Demo: voted down" : "Veto"}</button><button class="btn btn-sm btn-green" data-act="f-trade-review" data-l="${L.id}" data-id="${t.id}" data-yes="1">${t.status === "vote" ? "Demo: vote passes" : "Approve"}</button>` : `<button class="btn btn-sm btn-secondary" data-act="f-trade-review" data-l="${L.id}" data-id="${t.id}" data-yes="1">Demo: commissioner approves</button>`)).join("")}` : ""}
     ${sectionHead("Past trades")}${past.map((t) => card(t, "")).join("") || `<p class="card pad small muted">None yet.</p>`}`;
 }
 function tradeBuilder(L, r) {
@@ -3189,46 +3230,9 @@ function activityTab(L) {
   return `<div class="card list" data-tour="fantasy-activity">${L.log.map((x) => `<div class="list-item"><span class="small muted" style="width:92px">${fmtDay(x.at)}</span><span class="grow small">${esc(x.text)}</span></div>`).join("") || `<p class="pad muted">Nothing yet.</p>`}</div><p class="small muted">Every add, drop, trade, lineup move and commissioner change, for the whole league to see.</p>`;
 }
 function teamsTab(L) {
-  return `<div class="card list">${L.draft.order.map((id, i) => { const t = teamById(L, id); return `<div class="list-item"><span class="rank">${i + 1}</span><div class="grow"><b>${esc(t.name)}</b><div class="tiny muted">${esc(t.owner)}</div></div>${t.mine ? '<span class="tag">You</span>' : ""}</div>`; }).join("")}</div><p class="small muted">Draft order for round 1. The order reverses each round (snake).</p>`;
+  return `<div class="card list">${L.draft.order.map((id, i) => { const t = teamById(L, id); return `<div class="list-item"><span class="rank">${i + 1}</span><div class="grow"><b>${esc(t.name)}</b><div class="tiny muted">${esc(t.owner)}</div></div>${t.mine ? '<span class="tag">You</span>' : ""}</div>`; }).join("")}</div><p class="small muted">Draft order for round 1.</p>`;
 }
 
-function draftTab(L, r) {
-  const me = myTeam(L);
-  const slots = slotsOf(L);
-  if (L.draft.status === "done") {
-    const rounds = [];
-    [...L.draft.picks].sort((a, b) => a.n - b.n).forEach((p) => (rounds[Math.floor(p.n / L.size)] ||= []).push(p));
-    return `<p class="small muted">Snake draft: the order reverses every round. Keepers are marked K.</p><div class="draft-grid">${rounds
-      .map((picks, ri) => `<div class="stack-s"><h3 class="h3">Round ${ri + 1}</h3><div class="card list">${picks.map((p) => { const t = teamById(L, p.team); return `<div class="list-item small ${t.mine ? "mine" : ""}"><span class="num muted" style="width:40px">${HLL.pickLabel(p.n, L.size)}</span><span class="grow"><b>${esc(nameOf(p.pid))}</b>${p.keeper ? ' <span class="tag">K</span>' : ""}</span><span class="muted ellipsis" style="max-width:42%">${esc(t.name)}</span></div>`; }).join("")}</div></div>`)
-      .join("")}</div>`;
-  }
-  if (L.draft.status === "pre") {
-    const needKeepers = L.keepers && !L.keeperPicks;
-    return `<div class="card pad stack-s" data-tour="fantasy-draft"><p><b>${L.size} teams · ${slots.length} rounds · snake order.</b> Each team drafts ${HLL.STARTERS} starters and ${slots.length - HLL.STARTERS} bench players. ${me ? `You pick ${ord(L.draft.order.indexOf(me.id) + 1)} in round 1.` : ""}</p>
-      ${L.keepers ? `<p class="small">This league keeps ${L.keepers} player${L.keepers > 1 ? "s" : ""} per team from last season, in each team's last round${L.keepers > 1 ? "s" : ""}.</p>` : ""}
-      ${needKeepers ? keeperPicker(L) : isCommish(L) ? `<button class="btn btn-primary btn-block" data-act="f-start" data-l="${L.id}">Start the draft</button>` : `<p class="small muted">Waiting for the commissioner to start the draft.</p>`}</div>`;
-  }
-  const clock = teamOnClock(L);
-  const myTurn = clock === me.id;
-  const proj = projections(L);
-  const taken = new Set(L.draft.picks.map((p) => p.pid));
-  const avail = fantasyPool(L).filter((p) => !taken.has(p.id)).sort((a, b) => (proj.get(b.id)?.value || 0) - (proj.get(a.id)?.value || 0)).slice(0, 40);
-  const n = nextPick(L);
-  const recent = [...L.draft.picks].filter((p) => !p.keeper).sort((a, b) => b.n - a.n).slice(0, 8);
-  const minePicks = L.draft.picks.filter((p) => p.team === me.id);
-  return `<div class="card pad stack-s clock ${myTurn ? "on-clock" : ""}" data-tour="fantasy-draft">
-      <p class="eyebrow">Round ${Math.floor(n / L.size) + 1} · Pick ${HLL.pickLabel(n, L.size)}</p><p class="h2">${myTurn ? "You're on the clock" : `${esc(teamById(L, clock).name)} is picking`}</p>
-      <div class="row">${myTurn ? `<button class="btn btn-secondary btn-sm" data-act="f-autopick" data-l="${L.id}">Pick the best available for me</button>` : ""}<button class="btn btn-secondary btn-sm" data-act="f-auto" data-l="${L.id}">Autodraft the rest</button>${isCommish(L) && L.draft.picks.some((p) => !p.keeper) ? `<button class="btn btn-secondary btn-sm" data-act="f-undo-pick" data-l="${L.id}">Undo last pick (commissioner)</button>` : ""}</div>
-    </div>
-    <div class="cols"><div class="col">
-    ${sectionHead("Best available", `<span class="small muted">This season's points, plus a bit of last season's</span>`)}
-    <div class="card list">${avail.map((p) => `<div class="list-item">${badge(teamOf(p.id, L.season))}<div class="grow"><b>${esc(p.name)}</b><div class="tiny muted">${esc(posLabel(p))} · ${fmtPts(proj.get(p.id).value)}</div></div><button class="btn btn-sm btn-primary" data-act="f-pick" data-l="${L.id}" data-pid="${p.id}" ${myTurn ? "" : "disabled"}>Draft</button></div>`).join("")}</div>
-    </div><div class="col">
-    ${sectionHead("My roster")}
-    <div class="card list">${slots.map((sl, i) => { const p = minePicks.find((x) => x.slot === i); return `<div class="list-item"><span class="slot">${sl}</span>${p ? `<b>${esc(nameOf(p.pid))}</b>${p.keeper ? ' <span class="tag">K</span>' : ""}` : '<span class="muted">Empty</span>'}</div>`; }).join("")}</div>
-    ${recent.length ? `${sectionHead("Recent picks")}<div class="card list">${recent.map((p) => `<div class="list-item small"><span class="num muted" style="width:40px">${HLL.pickLabel(p.n, L.size)}</span><span class="grow"><b>${esc(nameOf(p.pid))}</b></span><span class="muted ellipsis" style="max-width:45%">${esc(teamById(L, p.team).name)}</span></div>`).join("")}</div>` : ""}
-    </div></div>`;
-}
 function keeperPicker(L) {
   const prev = leagueById(L.renewedFrom);
   const me = myTeam(L);
@@ -3240,29 +3244,6 @@ function keeperPicker(L) {
     .join("")}</div><p class="tiny muted">Kids who aged out or left the league can't be kept. The other teams pick theirs too.</p>
     <button class="btn btn-primary btn-block" data-act="f-keep-save" data-l="${L.id}">Save keepers</button></div>`;
   void me;
-}
-
-function settingsTab(L) {
-  const edit = isCommish(L);
-  const row = (group, k, label) => {
-    const v = L.scoring[group][k] ?? 0;
-    return `<div class="list-item"><span class="grow">${label}${k === "IP" ? ' <span class="tiny muted">(per inning)</span>' : ""}</span>${edit ? `<input class="input pts-input" type="number" step="0.5" value="${v}" data-change="f-score" data-l="${L.id}" data-g="${group}" data-k="${k}" aria-label="${label} points">` : `<b class="num">${v > 0 ? "+" : ""}${v}</b>`}</div>`;
-  };
-  const over = seasonOver(L);
-  const next = L.season === PAST.id && S.turnover ? NEXT : null;
-  const renewed = S.fantasy.leagues.some((x) => x.renewedFrom === L.id);
-  return `${!(over && edit && next && !renewed) ? `<section class="card pad stack-s" data-tour="fantasy-renew"><b>Next season</b><p class="small muted">Leagues don't restart on their own. When the season is over, the commissioner can bring the league back: everyone in it is added automatically, and the commissioner picks how many keepers each team gets.</p></section>` : ""}${over && edit && next && !renewed ? `<section class="card pad stack-s" data-tour="fantasy-renew"><h2 class="h2">Bring the league back for ${esc(next.name)}</h2><p class="small muted">Everyone in the league is added automatically, with the same team names. You decide how many keepers each team gets.</p>
-      <div class="field"><label for="f-keepn">Keepers per team</label><select class="input" id="f-keepn">${[0, 1, 2, 3].map((n) => `<option value="${n}" ${n === 2 ? "selected" : ""}>${n}</option>`).join("")}</select></div>
-      <button class="btn btn-primary" data-act="f-renew" data-l="${L.id}">Bring it back</button></section>` : ""}
-    <p class="small muted">${edit ? "You're the commissioner, so you can change how many points each stat is worth. Changes apply to the whole league right away, including past weeks." : `Only the commissioner (${esc(L.commissioner)}) can change scoring.`}</p>
-    <div class="cols" data-tour="fantasy-settings"><div class="col">${sectionHead("Hitting")}<div class="card list">${HLL.BAT_STATS.map(([k, l]) => row("bat", k, l)).join("")}</div></div>
-    <div class="col">${sectionHead("Pitching")}<div class="card list">${HLL.PIT_STATS.map(([k, l]) => row("pit", k, l)).join("")}</div></div></div>
-    ${edit ? `<button class="btn btn-secondary" data-act="f-reset-scoring" data-l="${L.id}">Reset to default scoring</button>` : ""}
-    ${sectionHead("League")}
-    <div class="card list small"><div class="list-item"><span class="grow">Format</span><b>Points, season total</b></div><div class="list-item"><span class="grow">Teams</span><b>${L.size}</b></div><div class="list-item"><span class="grow">Roster</span><b>${HLL.STARTERS} starters + ${slotsOf(L).length - HLL.STARTERS} bench</b></div><div class="list-item"><span class="grow">Lineups</span><b>Swap any time before a player's game starts</b></div><div class="list-item"><span class="grow">Draft</span><b>Snake${L.keepers ? `, ${L.keepers} keeper${L.keepers > 1 ? "s" : ""}` : ""}</b></div>${L.code ? `<div class="list-item"><span class="grow">League code</span><b>${esc(L.code)}</b></div>` : ""}</div>
-    ${sectionHead("Your team")}
-    <div class="card pad row"><input class="input grow" id="f-rename" value="${esc(myTeam(L).name)}" aria-label="Team name"><button class="btn btn-secondary" data-act="f-rename" data-l="${L.id}">Rename</button></div>
-    <button class="btn btn-danger" data-act="f-leave" data-l="${L.id}">${edit ? "Delete league" : "Leave league"}</button>`;
 }
 
 /* ---------------------------------------------------------------- actions */
@@ -3289,15 +3270,18 @@ ACT["f-reset-scoring"] = (el) => {
 CHANGE["f-search"] = (el) => go(withQuery({ q: el.value || null }).slice(2));
 ACT["f-start"] = (el) => {
   const L = leagueById(el.dataset.l);
+  if (leagueSettings(L).order === "random") {
+    L.draft.order = shuffle(L.draft.order);
+    logMove(L, Date.now(), `The draft order was drawn: ${L.draft.order.map((id) => teamById(L, id).name).join(", ")}.`);
+  }
   startDraft(L);
-  cpuPicks(L);
-  fsave(teamOnClock(L) === myTeam(L).id ? "You're on the clock." : "Draft started.");
+  armClock(L);
+  fsave(teamOnClock(L) === myTeam(L).id ? "You're on the clock." : `Draft started. You pick ${ord(L.draft.order.indexOf(myTeam(L).id) + 1)}.`);
 };
 ACT["f-pick"] = (el) => {
   const L = leagueById(el.dataset.l);
-  if (teamOnClock(L) !== myTeam(L).id) return;
-  makePick(L, el.dataset.pid);
-  cpuPicks(L);
+  if (teamOnClock(L) !== myTeam(L).id) return toast("It's not your pick yet.");
+  draftPick(L, el.dataset.pid);
   save();
   if (L.draft.status === "done") {
     go(`fantasy/${L.id}/team`);
@@ -3323,7 +3307,9 @@ ACT["f-undo-pick"] = (el) => {
   const last = [...L.draft.picks].filter((p) => !p.keeper).sort((a, b) => b.n - a.n)[0];
   if (!last) return;
   L.draft.picks = L.draft.picks.filter((p) => p !== last);
-  logMove(L, Date.now(), `The commissioner undid pick ${HLL.pickLabel(last.n, L.size)} (${nameOf(last.pid)}).`);
+  L.draft.clockFor = null;
+  L.draft.paused = true;
+  logMove(L, Date.now(), `The commissioner undid pick ${pickLabelOf(L, last.n)} (${nameOf(last.pid)}) and paused the draft.`);
   fsave(`Undid the pick of ${nameOf(last.pid)}.`);
 };
 ACT["f-move"] = (el) => {
@@ -3350,13 +3336,22 @@ ACT["f-move"] = (el) => {
   fsave("Lineup saved. It counts from each player's next game.");
 };
 let addPid = null;
+/** Adds this week against the league's limit. */
+function addsLeft(L) {
+  const limit = leagueSettings(L).addsPerWeek;
+  if (!limit) return Infinity;
+  const since = HLL.weekStart(Date.now());
+  return limit - (L.adds || []).filter((a) => a.team === myTeam(L).id && Date.parse(a.at) >= since).length;
+}
 ACT["f-add"] = (el) => {
   addPid = el.dataset.pid;
   const L = leagueById(el.dataset.l);
+  if (addsLeft(L) <= 0) return toast(`You've used your ${L.settings.addsPerWeek} add${L.settings.addsPerWeek === 1 ? "" : "s"} for this week. More on Monday.`);
   const rows = rosterNow(L, myTeam(L).id);
   if (rows.length < slotsOf(L).length) {
     const slot = freeSlot(L, myTeam(L).id);
     setRow(L, myTeam(L).id, addPid, slot, Date.now());
+    (L.adds ||= []).push({ team: myTeam(L).id, at: new Date().toISOString() });
     logMove(L, Date.now(), `${myTeam(L).name} added ${nameOf(addPid)}.`);
     return fsave(`Added ${nameOf(addPid)}.`);
   }
@@ -3372,6 +3367,9 @@ ACT["f-drop"] = (el) => {
   const at = Date.now();
   const row = endRow(L, drop, at);
   setRow(L, myTeam(L).id, addPid, row.slot_index, at);
+  (L.adds ||= []).push({ team: myTeam(L).id, at: new Date(at).toISOString() });
+  const days = leagueSettings(L).waiverDays;
+  if (days) (L.waivers ||= {})[drop] = new Date(at + days * DAY).toISOString();
   logMove(L, at, `${myTeam(L).name} added ${nameOf(addPid)} and dropped ${nameOf(drop)}.`);
   save();
   closeSheet();
@@ -3384,8 +3382,10 @@ CHANGE["f-trade-pick"] = (el) => {
   sel[k] = el.checked ? [...sel[k], el.dataset.pid] : sel[k].filter((x) => x !== el.dataset.pid);
   fsave();
 };
+const pastDeadline = (L) => leagueSettings(L).tradeDeadline && Date.now() > Date.parse(L.settings.tradeDeadline);
 ACT["f-trade-send"] = (el) => {
   const L = leagueById(el.dataset.l);
+  if (pastDeadline(L)) return toast("The trade deadline has passed.");
   const sel = S.fTrade || { give: [], get: [] };
   const full = slotsOf(L).length;
   const me = myTeam(L).id;
@@ -3398,11 +3398,29 @@ ACT["f-trade-send"] = (el) => {
   toast("Offer sent. They'll get a notification.");
 };
 function answerTrade(L, tr, yes, by) {
-  tr.status = yes ? "accepted" : "declined";
   tr.decidedAt = new Date().toISOString();
-  if (yes) applyTrade(L, tr, Date.now());
-  else logMove(L, Date.now(), `${by} declined a trade.`);
+  if (!yes) {
+    tr.status = "declined";
+    return logMove(L, Date.now(), `${by} declined a trade.`);
+  }
+  const review = leagueSettings(L).tradeReview;
+  if (review === "none") {
+    tr.status = "accepted";
+    return applyTrade(L, tr, Date.now());
+  }
+  // Accepted, but it waits for the commissioner (or a league vote) before the players move.
+  tr.status = review === "commish" ? "review" : "vote";
+  logMove(L, Date.now(), `${by} accepted a trade; it's waiting for ${review === "commish" ? "the commissioner" : "the league vote"}.`);
 }
+ACT["f-trade-review"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  const tr = L.trades.find((t) => t.id === el.dataset.id);
+  const ok = el.dataset.yes === "1";
+  tr.status = ok ? "accepted" : "vetoed";
+  if (ok) applyTrade(L, tr, Date.now());
+  else logMove(L, Date.now(), tr.status === "vetoed" && L.settings.tradeReview === "vote" ? "The league voted down a trade." : "The commissioner vetoed a trade.");
+  fsave(ok ? "Trade approved. The players have switched teams." : "Trade vetoed.");
+};
 ACT["f-trade-answer"] = (el) => {
   const L = leagueById(el.dataset.l);
   const tr = L.trades.find((t) => t.id === el.dataset.id);
@@ -3521,6 +3539,16 @@ ACT["f-docreate"] = () => {
   go(`fantasy/${id}/draft`);
   toast(priv ? `League created. Join code: ${code}` : "League created.");
 };
+ACT["f-mock"] = () => {
+  const id = `M${Date.now()}`;
+  const L = newLeague({ id, name: "Mock draft", season: W.season.id, size: 8, myIndex: 0, isPublic: false, code: null, seed: Date.now() % 11, myTeam: `${S.account.name.split(" ").pop()} Mock` });
+  L.mock = true;
+  leagueSettings(L);
+  S.fantasy.leagues.push(L);
+  save();
+  go(`fantasy/${id}/draft`);
+  toast("A practice league with 7 computer teams. Change the draft settings if you like, then start.");
+};
 ACT["f-code"] = () =>
   openSheet(
     () => `<h2 class="h2">Join a private league</h2><p class="small muted" style="margin:4px 0 12px">Enter the code from the league's commissioner.</p>
@@ -3535,6 +3563,485 @@ ACT["f-docode"] = () => {
     go(`fantasy/${L.id}`);
     toast("You're already in that league.");
   } else toast("No league with that code. In this demo, try COACH6.");
+};
+
+// ---- app-draft.js
+/* ---------------------------------------------------------------- fantasy: live draft room and league settings (modeled on ESPN)
+ * The draft runs on a pick clock (2 minutes by default). Computer teams pick after a few seconds; when your clock
+ * runs out, the best player in your queue (or the best available) is picked for you. The commissioner sets the
+ * clock, the draft type (snake, linear, third-round reversal), the order (random or set by hand) and everything
+ * else in League settings.
+ */
+const CLOCKS = [[0, "No limit"], [15, "15 seconds"], [30, "30 seconds"], [45, "45 seconds"], [60, "1 minute"], [90, "90 seconds"], [120, "2 minutes"], [180, "3 minutes"], [300, "5 minutes"], [600, "10 minutes"]];
+const DRAFT_TYPES = { snake: "Snake", linear: "Linear (same order every round)", trr: "Third-round reversal" };
+const LEAGUE_TYPES = { points: "Points (season total)", h2h: "Head-to-head points (weekly matchups)" };
+const TRADE_REVIEW = { none: "None (trades go through right away)", commish: "Commissioner approves", vote: "League votes (one day)" };
+const POS_FILTERS = [["", "All"], ["P", "P"], ["C", "C"], ["1B", "1B"], ["INF", "INF"], ["OF", "OF"]];
+
+/** Settings every league has (older saved leagues get the defaults). */
+function leagueSettings(L) {
+  L.settings ||= {};
+  const d = { type: "points", clock: 120, draftType: "snake", order: "random", draftAt: null, addsPerWeek: 0, waiverDays: 0, tradeReview: "none", tradeDeadline: null, playoffTeams: 4 };
+  for (const [k, v] of Object.entries(d)) if (!(k in L.settings)) L.settings[k] = v;
+  return L.settings;
+}
+
+/** Which draft position (0-based) owns overall pick n, for this league's draft type. */
+function ownerIndex(L, n) {
+  const size = L.size;
+  const round = Math.floor(n / size);
+  const i = n % size;
+  const type = leagueSettings(L).draftType;
+  const reversed = type === "linear" ? false : type === "trr" ? (round === 0 ? false : round === 1 || round === 2 ? true : round % 2 === 0) : round % 2 === 1;
+  return reversed ? size - 1 - i : i;
+}
+const pickLabelOf = (L, n) => `${Math.floor(n / L.size) + 1}.${String((n % L.size) + 1).padStart(2, "0")}`;
+const fmtClock = (ms) => {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+};
+
+/* ---- the clock */
+/** Starts the clock for the pick on the clock, if it isn't running yet. */
+function armClock(L) {
+  const n = nextPick(L);
+  if (n == null || L.draft.paused) return;
+  if (L.draft.clockFor === n) return;
+  const secs = leagueSettings(L).clock;
+  L.draft.clockFor = n;
+  L.draft.deadline = secs ? Date.now() + secs * 1000 : null;
+  // Computer teams take a few seconds, like a person looking over the board.
+  L.draft.cpuAt = Date.now() + 1500 + Math.random() * 2500;
+}
+/** The best player for a team: its queue first (for you), then the most projected points. */
+function bestPick(L, teamId) {
+  const taken = new Set(L.draft.picks.map((p) => p.pid));
+  const avail = fantasyPool(L).filter((p) => !taken.has(p.id));
+  const team = teamById(L, teamId);
+  if (team?.mine) {
+    const q = (L.queue || []).find((pid) => !taken.has(pid));
+    if (q) return q;
+  }
+  const proj = new Map([...projections(L)].map(([id, v]) => [id, v.proj]));
+  return HLL.autopick(avail, filledFor(L, teamId), slotsOf(L), proj)?.id || null;
+}
+function draftPick(L, pid, how = "") {
+  const team = teamOnClock(L);
+  makePick(L, pid);
+  if (L.queue) L.queue = L.queue.filter((x) => x !== pid);
+  if (how) logMove(L, Date.now(), `${teamById(L, team).name} ${how} ${nameOf(pid)}.`);
+  if (L.draft.status === "done") notify("fantasy", `The ${L.name} draft is done.`, `fantasy/${L.id}/team`);
+}
+
+// One clock for every draft in progress: computer picks, time running out, autodraft.
+setInterval(() => {
+  if (!S || !S.fantasy || !W) return;
+  const r = parseRoute();
+  let changed = false;
+  for (const L of S.fantasy.leagues) {
+    if (L.draft.status !== "drafting" || L.draft.paused) continue;
+    armClock(L);
+    const team = teamOnClock(L);
+    if (team == null) continue;
+    const mine = teamById(L, team)?.mine;
+    const now = Date.now();
+    if (!mine && now >= L.draft.cpuAt) {
+      const pid = bestPick(L, team);
+      if (pid) draftPick(L, pid);
+      changed = true;
+    } else if (mine && (L.draft.autodraft || (L.draft.deadline && now >= L.draft.deadline))) {
+      const pid = bestPick(L, team);
+      if (pid) draftPick(L, pid, L.draft.autodraft ? "autodrafted" : "ran out of time, so the pick was made for them:");
+      changed = true;
+    }
+    if (!changed && r.name === "fantasy" && r.parts[1] === L.id) {
+      const el = document.getElementById("draft-clock");
+      if (el) {
+        const left = L.draft.deadline ? L.draft.deadline - now : null;
+        el.textContent = left == null ? "No limit" : fmtClock(left);
+        el.classList.toggle("urgent", left != null && left <= 10000);
+      }
+    }
+  }
+  if (changed) {
+    save();
+    if (r.name === "fantasy") {
+      const y = window.scrollY;
+      const focus = document.activeElement?.id;
+      const caret = document.activeElement?.selectionStart;
+      render();
+      window.scrollTo(0, y);
+      if (focus) {
+        const el = document.getElementById(focus);
+        if (el) {
+          el.focus();
+          if (caret != null && el.setSelectionRange) el.setSelectionRange(caret, caret);
+        }
+      }
+    }
+  }
+}, 400);
+
+/* ---- the draft tab */
+function draftTab(L, r) {
+  leagueSettings(L);
+  if (L.draft.status === "pre") return preDraft(L);
+  if (L.draft.status === "done") return `<p class="small muted">${DRAFT_TYPES[L.settings.draftType]} draft · ${L.draft.picks.length} picks. Keepers are marked K.</p>${draftBoard(L)}`;
+  return draftRoom(L, r);
+}
+
+function preDraft(L) {
+  const s = L.settings;
+  const me = myTeam(L);
+  const needKeepers = L.keepers && !L.keeperPicks;
+  const slots = slotsOf(L);
+  return `<div class="card pad stack-s" data-tour="fantasy-draft">
+      <h2 class="h2">Draft</h2>
+      <div class="list small"><div class="list-item"><span class="grow">Type</span><b>${DRAFT_TYPES[s.draftType]}</b></div><div class="list-item"><span class="grow">Pick clock</span><b>${CLOCKS.find(([v]) => v === s.clock)?.[1]}</b></div><div class="list-item"><span class="grow">Order</span><b>${s.order === "random" ? "Random, set when the draft starts" : "Set by the commissioner"}</b></div><div class="list-item"><span class="grow">Rounds</span><b>${slots.length} (${HLL.STARTERS} starters + ${slots.length - HLL.STARTERS} bench)</b></div>${s.draftAt ? `<div class="list-item"><span class="grow">Scheduled</span><b>${fmtDay(s.draftAt)} ${fmtTime(s.draftAt)}</b></div>` : ""}${L.keepers ? `<div class="list-item"><span class="grow">Keepers</span><b>${L.keepers} per team, in the last rounds</b></div>` : ""}</div>
+      ${s.order === "manual" ? `<p class="small">You pick ${ord(L.draft.order.indexOf(me.id) + 1)} in round 1.</p>` : ""}
+      ${needKeepers ? keeperPicker(L) : isCommish(L) ? `<div class="row wrap"><button class="btn btn-primary grow" data-act="f-start" data-l="${L.id}">Start the draft</button><a class="btn btn-secondary" href="#/fantasy/${L.id}/settings" data-tour="fantasy-draft-settings-link">Draft settings</a></div>` : `<p class="small muted">Waiting for the commissioner to start the draft.</p>`}
+    </div>
+    <section class="stack-s">${sectionHead("Draft order")}<div class="card list">${L.draft.order.map((id, i) => `<div class="list-item"><span class="rank">${s.order === "random" ? "?" : i + 1}</span><b class="grow">${esc(teamById(L, id).name)}</b><span class="small muted">${esc(teamById(L, id).owner)}</span></div>`).join("")}</div>
+    ${s.order === "random" ? `<p class="small muted">The order is drawn at random when the commissioner starts the draft.</p>` : ""}</section>`;
+}
+
+function draftRoom(L, r) {
+  const me = myTeam(L);
+  const s = L.settings;
+  armClock(L);
+  const n = nextPick(L);
+  const clock = teamOnClock(L);
+  const myTurn = clock === me.id;
+  const view = r.q.view || "players";
+  // How many picks until yours.
+  let until = null;
+  for (let k = n; k < totalPicks(L); k++) if (L.draft.order[ownerIndex(L, k)] === me.id && !L.draft.picks.some((p) => p.n === k)) { until = k - n; break; }
+  const left = L.draft.deadline ? L.draft.deadline - Date.now() : null;
+  const recent = [...L.draft.picks].filter((p) => !p.keeper).sort((a, b) => b.n - a.n).slice(0, 6);
+  const views = [["players", "Players"], ["board", "Draft board"], ["rosters", "Rosters"], ["queue", `My queue${L.queue?.length ? ` (${L.queue.length})` : ""}`]];
+  const body = view === "board" ? draftBoard(L) : view === "rosters" ? draftRosters(L, r) : view === "queue" ? draftQueue(L) : draftPlayers(L, myTurn);
+  return `<div class="draft-head ${myTurn ? "on-clock" : ""}" data-tour="fantasy-draft-clock">
+      <div class="grow"><p class="eyebrow">Round ${Math.floor(n / L.size) + 1} · Pick ${pickLabelOf(L, n)} · overall ${n + 1} of ${totalPicks(L)}</p>
+        <p class="h2">${myTurn ? "You're on the clock" : `${esc(teamById(L, clock).name)} is picking`}</p>
+        <p class="small muted">${myTurn ? "Pick a player, or the best one in your queue is taken when the clock hits zero." : until != null ? `Your pick is ${until === 1 ? "next" : `in ${until} picks`}.` : "You're done picking."}${L.draft.paused ? " <b>Paused by the commissioner.</b>" : ""}</p></div>
+      <div class="draft-clock-box"><span id="draft-clock" class="draft-clock ${left != null && left <= 10000 ? "urgent" : ""}">${L.draft.paused ? "Paused" : left == null ? "No limit" : fmtClock(left)}</span><span class="tiny muted">${s.clock ? `${CLOCKS.find(([v]) => v === s.clock)?.[1]} per pick` : ""}</span></div>
+    </div>
+    <div class="row wrap draft-tools">
+      <label class="switch-inline small"><input type="checkbox" data-change="f-autodraft" data-l="${L.id}" ${L.draft.autodraft ? "checked" : ""}> Autodraft for me</label>
+      ${isCommish(L) ? `<button class="btn btn-sm btn-secondary" data-act="f-pause" data-l="${L.id}">${L.draft.paused ? "Resume draft" : "Pause draft"}</button>${L.draft.picks.some((p) => !p.keeper) ? `<button class="btn btn-sm btn-secondary" data-act="f-undo-pick" data-l="${L.id}">Undo last pick</button>` : ""}` : ""}
+      <button class="btn btn-sm btn-secondary" data-act="f-auto" data-l="${L.id}">Demo: finish the draft now</button>
+    </div>
+    ${recent.length ? `<div class="pick-ticker">${recent.map((p) => `<span><b>${pickLabelOf(L, p.n)}</b> ${esc(nameOf(p.pid))} <span class="muted">${esc(teamById(L, p.team).name)}</span></span>`).join("")}</div>` : ""}
+    <div class="tabs-inline">${views.map(([k, l]) => `<a href="${withQuery({ view: k === "players" ? null : k })}" class="${view === k ? "on" : ""}">${l}</a>`).join("")}</div>
+    ${body}`;
+}
+
+function draftPlayers(L, myTurn) {
+  return `<div class="row wrap" data-tour="fantasy-draft-search"><input class="input grow" id="draft-search" placeholder="Search for a player" value="${esc(S.draftQ || "")}" data-input="draft-search" aria-label="Search for a player" autocomplete="off">
+      <div class="chips">${POS_FILTERS.map(([k, l]) => `<button class="chip ${(S.draftPos || "") === k ? "on" : ""}" data-act="f-dpos" data-k="${k}">${l}</button>`).join("")}</div></div>
+    <div id="draft-avail" data-tour="fantasy-draft-avail">${availList(L, myTurn)}</div>`;
+}
+function availList(L, myTurn) {
+  const proj = projections(L);
+  const taken = new Set(L.draft.picks.map((p) => p.pid));
+  const q = (S.draftQ || "").toLowerCase().trim();
+  const pos = S.draftPos || "";
+  const list = fantasyPool(L)
+    .filter((p) => !taken.has(p.id) && (!q || p.name.toLowerCase().includes(q) || (teamOf(p.id, L.season)?.name || "").toLowerCase().includes(q)) && (!pos || (p.pos || []).includes(pos)))
+    .sort((a, b) => (proj.get(b.id)?.value || 0) - (proj.get(a.id)?.value || 0));
+  const queued = new Set(L.queue || []);
+  const rank = new Map(fantasyPool(L).sort((a, b) => (proj.get(b.id)?.value || 0) - (proj.get(a.id)?.value || 0)).map((p, i) => [p.id, i + 1]));
+  return `<div class="card scroll-x"><table class="draft-avail"><thead><tr><th>Rank</th><th>Player</th><th>Pos</th><th>Proj</th>${lastSeason(L) ? "<th>Last season</th>" : ""}<th></th></tr></thead><tbody>${list
+    .slice(0, 60)
+    .map((p) => {
+      const pr = proj.get(p.id);
+      return `<tr><td class="muted">${rank.get(p.id)}</td><td><a class="row player-cell" href="#/player/${p.id}">${badge(teamOf(p.id, L.season))}<b>${esc(p.name)}</b></a></td><td class="small">${esc(posLabel(p))}</td><td>${fmtPts(pr.value)}</td>${lastSeason(L) ? `<td class="muted">${fmtPts(pr.last.bat + pr.last.pit)}</td>` : ""}
+        <td class="nowrap"><button class="btn btn-sm ${queued.has(p.id) ? "btn-primary" : "btn-secondary"}" data-act="f-queue" data-l="${L.id}" data-pid="${p.id}" title="${queued.has(p.id) ? "Remove from queue" : "Add to queue"}">${queued.has(p.id) ? "Queued" : "+ Queue"}</button> <button class="btn btn-sm btn-green" data-act="f-pick" data-l="${L.id}" data-pid="${p.id}" ${myTurn ? "" : "disabled"}>Draft</button></td></tr>`;
+    })
+    .join("") || `<tr><td colspan="6" class="muted">Nobody matches "${esc(S.draftQ || "")}".</td></tr>`}</tbody></table></div>
+    <p class="small muted">${list.length} available. Proj is this season's points plus a bit of last season's. Queue players so the right one is picked if your clock runs out.</p>`;
+}
+document.addEventListener("input", (e) => {
+  const el = e.target.closest?.('[data-input="draft-search"]');
+  if (!el) return;
+  S.draftQ = el.value;
+  const L = curLeague();
+  const box = document.getElementById("draft-avail");
+  if (L && box) box.innerHTML = availList(L, teamOnClock(L) === myTeam(L).id);
+});
+
+/** Every pick, team by team (columns) and round by round (rows), like ESPN's draft board. */
+function draftBoard(L) {
+  const rounds = slotsOf(L).length;
+  const byN = new Map(L.draft.picks.map((p) => [p.n, p]));
+  const onClock = L.draft.status === "drafting" ? nextPick(L) : null;
+  const cols = L.draft.order;
+  const cell = (n) => {
+    const p = byN.get(n);
+    const who = p ? W.playerById[p.pid] : null;
+    const t = p ? teamOf(p.pid, L.season) : null;
+    return `<td class="board-cell ${n === onClock ? "now" : ""} ${p?.keeper ? "keeper" : ""}" style="${t ? `border-left-color:${t.color}` : ""}"><span class="tiny muted">${pickLabelOf(L, n)}</span>${who ? `<b>${esc(who.first)} ${esc(who.last)}</b><span class="tiny muted">${esc(t?.abbr || "")}${p.keeper ? " · K" : ""}</span>` : n === onClock ? '<b class="tiny">On the clock</b>' : ""}</td>`;
+  };
+  return `<div class="card scroll-x draft-board" data-tour="fantasy-draft-board"><table><thead><tr><th>Rd</th>${cols.map((id) => `<th class="${teamById(L, id).mine ? "mine" : ""}">${esc(teamById(L, id).name)}<div class="tiny muted">${esc(teamById(L, id).owner)}</div></th>`).join("")}</tr></thead><tbody>${Array.from({ length: rounds }, (_, ri) => {
+    const picks = cols.map((_, ci) => {
+      for (let n = ri * L.size; n < (ri + 1) * L.size; n++) if (ownerIndex(L, n) === ci) return n;
+      return null;
+    });
+    return `<tr><td class="bold">${ri + 1}</td>${picks.map((n) => cell(n)).join("")}</tr>`;
+  }).join("")}</tbody></table></div>`;
+}
+
+function draftRosters(L, r) {
+  const team = teamById(L, r.q.team) || myTeam(L);
+  const picks = L.draft.picks.filter((p) => p.team === team.id);
+  return `<div class="chips">${L.teams.map((t) => `<a class="chip ${t.id === team.id ? "on" : ""}" href="${withQuery({ team: t.mine ? null : t.id })}">${esc(t.name)}</a>`).join("")}</div>
+    <div class="card list">${slotsOf(L).map((sl, i) => { const p = picks.find((x) => x.slot === i); return `<div class="list-item"><span class="slot">${sl}</span>${p ? `<b class="grow">${esc(nameOf(p.pid))}</b><span class="tiny muted">${pickLabelOf(L, p.n)}${p.keeper ? " · K" : ""}</span>` : '<span class="muted">Empty</span>'}</div>`; }).join("")}</div>`;
+}
+
+function draftQueue(L) {
+  const taken = new Set(L.draft.picks.map((p) => p.pid));
+  const q = (L.queue || []).filter((pid) => !taken.has(pid));
+  return `<p class="small muted">If your clock runs out (or you turn on autodraft), the first player here who's still available is picked. Otherwise it's the best available.</p>
+    <div class="card list">${q.map((pid, i) => `<div class="list-item"><span class="rank">${i + 1}</span>${badge(teamOf(pid, L.season))}<b class="grow">${esc(nameOf(pid))}</b><button class="btn btn-sm btn-secondary" data-act="f-qmove" data-l="${L.id}" data-pid="${pid}" data-d="-1" ${i ? "" : "disabled"} aria-label="Up">↑</button><button class="btn btn-sm btn-secondary" data-act="f-qmove" data-l="${L.id}" data-pid="${pid}" data-d="1" ${i < q.length - 1 ? "" : "disabled"} aria-label="Down">↓</button><button class="btn btn-sm btn-secondary" data-act="f-queue" data-l="${L.id}" data-pid="${pid}">Remove</button></div>`).join("") || `<p class="pad muted">Nobody queued. Tap "+ Queue" next to players on the Players tab.</p>`}</div>`;
+}
+
+/* ---- league settings (commissioner) */
+function settingsTab(L) {
+  const s = leagueSettings(L);
+  const edit = isCommish(L);
+  const pre = L.draft.status === "pre";
+  const sel = (key, opts, { disabled = false } = {}) => `<select class="input input-sm" data-change="f-set" data-l="${L.id}" data-k="${key}" ${edit && !disabled ? "" : "disabled"}>${opts.map(([v, l]) => `<option value="${v}" ${String(s[key]) === String(v) ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+  const row = (label, control, sub = "") => `<div class="list-item"><span class="grow"><b>${label}</b>${sub ? `<br><span class="tiny muted">${sub}</span>` : ""}</span>${control}</div>`;
+  const scoreRow = (group, k, label) => {
+    const v = L.scoring[group][k] ?? 0;
+    return `<div class="list-item"><span class="grow">${label}${k === "IP" ? ' <span class="tiny muted">(per inning)</span>' : ""}</span>${edit ? `<input class="input pts-input" type="number" step="0.5" value="${v}" data-change="f-score" data-l="${L.id}" data-g="${group}" data-k="${k}" aria-label="${label} points">` : `<b class="num">${v > 0 ? "+" : ""}${v}</b>`}</div>`;
+  };
+  const over = seasonOver(L);
+  const next = L.season === PAST.id && S.turnover ? NEXT : null;
+  const renewed = S.fantasy.leagues.some((x) => x.renewedFrom === L.id);
+  const deadline = s.tradeDeadline ? s.tradeDeadline.slice(0, 10) : "";
+  return `<p class="small muted" data-tour="fantasy-settings">${edit ? "You're the commissioner (league manager), so you can change any of these. Everyone in the league can see them." : `Only the commissioner (${esc(L.commissioner)}) can change league settings.`}</p>
+    <section class="stack-s">${sectionHead("Basic settings")}<div class="card list">
+      ${row("League name", edit ? `<input class="input input-sm" value="${esc(L.name)}" data-change="f-lname" data-l="${L.id}" aria-label="League name">` : `<b>${esc(L.name)}</b>`)}
+      ${row("League type", sel("type", Object.entries(LEAGUE_TYPES)), "Points: most total points wins. Head-to-head: you play one team each week; your record decides the standings.")}
+      ${row("Number of teams", edit && pre ? `<select class="input input-sm" data-change="f-size" data-l="${L.id}">${[4, 6, 8, 10, 12].map((n) => `<option ${n === L.size ? "selected" : ""}>${n}</option>`).join("")}</select>` : `<b>${L.size}</b>`, pre ? "Can be changed until the draft starts." : "")}
+      ${row("Who can join", edit ? `<select class="input input-sm" data-change="f-public" data-l="${L.id}"><option value="1" ${L.public ? "selected" : ""}>Anyone (public)</option><option value="0" ${L.public ? "" : "selected"}>Invite code only</option></select>` : `<b>${L.public ? "Public" : "Private"}</b>`)}
+      ${L.code ? row("League code", `<b class="mono">${esc(L.code)}</b>${edit ? ` <button class="btn btn-sm btn-secondary" data-act="f-newcode" data-l="${L.id}">New code</button>` : ""}`) : ""}
+      ${s.type === "h2h" ? row("Playoff teams", sel("playoffTeams", [[2, "2"], [4, "4"], [6, "6"]]), "The top teams at the end of the regular season play for the title.") : ""}
+    </div></section>
+    <section class="stack-s" id="draft-settings" data-tour="fantasy-draft-settings">${sectionHead("Draft settings")}<div class="card list">
+      ${row("Pick clock", sel("clock", CLOCKS, { disabled: L.draft.status === "done" }), "Time each team has to pick. When it runs out, the best player in their queue (or the best available) is picked.")}
+      ${row("Draft type", sel("draftType", Object.entries(DRAFT_TYPES), { disabled: !pre }), "Snake reverses every round. Third-round reversal: rounds 2 and 3 both go last to first, then it snakes.")}
+      ${row("Draft order", sel("order", [["random", "Random (drawn when the draft starts)"], ["manual", "Set by the commissioner"]], { disabled: !pre }))}
+      ${row("Draft date", edit && pre ? `<input class="input input-sm" type="datetime-local" value="${s.draftAt ? toLocalInput(s.draftAt) : ""}" data-change="f-draftat" data-l="${L.id}" aria-label="Draft date">` : `<b>${s.draftAt ? `${fmtDay(s.draftAt)} ${fmtTime(s.draftAt)}` : "Not set"}</b>`)}
+      ${row("Keepers", edit && pre ? `<select class="input input-sm" data-change="f-keepers" data-l="${L.id}">${[0, 1, 2, 3].map((n) => `<option ${n === (L.keepers || 0) ? "selected" : ""}>${n}</option>`).join("")}</select>` : `<b>${L.keepers || 0} per team</b>`, "Players each team keeps from last season, in their last rounds.")}
+    </div>
+    ${edit && pre && s.order === "manual" ? `<p class="small bold muted">SET THE ORDER</p><div class="card list">${L.draft.order.map((id, i) => `<div class="list-item"><span class="rank">${i + 1}</span><b class="grow">${esc(teamById(L, id).name)}</b><button class="btn btn-sm btn-secondary" data-act="f-order" data-l="${L.id}" data-i="${i}" data-d="-1" ${i ? "" : "disabled"}>↑</button><button class="btn btn-sm btn-secondary" data-act="f-order" data-l="${L.id}" data-i="${i}" data-d="1" ${i < L.draft.order.length - 1 ? "" : "disabled"}>↓</button></div>`).join("")}</div><button class="btn btn-sm btn-secondary" data-act="f-shuffle" data-l="${L.id}">Randomize it now</button>` : ""}
+    </section>
+    <section class="stack-s">${sectionHead("Roster")}<div class="card list small">
+      ${row("Starters", `<b>${HLL.STARTERS}</b>`, "Everyone in a starting spot scores hitting and pitching points.")}
+      ${row("Bench", `<b>${slotsOf(L).length - HLL.STARTERS}</b>`, "Bench players don't score. Leagues with 11 or 12 teams get 1 bench spot so there are enough kids to go around.")}
+      ${row("Lineup changes", `<b>Until each game starts</b>`, "Swap starters and bench any time unless either player's game today has started.")}
+    </div></section>
+    <section class="stack-s">${sectionHead("Scoring")}<div class="cols"><div class="col"><p class="small bold muted">HITTING</p><div class="card list">${HLL.BAT_STATS.map(([k, l]) => scoreRow("bat", k, l)).join("")}</div></div>
+      <div class="col"><p class="small bold muted">PITCHING</p><div class="card list">${HLL.PIT_STATS.map(([k, l]) => scoreRow("pit", k, l)).join("")}</div></div></div>
+      ${edit ? `<button class="btn btn-secondary" data-act="f-reset-scoring" data-l="${L.id}">Reset to default scoring</button>` : ""}</section>
+    <section class="stack-s" data-tour="fantasy-acq">${sectionHead("Acquisitions and trades")}<div class="card list">
+      ${row("Adds per week", sel("addsPerWeek", [[0, "Unlimited"], [1, "1"], [2, "2"], [3, "3"], [4, "4"], [5, "5"], [7, "7"]]), "Free-agent pickups each team can make Monday through Sunday.")}
+      ${row("Waivers", sel("waiverDays", [[0, "None"], [1, "1 day"], [2, "2 days"]]), "How long a dropped player waits before anyone can add him.")}
+      ${row("Trade review", sel("tradeReview", Object.entries(TRADE_REVIEW)))}
+      ${row("Trade deadline", edit ? `<input class="input input-sm" type="date" value="${deadline}" data-change="f-deadline" data-l="${L.id}" aria-label="Trade deadline">` : `<b>${deadline ? fmtDay(deadline + "T12:00:00") : "None"}</b>`, "No trades after this date. Leave it empty for no deadline.")}
+    </div></section>
+    ${edit ? `<section class="stack-s" data-tour="fantasy-lm-tools">${sectionHead("Commissioner tools")}<div class="card list">
+      ${L.draft.status === "drafting" ? row("Draft", `<button class="btn btn-sm btn-secondary" data-act="f-pause" data-l="${L.id}">${L.draft.paused ? "Resume" : "Pause"}</button> <button class="btn btn-sm btn-secondary" data-act="f-undo-pick" data-l="${L.id}">Undo last pick</button>`) : ""}
+      ${L.draft.status !== "pre" ? row("Reset the draft", `<button class="btn btn-sm btn-danger" data-act="f-reset-draft" data-l="${L.id}">Reset</button>`, "Clears every pick and every roster. Use before the season starts.") : ""}
+      ${row("Team names", `<a class="btn btn-sm btn-secondary" href="#/fantasy/${L.id}/settings?names=1">Edit</a>`)}
+    </div>
+    ${parseRoute().q.names ? `<div class="card list">${L.teams.map((t) => `<div class="list-item"><input class="input input-sm grow" value="${esc(t.name)}" data-change="f-tname" data-l="${L.id}" data-t="${t.id}" aria-label="Team name"><span class="small muted">${esc(t.owner)}</span></div>`).join("")}</div>` : ""}</section>` : ""}
+    ${over && edit && next && !renewed ? `<section class="card pad stack-s" data-tour="fantasy-renew"><h2 class="h2">Bring the league back for ${esc(next.name)}</h2><p class="small muted">Everyone in the league is added automatically, with the same team names. You decide how many keepers each team gets.</p>
+      <div class="field"><label for="f-keepn">Keepers per team</label><select class="input" id="f-keepn">${[0, 1, 2, 3].map((n) => `<option value="${n}" ${n === 2 ? "selected" : ""}>${n}</option>`).join("")}</select></div>
+      <button class="btn btn-primary" data-act="f-renew" data-l="${L.id}">Bring it back</button></section>` : `<section class="card pad stack-s" data-tour="fantasy-renew"><b>Next season</b><p class="small muted">Leagues don't restart on their own. When the season is over, the commissioner can bring the league back: everyone in it is added automatically, and the commissioner picks how many keepers each team gets.</p></section>`}
+    ${sectionHead("Your team")}
+    <div class="card pad row"><input class="input grow" id="f-rename" value="${esc(myTeam(L).name)}" aria-label="Team name"><button class="btn btn-secondary" data-act="f-rename" data-l="${L.id}">Rename</button></div>
+    <button class="btn btn-danger" data-act="f-leave" data-l="${L.id}">${edit ? "Delete league" : "Leave league"}</button>`;
+}
+const toLocalInput = (iso) => {
+  const d = new Date(iso);
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+
+/* ---- head-to-head standings */
+/** Round-robin matchups week by week, and each team's record from its weekly points. */
+function h2hRecords(L, scores) {
+  const weeks = W.weeks.filter((w) => w.start <= NOW && L.season === W.season.id);
+  const ids = L.teams.map((t) => t.id);
+  const rec = new Map(ids.map((id) => [id, { w: 0, l: 0, t: 0 }]));
+  const matchups = [];
+  weeks.forEach((wk, wi) => {
+    const a = [...ids];
+    for (let r = 0; r < wi % Math.max(1, a.length - 1); r++) a.splice(1, 0, a.pop());
+    for (let i = 0; i < a.length / 2; i++) {
+      const x = a[i];
+      const y = a[a.length - 1 - i];
+      const px = scores.get(x)?.byWeek.get(wk.start) || 0;
+      const py = scores.get(y)?.byWeek.get(wk.start) || 0;
+      matchups.push({ week: wk.n, x, y, px, py });
+      if (wk.end > NOW) continue;
+      if (px > py) (rec.get(x).w++, rec.get(y).l++);
+      else if (py > px) (rec.get(y).w++, rec.get(x).l++);
+      else (rec.get(x).t++, rec.get(y).t++);
+    }
+  });
+  return { rec, matchups, weeks };
+}
+
+/* ---- actions */
+const settingsSaved = (L, text) => {
+  if (text) logMove(L, Date.now(), `The commissioner changed a setting: ${text}.`);
+  save();
+  render();
+  toast("Saved for the whole league.");
+};
+CHANGE["f-set"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  const s = leagueSettings(L);
+  const k = el.dataset.k;
+  const v = ["clock", "addsPerWeek", "waiverDays", "playoffTeams"].includes(k) ? Number(el.value) : el.value;
+  s[k] = v;
+  if (k === "clock" && L.draft.status === "drafting") L.draft.clockFor = null;
+  const label = { clock: `pick clock is ${CLOCKS.find(([x]) => x === v)?.[1]}`, draftType: `${DRAFT_TYPES[v]} draft`, order: v === "random" ? "draft order is random" : "draft order set by the commissioner", type: LEAGUE_TYPES[v], addsPerWeek: v ? `${v} adds per week` : "unlimited adds", waiverDays: v ? `${v}-day waivers` : "no waivers", tradeReview: `trade review: ${TRADE_REVIEW[v]}`, playoffTeams: `${v} playoff teams` }[k];
+  settingsSaved(L, label);
+};
+CHANGE["f-lname"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  if (!el.value.trim()) return;
+  L.name = el.value.trim();
+  settingsSaved(L, `the league is now called ${L.name}`);
+};
+CHANGE["f-public"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.public = el.value === "1";
+  if (!L.public && !L.code) L.code = Math.random().toString(36).slice(2, 8).toUpperCase();
+  settingsSaved(L, L.public ? "anyone can join" : "invite code only");
+};
+ACT["f-newcode"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.code = Math.random().toString(36).slice(2, 8).toUpperCase();
+  settingsSaved(L, "new league code");
+};
+CHANGE["f-size"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  const size = Number(el.value);
+  while (L.teams.length < size) {
+    const i = L.teams.length;
+    const t = { id: `${L.id}-t${Date.now()}${i}`, name: TEAM_NAMES[(i + 3) % TEAM_NAMES.length] + (L.teams.some((x) => x.name === TEAM_NAMES[(i + 3) % TEAM_NAMES.length]) ? " II" : ""), owner: OWNERS[(i + 5) % OWNERS.length] };
+    L.teams.push(t);
+    L.draft.order.push(t.id);
+  }
+  while (L.teams.length > size) {
+    const drop = [...L.teams].reverse().find((t) => !t.mine);
+    L.teams = L.teams.filter((t) => t !== drop);
+    L.draft.order = L.draft.order.filter((id) => id !== drop.id);
+  }
+  L.size = size;
+  settingsSaved(L, `${size} teams`);
+};
+CHANGE["f-draftat"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.settings.draftAt = el.value ? new Date(el.value).toISOString() : null;
+  settingsSaved(L, el.value ? "draft scheduled" : "");
+};
+CHANGE["f-keepers"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.keepers = Number(el.value);
+  if (!L.renewedFrom) L.keeperPicks = {};
+  settingsSaved(L, `${L.keepers} keepers per team`);
+};
+CHANGE["f-deadline"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.settings.tradeDeadline = el.value ? new Date(el.value + "T23:59:00").toISOString() : null;
+  settingsSaved(L, el.value ? `trade deadline ${fmtDay(el.value + "T12:00:00")}` : "no trade deadline");
+};
+CHANGE["f-tname"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  const t = teamById(L, el.dataset.t);
+  if (!el.value.trim()) return;
+  logMove(L, Date.now(), `The commissioner renamed ${t.name} to ${el.value.trim()}.`);
+  t.name = el.value.trim();
+  save();
+  toast("Team renamed.");
+};
+ACT["f-order"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  const i = Number(el.dataset.i);
+  const j = i + Number(el.dataset.d);
+  [L.draft.order[i], L.draft.order[j]] = [L.draft.order[j], L.draft.order[i]];
+  save();
+  render();
+};
+ACT["f-shuffle"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.draft.order = shuffle(L.draft.order);
+  settingsSaved(L, "draft order randomized");
+};
+const shuffle = (xs) => {
+  const a = [...xs];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+ACT["f-pause"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.draft.paused = !L.draft.paused;
+  if (L.draft.paused) L.draft.pausedLeft = L.draft.deadline ? L.draft.deadline - Date.now() : null;
+  else {
+    L.draft.deadline = L.draft.pausedLeft != null ? Date.now() + L.draft.pausedLeft : null;
+    L.draft.cpuAt = Date.now() + 2000;
+  }
+  logMove(L, Date.now(), L.draft.paused ? "The commissioner paused the draft." : "The draft is back on.");
+  save();
+  render();
+};
+ACT["f-reset-draft"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  if (!confirm("Reset the draft? Every pick and roster is cleared.")) return;
+  L.draft = { status: "pre", order: L.draft.order, picks: [], doneAt: null };
+  L.rows = [];
+  L.trades = [];
+  logMove(L, Date.now(), "The commissioner reset the draft.");
+  save();
+  go(`fantasy/${L.id}/draft`);
+};
+CHANGE["f-autodraft"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.draft.autodraft = el.checked;
+  save();
+  toast(el.checked ? "Autodraft is on: your picks are made for you." : "Autodraft is off.");
+};
+ACT["f-queue"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  L.queue ||= [];
+  const pid = el.dataset.pid;
+  L.queue = L.queue.includes(pid) ? L.queue.filter((x) => x !== pid) : [...L.queue, pid];
+  save();
+  const box = document.getElementById("draft-avail");
+  if (box && parseRoute().q.view == null) box.innerHTML = availList(L, teamOnClock(L) === myTeam(L).id);
+  else render();
+};
+ACT["f-qmove"] = (el) => {
+  const L = leagueById(el.dataset.l);
+  const i = L.queue.indexOf(el.dataset.pid);
+  const j = i + Number(el.dataset.d);
+  [L.queue[i], L.queue[j]] = [L.queue[j], L.queue[i]];
+  save();
+  render();
+};
+ACT["f-dpos"] = (el) => {
+  S.draftPos = el.dataset.k;
+  render();
 };
 
 // ---- app-pages.js
@@ -4696,8 +5203,10 @@ const SECTIONS = {
       { route: "fantasy/L1/players", sel: "fantasy-fa", title: "Free agents", body: "Add anyone nobody has. If your roster is full, pick someone to drop." },
       { route: "fantasy/L1/trades", sel: "fantasy-trades", title: "Trades", body: "Propose trades and answer offers. Mike Chen sent you one; accept or decline it. The commissioner can cancel any trade." },
       { route: "fantasy/L1/activity", sel: "fantasy-activity", title: "Activity", body: "Every add, drop, trade and lineup move, for the whole league to see." },
-      { route: "fantasy/L2/draft", sel: "fantasy-draft", title: "Snake draft", body: "You're the commissioner here: start the draft, pick when you're on the clock, or autodraft. The order reverses each round." },
-      { route: "fantasy/L2/settings", sel: "fantasy-settings", title: "Commissioner scoring", body: "The commissioner sets what each stat is worth. Standings update right away." },
+      { route: "fantasy/L2/draft", sel: "fantasy-draft", title: "The draft", body: "You're the commissioner of this league. Start the draft here when everyone's ready, or try a mock draft from the Fantasy page first." },
+      { route: "fantasy/L2/settings", sel: "fantasy-draft-settings", title: "Draft settings", body: "The commissioner sets the pick clock (2 minutes to start), the draft type (snake, linear or third-round reversal), whether the order is random or set by hand, the draft date and keepers." },
+      { route: "fantasy/L1/draft", sel: "fantasy-draft-board", title: "Draft board", body: "Every pick, team by team and round by round, with who took each player. During a draft the pick on the clock is highlighted, and you can search the available players, queue your favorites and turn on autodraft." },
+      { route: "fantasy/L2/settings", sel: "fantasy-acq", title: "League settings", body: "Everything a league manager needs: league type (points or head-to-head), size, who can join, scoring, adds per week, waivers, trade review and a trade deadline, plus tools to pause or reset the draft and rename teams." },
       { route: "fantasy/L2/settings", sel: "fantasy-renew", title: "Next season", body: "Leagues don't restart on their own. The commissioner brings a league back: everyone's in automatically, and the commissioner picks how many keepers each team gets." },
     ],
   },
