@@ -1572,6 +1572,40 @@ function viewTeam(r) {
 }
 
 /* ---------------------------------------------------------------- player */
+/** A player's advanced stats: each season scored pitch by pitch, plus a career line (same as the site's player page). */
+function playerAdvanced(p) {
+  const sum = (rows) => (rows.length ? rows.slice(1).reduce((a, x) => { const o = { ...a }; for (const [k, v] of Object.entries(x)) if (typeof v === "number") o[k] = (a[k] ?? 0) + v; return o; }, { ...rows[0] }) : null);
+  const mine = (rows) => sum(rows.filter((x) => x.player_id === p.id));
+  const rows = W.seasons
+    .slice()
+    .reverse()
+    .map((s) => {
+      const all = W.scoredBy[s.id] || [];
+      const games = all.filter((g) => g.state.appeared.has(p.id));
+      if (!games.length) return null;
+      const adv = HLL.advancedFromGames(games);
+      return { label: esc(s.name), team: teamOf(p.id, s.id), bat: mine(adv.bat), pit: mine(adv.pit), fipC: HLL.fipConstant(HLL.advancedFromGames(all).pit), games: all };
+    })
+    .filter(Boolean);
+  if (!rows.length) return "";
+  if (rows.length > 1) {
+    const all = rows.flatMap((r) => r.games);
+    const adv = HLL.advancedFromGames(all.filter((g) => g.state.appeared.has(p.id)));
+    rows.push({ label: "Career", career: true, bat: mine(adv.bat), pit: mine(adv.pit), fipC: HLL.fipConstant(HLL.advancedFromGames(all).pit) });
+  }
+  const table = (title, list, cols, get) =>
+    list.length
+      ? `<div class="card scroll-x"><table><thead><tr><th>${title}</th>${cols.map((c) => `<th title="${esc(c.help)}">${esc(c.label)}</th>`).join("")}</tr></thead><tbody>${list
+          .map((r) => `<tr class="${r.career ? "total-row" : ""}"><td class="bold">${r.label} ${r.team ? badge(r.team) : ""}</td>${cols.map((c, i) => `<td>${HLL.fmtAdv(c.kind, get(r, i))}</td>`).join("")}</tr>`)
+          .join("")}</tbody></table></div>`
+      : "";
+  const bat = rows.filter((r) => r.bat && r.bat.PA > 0);
+  const pit = rows.filter((r) => r.pit && r.pit.BF > 0);
+  if (!bat.length && !pit.length) return "";
+  return `${sectionHead("Advanced")}${table("Hitting", bat, HLL.ADV_BAT, (r, i) => HLL.ADV_BAT[i].get(r.bat))}${table("Pitching", pit, HLL.advPitColumns(0), (r, i) => HLL.advPitColumns(r.fipC)[i].get(r.pit))}
+    <p class="small muted">From games scored pitch by pitch on the site (spreadsheet seasons don't have this detail). Hover a column name for what it means.</p>`;
+}
+
 function viewPlayer(r) {
   const p = W.playerById[r.parts[1]];
   if (!p) return `<p>Player not found.</p>`;
@@ -1600,6 +1634,7 @@ function viewPlayer(r) {
       .map((x) => `<tr class="${x.career ? "total-row" : ""}"><td class="bold">${esc(x.label)} ${x.team ? badge(x.team) : ""}</td><td>${x.s.p_g ?? 0}</td><td>${HLL.fmtIp(x.s.outs)}</td>${[x.s.w, x.s.l, x.s.sv, x.s.p_h, x.s.p_r, x.s.er, x.s.p_bb, x.s.p_so].map((v) => `<td>${v ?? 0}</td>`).join("")}<td>${HLL.fmt2(HLL.era(x.s))}</td><td>${HLL.fmt2(HLL.whip(x.s))}</td><td>${HLL.fmt1(x.s.pit_war ?? null)}</td></tr>`)
       .join("")}</tbody></table></div>`
     : "";
+  const advTables = playerAdvanced(p);
   const tiles = cur && HLL.hasBatting(cur)
     ? `<div class="tiles" data-tour="player-cards">${tile(HLL.fmtRate(HLL.avg(cur)), "AVG")}${tile(cur.hr ?? 0, "HR")}${tile(cur.rbi ?? 0, "RBI")}${tile(HLL.fmtRate(HLL.obp(cur)), "OBP")}${tile(HLL.fmtRate(HLL.ops(cur)), "OPS")}${cur.war != null ? tile(HLL.fmt1(cur.war), "WAR") : tile(cur.h ?? 0, "H")}</div>`
     : "";
@@ -1611,6 +1646,7 @@ function viewPlayer(r) {
     ${tiles}${pitTiles}${!tiles && !pitTiles ? `<p class="card pad small muted">No games yet this season.</p>` : ""}
     ${sectionHead("By season")}
     ${batTable}${pitTable}
+    ${advTables}
     </div><div class="col">
     ${bip.length ? `<section class="card pad stack-s" data-tour="spray"><div class="row between"><b>Spray chart</b><span class="small muted">${bip.length} ball${bip.length > 1 ? "s" : ""} in play</span></div>
       ${fieldSvg({ dots: bip.map((x) => ({ x: x.x, y: x.y, color: bipColor(x.r), label: E.RESULTS[x.r].label })) })}
