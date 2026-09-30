@@ -373,22 +373,6 @@ table.stats td.sorted { font-weight: 700; background: #f5f7ff; }
 /* ---------------------------------------------------------------- innings table */
 table.innings td.inn-cell { color: var(--ink); font-weight: 600; min-width: 38px; }
 
-/* ---------------------------------------------------------------- practice-game coach */
-.coach { position: fixed; z-index: 45; left: 8px; right: 8px; bottom: calc(68px + env(safe-area-inset-bottom)); background: #fff; border-radius: 10px; border-top: 4px solid var(--red); box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28); padding: 12px 14px; max-height: 46dvh; overflow-y: auto; }
-.coach h3 { font-family: var(--head); font-size: 21px; font-weight: 700; margin: 3px 0 4px; }
-.coach p { font-size: 14px; line-height: 1.45; color: var(--ink-2); }
-.coach .coach-hint { margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--green); }
-.coach-bar { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
-.coach-progress { flex: 1; height: 5px; border-radius: 99px; background: var(--line); overflow: hidden; }
-.coach-progress i { display: block; height: 100%; background: var(--navy); }
-.coach-hl { outline: 3px solid #fbbf24; outline-offset: 3px; border-radius: 10px; }
-body.walking .shell { padding-bottom: 46dvh; }
-@media (min-width: 960px) {
-  .coach { left: auto; right: 24px; bottom: 24px; width: 380px; max-height: 70dvh; }
-  body.walking .shell { padding-bottom: 40px; }
-  body.walking main.view { padding-right: 420px; }
-}
-
 /* ---------------------------------------------------------------- added for the full-feature demo */
 .notice:not(.warn):not(.bad):not(.good) { background: #eef2ff; color: #1e3a8a; }
 .notice ul { margin: 6px 0 0 18px; padding: 0; }
@@ -469,7 +453,6 @@ tr.now td { background: #fffbeb; }
 </div></div>
 <div id="sheet"></div>
 <div id="tour"></div>
-<div id="coach"></div>
 <noscript>This demo needs JavaScript turned on.</noscript>
 <script>
 window.addEventListener("error", function (e) { var m = document.getElementById("boot-msg"); if (m) m.textContent = "Something went wrong starting the demo: " + e.message; });
@@ -1292,7 +1275,6 @@ function render() {
   window.scrollTo(0, keep);
   if (sheetRender) paintSheet();
   if (typeof tourRefresh === "function") tourRefresh();
-  if (typeof walkRefresh === "function") walkRefresh();
 }
 
 /* ---------------------------------------------------------------- shared bits */
@@ -1358,7 +1340,7 @@ function viewWelcome() {
       <div class="feature"><b>Fantasy baseball</b><p class="small muted">Drafts, weekly lineups, free agents and trades.</p></div>
     </div>
     <button class="btn btn-primary btn-block" data-act="start-tour">Take the full tour</button>
-    <button class="btn btn-secondary btn-block" data-act="walk-start">Score a practice game (guided)</button>
+    <button class="btn btn-secondary btn-block" data-act="walk-start">Score a practice game</button>
     <button class="btn btn-secondary btn-block" data-act="explore">Explore on my own</button>
     <button class="link center" data-act="about">Costs & plan</button>
   </div>`;
@@ -2158,7 +2140,7 @@ function viewScore(r) {
   };
   return `<h1 class="h1">Scorekeeping</h1>
     <p class="muted">Games to score. Works in any phone browser with no app to install, and keeps working if the signal drops. The admin can assign each game to a scorekeeper so two people don't score the same game.</p>
-    <div class="card pad row" data-tour="practice-card"><div class="grow"><b>Practice game</b><p class="small muted">A guided full game that walks through every scorekeeping feature.</p></div><button class="btn btn-sm btn-primary" data-act="walk-start">${W.gameById.practice ? "Restart" : "Start"}</button></div>
+    <div class="card pad row" data-tour="practice-card"><div class="grow"><b>Practice game</b><p class="small muted">Score a game yourself to try it out. Nothing counts toward stats.</p></div><button class="btn btn-sm btn-primary" data-act="walk-start">${W.gameById.practice ? "Restart" : "Start"}</button></div>
     ${W.gameById.practice && W.gameById.practice.status !== "scheduled" ? `<a class="card pad row" href="#/score/practice"><div class="grow"><b>Continue practice game</b><p class="small muted">${esc(W.teamById[W.gameById.practice.away].abbr)} at ${esc(W.teamById[W.gameById.practice.home].abbr)} · ${W.gameById.practice.status}</p></div><span class="chev">›</span></a>` : ""}
     ${live.length ? `<h2 class="h2">In progress</h2>${live.map((g) => item(g, "Continue", "btn-green")).join("")}` : ""}
     ${todays.length ? `<h2 class="h2">Today</h2>${todays.map((g) => item(g, "Start", "btn-primary")).join("")}` : ""}
@@ -3225,7 +3207,7 @@ function playoffPlan(L) {
 }
 function pointsTable(L) {
   const st = fantasyStandings(L);
-  return `<div class="card scroll-x"><table><thead><tr><th>Team</th><th>Total</th></tr></thead><tbody>${st.map((x, i) => `<tr class="${x.team.mine ? "mine" : ""}"><td><span class="rank">${i + 1}</span> <b>${esc(x.team.name)}</b></td><td><b>${fmtPts(x.total)}</b></td></tr>`).join("")}</tbody></table></div>`;
+  return `<div class="card scroll-x" data-tour="fantasy-standings"><table><thead><tr><th>Team</th><th>Total</th></tr></thead><tbody>${st.map((x, i) => `<tr class="${x.team.mine ? "mine" : ""}"><td><span class="rank">${i + 1}</span> <b>${esc(x.team.name)}</b></td><td><b>${fmtPts(x.total)}</b></td></tr>`).join("")}</tbody></table></div>`;
 }
 
 function playersTab(L, r) {
@@ -4839,254 +4821,13 @@ ACT["set-role"] = (el) => {
 };
 
 // ---- app-walk.js
-/* ---------------------------------------------------------------- guided practice game (scorekeeping walkthrough)
- * A practice game between the top two teams. A coach panel walks through every
- * scorekeeping feature. Next either moves on (if you did the step yourself) or
- * does the step for you. Skip ends the walkthrough and leaves the game to play with.
+/* ---------------------------------------------------------------- practice game
+ * A game between the top two teams to score however you like. No walkthrough, and nothing counts
+ * toward stats or standings.
  */
-const walkGame = () => W.gameById.practice;
-const walkSig = (g) => (g ? `${g.status}:${(g.events || []).length}` : "");
-
-/** Builds events on top of the practice game, re-reading the game state as it goes. */
-function walkCtx() {
-  const g = walkGame();
-  return {
-    events: [...(g.events || [])],
-    s() {
-      return E.replay({ setup: g.setup, events: this.events }, W.rules, W.names);
-    },
-    push(...evs) {
-      if (this.s().status !== "final") this.events.push(...evs);
-    },
-    pitch(r) {
-      this.push({ t: "pitch", r });
-    },
-    walk() {
-      const s = this.s();
-      for (let i = s.balls; i < 4; i++) this.pitch("B");
-    },
-    strikeout() {
-      const s = this.s();
-      for (let i = s.strikes; i < 2; i++) this.pitch("CS");
-      this.pitch("SS");
-    },
-    /** Make sure there are at most `max` outs (strike out the side if needed). */
-    outsAtMost(max) {
-      for (let i = 0; i < 3 && this.s().outs > max; i++) this.strikeout();
-    },
-    /** Make sure base `b` (1-3) is occupied, by walking batters. */
-    runnerOn(b) {
-      for (let i = 0; i < 4 && !this.s().bases[b - 1]; i++) this.walk();
-    },
-    play(r, f, loc, bb, patch = {}, hh = bb === "L") {
-      const s = this.s();
-      this.push({ t: "play", r, f, m: { ...E.defaultMoves(s.bases, r), ...patch }, bb, loc, hh });
-    },
-    runner(k, m) {
-      this.push({ t: "runner", k, m });
-    },
-  };
-}
-
-const WALK = [
-  {
-    title: "Who's here?",
-    body: "Start by tapping anyone who isn't at the game. They're left out of the lineup, can't be subbed in, and don't get charged a game played. The suggested lineup fills in around them.",
-    sel: "absent",
-  },
-  {
-    title: "Set the lineups",
-    body: "Before first pitch, set each team's batting order and positions. Pick a different player for any spot to swap them in (bench players too), change a position (whoever had it swaps with them), or move batters with the arrows. Then press Start game.",
-    sel: "lineup-editor",
-    act: "start",
-  },
-  { title: "The scoreboard", body: "Score, inning, count, outs and runners on base. Everything here comes from what you enter below.", sel: "sk-board" },
-  { title: "Batter and pitcher", body: "Who's up and how they've done today, plus the pitcher's count against the Little League limit for their age. A warning appears 10 pitches before the limit.", sel: "sk-pitcher" },
-  { title: "Ball", body: "Tap Ball for a pitch outside the zone.", sel: "sk-pitch", act: (c) => c.pitch("B") },
-  { title: "Called strike", body: "Strike looking is a strike the batter didn't swing at.", sel: "sk-pitch", act: (c) => c.pitch("CS") },
-  { title: "Swinging strike", body: "Strike swinging is a swing and a miss.", sel: "sk-pitch", act: (c) => c.pitch(c.s().strikes < 2 ? "SS" : "F") },
-  { title: "Foul ball", body: "A foul counts as a strike, except with two strikes. Then the count stays where it is.", sel: "sk-pitch", act: (c) => c.pitch("F") },
-  { title: "Strikeout", body: "The third strike records the strikeout, and the next batter comes up automatically.", sel: "sk-pitch", act: (c) => c.strikeout() },
-  { title: "Walk", body: "Four balls is a walk. The batter goes to first and any forced runners move up.", sel: "sk-pitch", act: (c) => c.walk() },
-  { title: "Hit by pitch", body: "Hit by pitch works like a walk: the batter goes to first and forced runners move up.", sel: "sk-more", act: (c) => c.push({ t: "hbp" }) },
-  {
-    title: "Ball in play",
-    body: "When the ball is put in play, tap Ball in play. Tap where it went on the field, choose how it was hit (ground ball, line drive, fly ball, pop up or bunt), then pick the result.",
-    sel: "sk-inplay",
-    act: (c) => c.play("1B", "8", [50, 40], "L"),
-  },
-  {
-    title: "Hard hit",
-    body: "After picking how it was hit, check Hard hit for anything smoked, even an out. Line drives are checked for you. It feeds hard-hit %, quality at-bats and the advanced stats.",
-    sel: "sk-inplay",
-    act: (c) => c.play("LO", "6", [42, 58], "L", {}, true),
-  },
-  {
-    title: "Outs and fielders",
-    body: "For an out, the fielders are filled in from where you tapped, like 6-3 for a grounder to the shortstop. Tap the fielders to change them.",
-    sel: "sk-inplay",
-    act: (c) => {
-      c.outsAtMost(1);
-      c.play("GO", "6-3", [42, 60], "G");
-    },
-  },
-  {
-    title: "Where the runners ended up",
-    body: "After every ball in play you confirm the runners. The usual result is filled in and you can change any of it. Here the runner from second scores on a single.",
-    sel: "sk-inplay",
-    act: (c) => {
-      c.runnerOn(2);
-      c.play("1B", "9", [76, 42], "G", { 2: 4 });
-    },
-  },
-  {
-    title: "Sacrifice fly",
-    body: "A fly ball is caught and the runner on third tags up and scores. The batter is out but gets an RBI and isn't charged an at-bat.",
-    sel: "sk-inplay",
-    act: (c) => {
-      c.outsAtMost(1);
-      c.runnerOn(3);
-      c.play("SF", "8", [50, 22], "F");
-    },
-  },
-  {
-    title: "Error",
-    body: "If a fielder misplays it, choose Error and pick who made it. The batter is safe, and runs that score because of it are unearned for the pitcher.",
-    sel: "sk-inplay",
-    act: (c) => c.play("E", "E6", [42, 58], "G"),
-  },
-  {
-    title: "Stolen base",
-    body: "Plays between pitches go under Runners: stolen bases, caught stealing, pickoffs, wild pitches and passed balls.",
-    sel: "sk-more",
-    act: (c) => {
-      c.runnerOn(1);
-      const s = c.s();
-      const from = [1, 2].find((b) => s.bases[b - 1] && !s.bases[b]) || 3;
-      c.runner("SB", { [from]: from + 1 });
-    },
-  },
-  {
-    title: "Wild pitch",
-    body: "On a wild pitch or passed ball, every runner can move up. The runner screen lets you set exactly where each one ended up.",
-    sel: "sk-more",
-    act: (c) => {
-      c.runnerOn(1);
-      const s = c.s();
-      const m = {};
-      [1, 2, 3].forEach((b) => s.bases[b - 1] && (m[b] = b + 1));
-      c.runner("WP", m);
-    },
-  },
-  {
-    title: "Caught stealing",
-    body: "A runner thrown out stealing is an out, and the batter stays at the plate. Pickoffs work the same way.",
-    sel: "sk-more",
-    act: (c) => {
-      c.outsAtMost(1);
-      c.runnerOn(1);
-      c.runner("CS", { 1: "X" });
-    },
-  },
-  {
-    title: "Fielder's choice",
-    body: "The defense gets the lead runner instead of the batter. The batter is safe at first; it's an at-bat but not a hit.",
-    sel: "sk-inplay",
-    act: (c) => {
-      c.outsAtMost(1);
-      c.runnerOn(1);
-      c.play("FC", "6-4", [42, 60], "G");
-    },
-  },
-  {
-    title: "Double play",
-    body: "Two outs on one play, like 6-4-3. Double play only shows up when there's a runner on first and fewer than two outs.",
-    sel: "sk-inplay",
-    act: (c) => {
-      c.outsAtMost(1);
-      c.runnerOn(1);
-      c.play("DP", "6-4-3", [43, 60], "G");
-    },
-  },
-  {
-    title: "Sacrifice bunt",
-    body: "A bunt that moves a runner up while the batter is thrown out. It doesn't count as an at-bat.",
-    sel: "sk-inplay",
-    act: (c) => {
-      c.outsAtMost(1);
-      c.runnerOn(1);
-      c.play("SAC", "1-3", [52, 80], "B");
-    },
-  },
-  { title: "Home run", body: "Everyone scores, and the batter gets an RBI for each run.", sel: "sk-inplay", act: (c) => c.play("HR", "8", [45, 6], "F") },
-  {
-    title: "Substitution",
-    body: "Open Lineup & substitutions and tap Sub next to a player to bring someone in from the bench. The new player takes over that batting spot and position.",
-    sel: "sk-more",
-    act: (c) => {
-      const s = c.s();
-      const t = 1 - s.half;
-      const slot = s.lineup[t].findIndex((x, i) => i > 3 && x.pos !== "P" && x.pos !== "C");
-      if (s.bench[t].length && slot >= 0) c.push({ t: "sub", team: t, slot, pid: s.bench[t][0] });
-    },
-  },
-  {
-    title: "Pitching change",
-    body: "In the same screen, tap Pitch next to a player to make them the new pitcher. Their count starts at zero, and the old pitcher's count is kept for rest-day tracking.",
-    sel: "sk-pitcher",
-    act: (c) => {
-      const s = c.s();
-      const t = 1 - s.half;
-      const who = s.lineup[t].find((x) => x.pos !== "P" && x.pos !== "C" && !s.pitchersUsed[t].includes(x.pid));
-      if (who) c.push({ t: "pos", team: t, pid: who.pid, pos: "P" });
-    },
-  },
-  {
-    title: "No signal? Keep scoring",
-    body: "Fields often have bad reception. Turn on \"pretend there's no signal\" here and keep entering pitches: they're saved on the phone and sent the moment there's a signal again. Nothing gets lost.",
-    sel: "sk-offline",
-  },
-  { title: "Undo", body: "Entered something wrong? Undo removes the last entry, and every stat is recalculated from the play-by-play. Try it, then enter the play again.", sel: "sk-undo" },
-  {
-    title: "How innings and games end",
-    body: "Three outs, or the run limit, ends a half inning. The game ends after 6 innings, on a walk-off, by the mercy rule (if the league uses it), or when you tap End game for a time limit or weather. The admin sets these rules.",
-    sel: "sk-board",
-  },
-  { title: "What everyone else sees", body: "Each entry shows up right away on the game page: the line score and the play-by-play, plus the box score and spray chart.", route: "game/practice", sel: "plays" },
-  { title: "Defense", body: "The Defense tab shows innings at each position, plus putouts, assists and errors, all worked out from your entries.", route: "game/practice?tab=defense", sel: "game-defense" },
-  {
-    title: "Finish the game",
-    body: "That's every scorekeeping feature. Press Next to play out the rest of this game.",
-    sel: "sk-board",
-    act: (c) => {
-      const g = walkGame();
-      c.events = E.simulate(g.setup, g.seed, W.rules, null, c.events, PROFILES).events;
-    },
-  },
-  { title: "Final", body: "The box score has everyone's line, including the winning and losing pitchers.", route: "game/practice?tab=box", sel: "board" },
-];
-
-function startPractice() {
-  const g = walkGame();
-  if (g && g.status === "scheduled") saveGame(g, { setup: draftSetup(g), events: [], status: "live" });
-}
-// The practice game never goes offline for real: make sure the switch is off when the walkthrough ends.
-
-function runStep(step) {
-  if (!step.act) return;
-  if (step.act === "start") return startPractice();
-  const g = walkGame();
-  if (!g || !g.events || g.status === "final") return;
-  const c = walkCtx();
-  step.act(c);
-  const rep = E.replay({ setup: g.setup, events: c.events }, W.rules, W.names);
-  saveGame(g, { events: c.events, status: rep.status === "final" ? "final" : "live" });
-}
-
-const stepRoute = (step) => step.route || "score/practice";
-
 ACT["walk-start"] = () => {
   T = null;
+  tourRefresh();
   closeSheet();
   const [a, b] = W.standings;
   S.practice = { home: a.team.id, away: b.team.id, date: new Date().toISOString() };
@@ -5095,74 +4836,11 @@ ACT["walk-start"] = () => {
   S.seenWelcome = true;
   S.signedIn = true;
   S.role = "scorekeeper";
-  build();
-  S.walk = { step: 0, mark: walkSig(walkGame()) };
-  save();
-  go(stepRoute(WALK[0]));
-};
-ACT["walk-next"] = () => {
-  const step = WALK[S.walk.step];
-  // If you did the step yourself, just move on; otherwise do it for you.
-  if (walkSig(walkGame()) === S.walk.mark) runStep(step);
-  S.walk.step++;
-  if (S.walk.step >= WALK.length) {
-    S.walk = null;
-    save();
-    render();
-    openSheet(
-      () => `<h2 class="h2">Walkthrough complete</h2><p class="small muted" style="margin:4px 0 12px">You've seen every scorekeeping feature. The practice game stays here if you want to look around.</p>
-      <div class="card list"><a class="list-item" href="#/game/practice?tab=box" data-act="close-sheet-nav"><b class="grow">Box score</b><span class="chev">›</span></a><a class="list-item" href="#/game/practice?tab=defense" data-act="close-sheet-nav"><b class="grow">Defense and innings</b><span class="chev">›</span></a><a class="list-item" href="#/score" data-act="close-sheet-nav"><b class="grow">Score a real game</b><span class="chev">›</span></a></div>
-      <button class="btn btn-secondary btn-block" style="margin-top:12px" data-act="close-sheet">Close</button>`,
-    );
-    return;
-  }
-  S.walk.mark = walkSig(walkGame());
-  save();
-  walkScrolled = -1;
-  const target = "#/" + stepRoute(WALK[S.walk.step]);
-  if (location.hash !== target) location.hash = target;
-  else render();
-};
-ACT["walk-skip"] = () => {
   S.walk = null;
+  build();
   save();
-  render();
-  toast("Walkthrough closed. The practice game is still here to play with.");
+  go("score/practice");
 };
-ACT["walk-back-to-game"] = () => go(stepRoute(WALK[S.walk.step]));
-
-let walkScrolled = -1;
-function walkRefresh() {
-  const host = document.getElementById("coach");
-  document.body.classList.toggle("walking", !!S.walk);
-  document.querySelectorAll(".coach-hl").forEach((el) => el.classList.remove("coach-hl"));
-  if (!S.walk || !walkGame()) {
-    host.innerHTML = "";
-    return;
-  }
-  const step = WALK[S.walk.step];
-  const here = location.hash.replace(/^#\//, "").split("?")[0] === stepRoute(step).split("?")[0];
-  const did = walkSig(walkGame()) !== S.walk.mark;
-  host.innerHTML = `<aside class="coach" aria-live="polite">
-    <div class="row between"><span class="eyebrow">Practice game · step ${S.walk.step + 1} of ${WALK.length}</span><button class="link" data-act="walk-skip">Skip</button></div>
-    <h3>${esc(step.title)}</h3><p>${esc(step.body)}</p>
-    ${step.act && here ? `<p class="coach-hint">${did ? "Nice. Press Next to continue." : "Try it yourself, or press Next and it will be done for you."}</p>` : ""}
-    <div class="coach-bar"><div class="coach-progress"><i style="width:${Math.round(((S.walk.step + 1) / WALK.length) * 100)}%"></i></div>
-    ${here ? `<button class="btn btn-primary btn-sm" data-act="walk-next">Next</button>` : `<button class="btn btn-secondary btn-sm" data-act="walk-back-to-game">Back to the step</button>`}</div>
-  </aside>`;
-  if (!here) return;
-  const el = document.querySelector(`[data-tour="${step.sel}"]`);
-  if (!el) return;
-  el.classList.add("coach-hl");
-  if (walkScrolled !== S.walk.step) {
-    walkScrolled = S.walk.step;
-    el.scrollIntoView({ block: "center" });
-    // Keep the highlighted part clear of the coach panel.
-    const coach = host.querySelector(".coach").getBoundingClientRect();
-    const r = el.getBoundingClientRect();
-    if (coach.left < r.right && r.bottom > coach.top - 8) window.scrollBy(0, Math.min(r.top - 70, r.bottom - coach.top + 16));
-  }
-}
 
 // ---- app-tour.js
 /* ---------------------------------------------------------------- guided tours: every feature, a step at a time */
@@ -5177,7 +4855,7 @@ const SECTIONS = {
     blurb: "News, live games, scores, rainouts, standings, playoffs",
     role: "fan",
     steps: [
-      { route: "home", sel: "role", title: "Accounts", body: "Everyone signs in with an email and password. For the demo, click here to switch between a parent, a scorekeeper and the league admin." },
+      { route: "home", sel: "role", title: "Accounts", body: "Everyone signs in with an email and password. The tour switches between a parent, a scorekeeper and the league admin as it goes." },
       { route: "home", sel: "news", title: "League news", body: "The admin posts news, announcements and schedule updates. Pinned posts stay on top." },
       { route: "home", sel: "headlines", title: "Automatic headlines", body: "Every final gets a headline and a player of the game, written from the play-by-play. Nobody has to type them." },
       { route: "home", sel: "live-card", title: "Live games", body: "When a game is being scored, anyone can follow it pitch by pitch." },
@@ -5237,11 +4915,11 @@ const SECTIONS = {
       { route: () => `score/${nextScheduled()}`, sel: "absent", title: "Who's here", body: "Before the game, tap anyone who isn't there. They're left out of the lineup and don't get a game played." },
       { route: () => `score/${nextScheduled()}`, sel: "lineup-editor", title: "Lineups", body: "The batting order and positions are suggested; change anything, then start the game." },
       { route: `score/${SHOWCASE}`, sel: "sk-board", title: "Scoring screen", body: "Made for a phone at the field. This game is in the bottom of the 4th." },
-      { route: `score/${SHOWCASE}`, sel: "sk-pitch", title: "Every pitch", body: "Ball, strike or foul. Four balls is a walk and three strikes is a strikeout, automatically.", tryIt: "Try it: click Ball." },
-      { route: `score/${SHOWCASE}`, sel: "sk-inplay", title: "Ball in play", body: "Tap where the ball went, choose how it was hit, check Hard hit if it was smoked, then pick the result and confirm the runners.", tryIt: "Try it: click Ball in play." },
+      { route: `score/${SHOWCASE}`, sel: "sk-pitch", title: "Every pitch", body: "Ball, strike or foul. Four balls is a walk and three strikes is a strikeout, automatically." },
+      { route: `score/${SHOWCASE}`, sel: "sk-inplay", title: "Ball in play", body: "Tap where the ball went, choose how it was hit, check Hard hit if it was smoked, then pick the result and confirm the runners." },
       { route: `score/${SHOWCASE}`, sel: "sk-rare", title: "Anything that can happen", body: "Foul tips, foul bunts and intentional walks are right here. More… has everything else: catcher's interference, dropped third strikes, batter interference, balks, obstruction, appeal plays, pinch and courtesy runners, a player leaving with no sub, notes and forfeits. Ground-rule doubles, infield flies and triple plays are under Ball in play." },
       { route: `score/${SHOWCASE}`, sel: "sk-pitcher", title: "Pitch counts", body: "Tracked against Little League's limits for the pitcher's age, with a warning 10 pitches before the limit." },
-      { route: `score/${SHOWCASE}`, sel: "sk-offline", title: "No signal? No problem", body: "If the phone loses signal, keep scoring. Plays are saved on the phone and sent when the signal comes back. Try the switch." },
+      { route: `score/${SHOWCASE}`, sel: "sk-offline", title: "No signal? No problem", body: "If the phone loses signal, keep scoring. Plays are saved on the phone and sent when the signal comes back." },
       { route: `score/${SHOWCASE}`, sel: "sk-undo", title: "Undo", body: "Undo removes the last entry, and every stat is rebuilt from the play-by-play." },
       { route: `game/${SHOWCASE}`, sel: "board", role: "fan", title: "Everyone sees it", body: "Each entry shows up on the game page right away. Open the demo in two tabs to see it happen." },
       { route: "pitchers", sel: "pitchers", title: "Who can pitch", body: "Rest days are worked out from every pitch thrown, so coaches know who's available today." },
@@ -5257,7 +4935,7 @@ const SECTIONS = {
       { route: "fantasy/L1/team", sel: "fantasy-myteam", title: "Your team", body: "Tap Move on two players to swap them between the lineup and the bench." },
       { route: "fantasy/L1/standings", sel: "fantasy-standings", title: "Standings", body: "Every team's points. During a season scored on the site, points are also shown week by week." },
       { route: "fantasy/L1/players", sel: "fantasy-fa", title: "Free agents", body: "Add anyone nobody has. If your roster is full, pick someone to drop." },
-      { route: "fantasy/L1/trades", sel: "fantasy-trades", title: "Trades", body: "Propose trades and answer offers. Mike Chen sent you one; accept or decline it. The commissioner can cancel any trade." },
+      { route: "fantasy/L1/trades", sel: "fantasy-trades", title: "Trades", body: "Propose trades and answer offers. Here Mike Chen has sent you one to accept or decline. The commissioner can cancel any trade." },
       { route: "fantasy/L1/activity", sel: "fantasy-activity", title: "Activity", body: "Every add, drop, trade and lineup move, for the whole league to see." },
       { route: "fantasy/L2/draft", sel: "fantasy-draft", title: "The draft", body: "You're the commissioner of this league. Start the draft here when everyone's ready, or try a mock draft from the Fantasy page first." },
       { route: "fantasy/L2/settings", sel: "fantasy-draft-settings", title: "Draft settings", body: "The commissioner sets the pick clock (2 minutes to start), the draft type (snake, linear or third-round reversal), whether the order is random or set by hand, the draft date and keepers." },
@@ -5328,6 +5006,7 @@ function showStep() {
 
 function tourRefresh() {
   const host = tourHost();
+  document.getElementById("app").inert = !!T;
   if (!T) {
     host.innerHTML = "";
     return;
@@ -5337,8 +5016,8 @@ function tourRefresh() {
   const el = document.querySelector(`[data-tour="${step.sel}"]`);
   const last = T.i === tour.steps.length - 1;
   host.innerHTML = `<div class="tour-spot" hidden></div><div class="tour-tip" role="dialog" aria-live="polite">
-    <div class="row between"><span class="step">${esc(step.section || tour.title)} · ${T.i + 1} of ${tour.steps.length}</span><button class="link" data-act="tour-end">Close</button></div>
-    <h3>${esc(step.title)}</h3><p>${esc(step.body)}</p>${step.tryIt ? `<p class="try">${esc(step.tryIt)}</p>` : ""}
+    <div class="row between"><span class="step">${esc(step.section || tour.title)} · ${T.i + 1} of ${tour.steps.length}</span></div>
+    <h3>${esc(step.title)}</h3><p>${esc(step.body)}</p>
     <div class="row between" style="margin-top:14px"><div class="tour-progress"><i style="width:${Math.round(((T.i + 1) / tour.steps.length) * 100)}%"></i></div>
     <div class="row">${T.i ? `<button class="btn btn-sm btn-secondary" data-act="tour-prev">Back</button>` : ""}<button class="btn btn-sm btn-primary" data-act="tour-next">${last ? "Finish" : "Next"}</button></div></div></div>`;
   if (el) {
@@ -5391,7 +5070,8 @@ ACT["tour-next"] = () => {
   } else {
     T = null;
     tourRefresh();
-    openSheet(() => tourMenu("Tour finished", "That's every feature. Try the practice game, or keep exploring."));
+    go("welcome");
+    toast("That's the whole tour. Try the practice game next.");
   }
 };
 ACT["tour-prev"] = () => {
@@ -5409,7 +5089,7 @@ function tourMenu(title, sub) {
   return `<h2 class="h2">${title}</h2><p class="small muted" style="margin:4px 0 12px">${sub}</p>
     <div class="card list">
       <button class="list-item" data-act="start-tour"><div class="grow"><b>The full tour</b><div class="small muted">Every feature, start to finish · ${TOURS.full.steps.length} steps</div></div><span class="link">Start</span></button>
-      <button class="list-item" data-act="walk-start"><div class="grow"><b>Score a practice game</b><div class="small muted">A guided full game covering every scorekeeping button · ${WALK.length} steps</div></div><span class="link">Start</span></button>
+      <button class="list-item" data-act="walk-start"><div class="grow"><b>Score a practice game</b><div class="small muted">Score a game yourself. Nothing counts.</div></div><span class="link">Start</span></button>
     </div>
     <p class="eyebrow" style="margin-top:14px">Or jump to one part of the tour</p>
     <div class="chips" style="margin-top:6px">${Object.entries(SECTIONS).map(([id, sec]) => `<button class="chip" data-act="start-tour" data-section="${id}" title="${esc(sec.blurb)}">${esc(sec.title)}</button>`).join("")}</div>
@@ -5441,7 +5121,6 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key === "Escape") {
     if (sheetRender) ACT["close-sheet"]();
-    else if (T) ACT["tour-end"]();
   }
 });
 window.addEventListener("hashchange", () => {
