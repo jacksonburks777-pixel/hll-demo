@@ -1575,7 +1575,7 @@ function viewTeam(r) {
     body = `<div class="seg"><a href="${withQuery({ type: null, sort: null, dir: null })}" class="${type === "bat" ? "on" : ""}">Hitting</a><a href="${withQuery({ type: "pit", sort: null, dir: null })}" class="${type === "pit" ? "on" : ""}">Pitching</a></div>
       ${statTable({ rows, type, sort: r.q.sort, dir: r.q.dir, limit: 0, showTeam: false, seasonId: W.season.id })}`;
   } else if (tab === "innings") {
-    body = `<p class="small muted">Innings played at each position in games scored on the site.</p>${inningsTable(roster.map((p) => p.id), W.extrasBy[W.season.id].def)}`;
+    body = `${inningsTable(roster.map((p) => p.id), W.extrasBy[W.season.id].def)}`;
   } else {
     const games = W.games.filter((g) => g.home === t.id || g.away === t.id);
     body = games.length ? `<div class="card-grid">${games.map((g) => gameCard(g, { showDate: true })).join("")}</div>` : `<p class="card pad muted">No games yet.</p>`;
@@ -1616,7 +1616,7 @@ function playerAdvanced(p) {
           .join("")}</tbody></table></div>`
       : "";
   const totals = totalsHtml("Hitting · regular season", totalRows.filter((x) => HLL.hasBatting(x.line)), HLL.ADV_BAT_TOTALS) + totalsHtml("Pitching · regular season", totalRows.filter((x) => (x.line.outs ?? 0) > 0), HLL.ADV_PIT_TOTALS);
-  if (!rows.length) return totals ? `${sectionHead("Advanced")}${totals}<p class="small muted">Hover a column name for what it means.</p>` : "";
+  if (!rows.length) return totals ? `${sectionHead("Advanced")}${totals}` : "";
   if (rows.length > 1) {
     const all = rows.flatMap((r) => r.games);
     const adv = HLL.advancedFromGames(all.filter((g) => g.state.appeared.has(p.id)));
@@ -1633,7 +1633,7 @@ function playerAdvanced(p) {
   if (!bat.length && !pit.length && !totals) return "";
   const pbpLabel = totals ? " · playoffs, every pitch" : "";
   return `${sectionHead("Advanced")}${totals}${table("Hitting" + pbpLabel, bat, HLL.ADV_BAT, (r, i) => HLL.ADV_BAT[i].get(r.bat))}${table("Pitching" + pbpLabel, pit, HLL.advPitColumns(0), (r, i) => HLL.advPitColumns(r.fipC)[i].get(r.pit))}
-    <p class="small muted">Hover a column name for what it means.</p>`;
+    `;
 }
 
 function viewPlayer(r) {
@@ -1798,7 +1798,7 @@ function boxScore(g) {
       <div class="card scroll-x"><table><thead><tr><th>Pitching</th><th>IP</th><th>H</th><th>R</th><th>ER</th><th>BB</th><th>K</th><th>HR</th><th>P-S</th></tr></thead><tbody>${pitchers}</tbody></table></div>
       ${out.length ? `<p class="small muted">Not at this game: ${out.map(esc).join(", ")}</p>` : ""}`;
   };
-  return `<div class="stack" data-tour="box-score">${live ? '<p class="small muted">Live: updates with every pitch.</p>' : ""}${side(0)}${side(1)}</div>`;
+  return `<div class="stack" data-tour="box-score">${live ? '' : ""}${side(0)}${side(1)}</div>`;
 }
 
 /** A game's fielding: innings at each position, putouts, assists, errors. */
@@ -1837,7 +1837,7 @@ function viewGame(r) {
     ${live ? `<div class="card pad at-bat"><div><span class="eyebrow">At bat</span><b>${esc(nameOf(s.batter))}</b></div><div><span class="eyebrow">Pitching</span><b>${esc(nameOf(s.pitcher))}</b><span class="small muted">${s.pit[s.pitcher]?.P || 0} pitches</span></div></div>` : ""}
     ${lineScore(g, "linescore")}
     ${live && staff ? `<a class="btn btn-green btn-block" href="#/score/${g.id}">Open scorekeeper screen</a>` : ""}
-    ${live ? `<p class="small muted">Updates as the scorekeeper enters each pitch. Open this demo in two browser tabs, score in one and watch the other.</p>` : ""}
+    ${live ? `` : ""}
     </div><div class="col">
     <div class="seg" data-tour="game-tabs">${[...(hasRecap ? [["recap", "Recap"]] : []), ["plays", "Plays"], ["box", live ? "Live box score" : "Box score"], ["spray", "Spray"], ["defense", "Defense"]].map(([k, l]) => `<a href="#/game/${g.id}?tab=${k}" class="${tab === k ? "on" : ""}">${l}</a>`).join("")}</div>
     ${tab === "recap" && hasRecap ? gameRecapCard(g) : tab === "box" ? boxScore(g) : tab === "spray" ? `<div class="card pad">${fieldSvg({ dots: spray })}</div>` : tab === "defense" ? gameDefense(g) : playLog(g, { tour: "plays" })}
@@ -2012,17 +2012,17 @@ function advancedView(view, scored, r) {
   const games = scoredGamesFor(scored);
   if (view === "abat") {
     const cols = HLL.ADV_BAT;
-    return `<p class="small muted">Stats from every pitch. Percentages rank players with at least ${HLL.QUAL_PA} plate appearances per game their team has played; counting stats show everyone. Hover a column name, or open the list below.</p>
+    return `<p class="small muted">Percentages rank players with at least ${HLL.QUAL_PA} plate appearances per game their team has played.</p>
       ${advTable(adv.bat, cols, { sort: r.q.sort || "QABP", dir: r.q.dir, qualifies: (x) => x.PA >= HLL.minPa(HLL.gamesFor(games, x.team_id)) })}${glossary(cols)}`;
   }
   const cols = HLL.advPitColumns(HLL.fipConstant(adv.pit));
-  return `<p class="small muted">Pitch by pitch. Percentages rank pitchers on pace for ${HLL.QUAL_IP} innings over a ${HLL.SEASON_GAMES}-game season; counting stats show everyone.</p>
+  return `<p class="small muted">Percentages rank pitchers on pace for ${HLL.QUAL_IP} innings over a ${HLL.SEASON_GAMES}-game season.</p>
     ${advTable(adv.pit, cols, { sort: r.q.sort || "SP", dir: r.q.dir, qualifies: (x) => x.outs >= HLL.minOuts(HLL.gamesFor(games, x.team_id)) })}${glossary(cols)}`;
 }
 
 function warView(scored, r) {
   const { lines, league } = HLL.warFromGames(scored);
-  return `<p class="small muted" data-tour="war-note">Wins above replacement: how many more wins a player was worth than a bench player would have been, counting hitting, baserunning, fielding and pitching. It's measured against this league, where it takes about ${league.rpw.toFixed(0)} extra runs to win one more game. Over a short season most kids land between −0.5 and +1.5, so small differences don't mean much. Fielding only counts errors, since the site can't measure range.</p>
+  return `<p class="small muted" data-tour="war-note">Wins above replacement: how many more wins a player was worth than a bench player, compared with this league (about ${league.rpw.toFixed(0)} runs per win).</p>
     ${advTable(lines, HLL.WAR_COLUMNS, { sort: r.q.sort || "WAR", dir: r.q.dir, qualifies: () => true, tour: "war-table" })}${glossary(HLL.WAR_COLUMNS)}`;
 }
 
@@ -2041,7 +2041,7 @@ function fieldingView(season, scored, r) {
   const col = cols.find((c) => c.key === sort) || cols[1];
   const desc = r.q.dir ? r.q.dir === "desc" : !col.asc;
   const shown = lines.filter((x) => (col.rate ? x.TC >= 3 : true) && col.get(x) != null).sort((a, b) => ((col.get(b) ?? 0) - (col.get(a) ?? 0)) * (desc ? 1 : -1)).slice(0, 25);
-  return `<p class="small muted">From games scored on the site: putouts, assists and errors from each play, innings from who was at each position.</p>
+  return `
     <div class="card scroll-x"><table class="stats"><thead><tr><th>#</th><th>Player</th>${cols.map((c) => (c.text ? `<th>${c.label}</th>` : `<th class="${c === col ? "sorted" : ""}"><a href="${withQuery({ sort: c.key, dir: c === col ? (desc ? "asc" : "desc") : c.asc ? "asc" : "desc" })}">${c.label}</a></th>`)).join("")}</tr></thead><tbody>${shown
       .map((x, i) => `<tr><td class="muted">${i + 1}</td><td><a class="row player-cell" href="#/player/${x.player_id}">${badge(W.teamById[x.team_id])}<b>${esc(nameOf(x.player_id))}</b></a></td>${cols.map((c) => `<td>${c.text ? c.text(x) : HLL.fmtAdv(c.kind, c.get(x))}</td>`).join("")}</tr>`)
       .join("")}</tbody></table></div>`;
@@ -2069,7 +2069,7 @@ function viewInnings(r) {
   const team = W.teamById[r.q.team] ? r.q.team : W.teams[0].id;
   const games = W.games.filter((g) => g.rep && g.status === "final" && (g.home === team || g.away === team)).length;
   return `<a class="link back" href="#/stats?type=fld">‹ Fielding stats</a>
-    <div class="page-head"><h1 class="h1">Innings by position</h1><p class="muted">Who played where, and for how long, in games scored on the site. Handy for playing-time rules and pitcher use.</p></div>
+    <div class="page-head"><h1 class="h1">Innings by position</h1></div>
     <div class="chips">${W.teams.map((t) => `<a class="chip ${team === t.id ? "on" : ""}" href="#/innings?team=${t.id}">${badge(t)}${esc(t.name)}</a>`).join("")}</div>
     <p class="small muted">${esc(W.teamById[team].name)} · ${games} game${games === 1 ? "" : "s"} · darker cells = more innings · everyone should get at least ${W.rules.minDefensiveOuts / 3} innings in the field</p>
     ${inningsTable(rosterOf(team).map((p) => p.id), def)}`;
@@ -2135,7 +2135,7 @@ function viewRecap(r) {
   const hasWar = statsOf(season.id).some((s) => s.war != null);
   const cats = [["bat", "AVG", "Batting average"], ["bat", "HR", "Home runs"], ["bat", "RBI", "Runs batted in"], ["bat", "OPS", "OPS"], ["pit", "K", "Strikeouts"], ["pit", "ERA", "ERA"], ...(hasWar ? [["bat", "WAR", "WAR"], ["pit", "WAR", "Pitching WAR"]] : [])];
   const fz = (S.fantasy?.leagues || []).filter((L) => L.season === season.id && L.rows?.length);
-  return `<div class="page-head"><p class="eyebrow">Season recap</p><h1 class="h1">${esc(season.name)}</h1><p class="muted">Champions, final standings, the best players and fantasy winners.</p></div>
+  return `<div class="page-head"><p class="eyebrow">Season recap</p><h1 class="h1">${esc(season.name)}</h1></div>
     ${seasonPicker(season.id)}
     ${champ ? `<div class="champ" data-tour="recap"><p class="eyebrow">Champions</p><p class="h1">${esc(W.teamById[champ].name)}</p></div>` : `<p class="card pad small muted" data-tour="recap">${season.id === PAST.id ? "The champion shows here once the playoffs finish." : "The champion shows here once the playoffs finish."}</p>`}
     <div class="cols"><div class="col">${sectionHead("Final standings")}${standingsTable(rows, { compact: true })}</div>
@@ -2150,7 +2150,7 @@ function viewPitchers(r) {
   const team = W.teamById[r.q.team] ? r.q.team : W.teams[0].id;
   const rows = list.filter((x) => teamIdOf(x.playerId) === team).sort((a, b) => Number(b.availableToday) - Number(a.availableToday) || a.eligibleOn.localeCompare(b.eligibleOn));
   const d = (k) => fmtDay(k + "T12:00:00");
-  return `<div class="page-head"><h1 class="h1">Who can pitch</h1><p class="muted">Little League rest rules, worked out from every pitch the scorekeepers entered: 66+ pitches = 4 days of rest, 51–65 = 3, 36–50 = 2, 21–35 = 1.</p></div>
+  return `<div class="page-head"><h1 class="h1">Who can pitch</h1><p class="muted">Little League rest rules: 66+ pitches = 4 days of rest, 51–65 = 3, 36–50 = 2, 21–35 = 1.</p></div>
     <div class="chips">${W.teams.map((t) => `<a class="chip ${team === t.id ? "on" : ""}" href="#/pitchers?team=${t.id}">${badge(t)}${esc(t.abbr)}</a>`).join("")}</div>
     <div class="card scroll-x" data-tour="pitchers"><table><thead><tr><th>Pitcher</th><th>Today</th><th>Last pitched</th><th>Pitches</th><th>Rest</th><th>Last 7 days</th><th>Max/day</th><th>Season</th></tr></thead><tbody>${rows
       .map((x) => `<tr><td><a href="#/player/${x.playerId}"><b>${esc(nameOf(x.playerId))}</b></a></td><td>${x.availableToday ? '<span class="tag tag-good">Can pitch</span>' : `<span class="tag">From ${d(x.eligibleOn)}</span>`}</td><td>${d(x.lastDate)}</td><td>${x.lastPitches}</td><td>${x.rest} day${x.rest === 1 ? "" : "s"}</td><td>${x.last7}</td><td>${x.maxPerDay}</td><td>${E.inningsPitched(x.outs)} IP · ${x.pitches} P</td></tr>`)
@@ -2211,7 +2211,7 @@ function viewScore(r) {
     return `<a class="card pad row" href="#/score/${g.id}"><div class="grow"><b>${esc(W.teamById[g.away].name)} @ ${esc(W.teamById[g.home].name)}</b><p class="small muted">${fmtDay(g.date)} · ${fmtTime(g.date)}${g.field ? " · " + esc(g.field) : ""}</p>${tag}</div><span class="btn btn-sm ${cls}">${label}</span></a>`;
   };
   return `<h1 class="h1">Scorekeeping</h1>
-    <p class="muted">Games to score. Works in any phone browser with no app to install, and keeps working if the signal drops. The admin can assign each game to a scorekeeper so two people don't score the same game.</p>
+    <p class="muted">Pick a game to start scoring.</p>
     <div class="card pad row" data-tour="practice-card"><div class="grow"><b>Practice game</b><p class="small muted">Score a game yourself to try it out. Nothing counts toward stats.</p></div><button class="btn btn-sm btn-primary" data-act="walk-start">${W.gameById.practice ? "Restart" : "Start"}</button></div>
     ${W.gameById.practice && W.gameById.practice.status !== "scheduled" ? `<a class="card pad row" href="#/score/practice"><div class="grow"><b>Continue practice game</b><p class="small muted">${esc(W.teamById[W.gameById.practice.away].abbr)} at ${esc(W.teamById[W.gameById.practice.home].abbr)} · ${W.gameById.practice.status}</p></div><span class="chev">›</span></a>` : ""}
     ${live.length ? `<h2 class="h2">In progress</h2>${live.map((g) => item(g, "Continue", "btn-green")).join("")}` : ""}
@@ -3170,7 +3170,7 @@ const isCommish = (L) => L.commissioner === S.account.name;
 function viewFantasy(r) {
   if (r.parts[1]) return viewFantasyLeague(r);
   const fz = S.fantasy;
-  return `<div class="page-head"><h1 class="h1">Fantasy</h1><p class="muted">Points leagues with our own players. Draft 9 starters and a bench; set your lineup each week.</p></div>
+  return `<div class="page-head"><h1 class="h1">Fantasy</h1></div>
     <section class="stack" data-tour="fantasy-leagues">${sectionHead("My leagues")}<div class="card list">${fz.leagues
       .map((L) => {
         const me = myTeam(L);
@@ -3262,7 +3262,7 @@ function h2hStandings(L) {
   const shown = matchups.filter((m) => m.week === shownWeek);
   const nm = (id) => (id ? esc(teamById(L, id).name) : "Bye");
   return `<div class="card scroll-x" data-tour="fantasy-standings"><table><thead><tr><th>Team</th><th>W</th><th>L</th><th>T</th><th>PF</th><th>PA</th></tr></thead><tbody>${table.map((x, i) => { const team = teamById(L, x.teamId); return `<tr class="${team.mine ? "mine" : ""} ${i === field ? "cut" : ""}"><td><span class="rank">${i + 1}</span> <b>${esc(team.name)}</b></td><td><b>${x.w}</b></td><td>${x.l}</td><td>${x.t}</td><td>${fmtPts(x.pf)}</td><td class="muted">${fmtPts(x.pa)}</td></tr>`; }).join("")}</tbody></table></div>
-    <p class="small muted">Each week you play one team; more points that week wins. The top ${field} make the playoffs${start != null ? `, starting week ${start} (${weeksText(HLL.playoffRounds(field))}, one round a week)` : ""}.</p>
+    <p class="small muted">The top ${field} make the playoffs${start != null ? `, starting week ${start} (${weeksText(HLL.playoffRounds(field))}, one round a week)` : ""}.</p>
     ${shown.length && !inPlayoffs ? `${sectionHead(`Week ${shownWeek} matchups`)}<div class="card list">${shown.map((m) => `<div class="list-item"><b class="grow">${nm(m.a)}</b><span class="num">${m.b ? `${fmtPts(m.pa)} – ${fmtPts(m.pb)}` : "bye"}</span><b class="grow" style="text-align:right">${m.b ? nm(m.b) : ""}</b></div>`).join("")}</div>` : ""}
     ${bracket.length ? `${sectionHead(inPlayoffs ? "Playoffs" : "Playoffs (if the season ended today)")}<div class="cols">${bracket.map((games, r) => `<div class="col card list"><div class="list-item"><b class="small muted">${HLL.roundName(r + 1, bracket.length).toUpperCase()} · WEEK ${start + r}</b></div>${games.map((g) => [[g.a, g.pa], [g.b, g.pb]].map(([seed, pts]) => `<div class="list-item"><span class="grow ${g.winner && g.winner === seed ? "bold" : ""}">${seed ? `${seed}. ${nm(seeds[seed - 1])}` : '<span class="muted">TBD</span>'}</span>${seed && inPlayoffs && cur.n >= start + r ? `<span class="num">${fmtPts(pts)}</span>` : ""}</div>`).join("")).join('<div class="list-item"></div>')}</div>`).join("")}</div>${field === 6 ? '<p class="small muted">Seeds 1 and 2 have a bye in the first round.</p>' : ""}` : ""}`;
 }
@@ -3301,7 +3301,7 @@ function playersTab(L, r) {
         return `<div class="list-item">${badge(teamOf(p.id, L.season))}<div class="grow"><a href="#/player/${p.id}"><b>${esc(p.name)}</b></a><div class="tiny muted">${esc(posLabel(p))} · ${fmtPts(pr.now.bat + pr.now.pit)} pts this season${lastSeason(L) ? ` · ${fmtPts(pr.last.bat + pr.last.pit)} last season` : ""}</div></div>${right}</div>`;
       })
       .join("") || `<p class="pad muted">Nobody matches.</p>`}</div>
-    <p class="small muted">Free agents can be added any time; they score from their next game. If your roster is full, you pick someone to drop.</p>`;
+    `;
 }
 
 function tradeLine(L, tr) {
@@ -3333,12 +3333,12 @@ function tradeBuilder(L, r) {
   const col = (team, key) => `<div class="col">${sectionHead(esc(team.name))}<div class="card list">${rosterNow(L, team.id)
     .map((row) => `<label class="list-item"><input type="checkbox" data-change="f-trade-pick" data-k="${key}" data-pid="${row.player_id}" ${sel[key].includes(row.player_id) ? "checked" : ""}><span class="grow"><b>${esc(nameOf(row.player_id))}</b> <span class="tiny muted">${row.slot_index < HLL.STARTERS ? "Starter" : "Bench"}</span></span></label>`)
     .join("")}</div></div>`;
-  return `<a class="link back" href="#/fantasy/${L.id}/trades">‹ Trades</a><h2 class="h2">Trade with ${esc(them.name)}</h2><p class="small muted">Pick who you'd give and who you want. Both rosters have to fit (${slotsOf(L).length} players), so full rosters trade the same number of players.</p>
+  return `<a class="link back" href="#/fantasy/${L.id}/trades">‹ Trades</a><h2 class="h2">Trade with ${esc(them.name)}</h2><p class="small muted">Both rosters have to fit (${slotsOf(L).length} players).</p>
     <div class="cols">${col(me, "give")}${col(them, "get")}</div>
     <button class="btn btn-primary btn-block" data-act="f-trade-send" data-l="${L.id}" data-with="${them.id}" ${sel.give.length && sel.get.length ? "" : "disabled"}>Send offer</button>`;
 }
 function activityTab(L) {
-  return `<div class="card list" data-tour="fantasy-activity">${L.log.map((x) => `<div class="list-item"><span class="small muted" style="width:92px">${fmtDay(x.at)}</span><span class="grow small">${esc(x.text)}</span></div>`).join("") || `<p class="pad muted">Nothing yet.</p>`}</div><p class="small muted">Every add, drop, trade, lineup move and commissioner change, for the whole league to see.</p>`;
+  return `<div class="card list" data-tour="fantasy-activity">${L.log.map((x) => `<div class="list-item"><span class="small muted" style="width:92px">${fmtDay(x.at)}</span><span class="grow small">${esc(x.text)}</span></div>`).join("") || `<p class="pad muted">Nothing yet.</p>`}</div>`;
 }
 function teamsTab(L) {
   return `<div class="card list">${L.draft.order.map((id, i) => { const t = teamById(L, id); return `<div class="list-item"><span class="rank">${i + 1}</span><div class="grow"><b>${esc(t.name)}</b><div class="tiny muted">${esc(t.owner)}</div></div>${t.mine ? '<span class="tag">You</span>' : ""}</div>`; }).join("")}</div><p class="small muted">Draft order for round 1.</p>`;
@@ -3912,7 +3912,7 @@ function draftRosters(L, r) {
 function draftQueue(L) {
   const taken = new Set(L.draft.picks.map((p) => p.pid));
   const q = (L.queue || []).filter((pid) => !taken.has(pid));
-  return `<p class="small muted">If your clock runs out (or you turn on autodraft), the first player here who's still available is picked. Otherwise it's the best available.</p>
+  return `<p class="small muted">If your clock runs out, you get the first player here who's still available.</p>
     <div class="card list">${q.map((pid, i) => `<div class="list-item"><span class="rank">${i + 1}</span>${badge(teamOf(pid, L.season))}<b class="grow">${esc(nameOf(pid))}</b><button class="btn btn-sm btn-secondary" data-act="f-qmove" data-l="${L.id}" data-pid="${pid}" data-d="-1" ${i ? "" : "disabled"} aria-label="Up">↑</button><button class="btn btn-sm btn-secondary" data-act="f-qmove" data-l="${L.id}" data-pid="${pid}" data-d="1" ${i < q.length - 1 ? "" : "disabled"} aria-label="Down">↓</button><button class="btn btn-sm btn-secondary" data-act="f-queue" data-l="${L.id}" data-pid="${pid}">Remove</button></div>`).join("") || `<p class="pad muted">Nobody queued. Tap "+ Queue" next to players on the Players tab.</p>`}</div>`;
 }
 
@@ -3971,7 +3971,7 @@ function settingsTab(L) {
     ${parseRoute().q.names ? `<div class="card list">${L.teams.map((t) => `<div class="list-item"><input class="input input-sm grow" value="${esc(t.name)}" data-change="f-tname" data-l="${L.id}" data-t="${t.id}" aria-label="Team name"><span class="small muted">${esc(t.owner)}</span></div>`).join("")}</div>` : ""}</section>` : ""}
     ${over && edit && next && !renewed ? `<section class="card pad stack-s" data-tour="fantasy-renew"><h2 class="h2">Bring the league back for ${esc(next.name)}</h2><p class="small muted">Everyone in the league is added automatically, with the same team names. You decide how many keepers each team gets.</p>
       <div class="field"><label for="f-keepn">Keepers per team</label><select class="input" id="f-keepn">${[0, 1, 2, 3].map((n) => `<option value="${n}" ${n === 2 ? "selected" : ""}>${n}</option>`).join("")}</select></div>
-      <button class="btn btn-primary" data-act="f-renew" data-l="${L.id}">Bring it back</button></section>` : `<section class="card pad stack-s" data-tour="fantasy-renew"><b>Next season</b><p class="small muted">Leagues don't restart on their own. When the season is over, the commissioner can bring the league back: everyone in it is added automatically, and the commissioner picks how many keepers each team gets.</p></section>`}
+      <button class="btn btn-primary" data-act="f-renew" data-l="${L.id}">Bring it back</button></section>` : `<section class="card pad stack-s" data-tour="fantasy-renew"><b>Next season</b><p class="small muted">When the season is over, the commissioner can bring the league back.</p></section>`}
     ${sectionHead("Your team")}
     <div class="card pad row"><input class="input grow" id="f-rename" value="${esc(myTeam(L).name)}" aria-label="Team name"><button class="btn btn-secondary" data-act="f-rename" data-l="${L.id}">Rename</button></div>
     <button class="btn btn-danger" data-act="f-leave" data-l="${L.id}">${edit ? "Delete league" : "Leave league"}</button>`;
@@ -4242,7 +4242,7 @@ function adminHome() {
   return `<div class="page-head"><h1 class="h1">${esc(W.season.name)}</h1><p class="muted">${W.games.length ? `${W.games.filter((g) => g.status === "final").length} of ${W.games.length} games played` : "No schedule yet"}</p></div>
     <section class="stack" data-tour="admin-today">${sectionHead(`Today's games (${todays.length})`)}
       <div class="card list">${todays.map((g) => `<a class="list-item" href="#/${g.status === "final" ? "game" : "score"}/${g.id}"><div class="grow"><b>${esc(W.teamById[g.away].abbr)} at ${esc(W.teamById[g.home].abbr)}</b><div class="small muted">${gameLabel(g)} · ${fmtTime(g.date)}</div></div><span class="tag ${g.status === "live" ? "tag-live" : ""}">${g.status === "final" ? `Final ${g.score[0]}-${g.score[1]}` : g.status === "live" ? "Live" : "Score it"}</span></a>`).join("") || `<p class="pad small muted">No games today.</p>`}</div>
-      <p class="small muted">Every game is scored live, pitch by pitch, so standings and stats update by themselves.</p></section>
+      </section>
     ${sectionHead("Setup checklist")}<div class="card list">${check(true, `${W.teams.length} teams`)}${check(W.players.length > 0, `${W.players.length} players on rosters`)}${check(W.games.length > 0, W.games.length ? `${W.games.length} games on the schedule` : "Make the schedule (Games)")}${check(true, "Game rules set")}${check(S.staff.some((u) => u.role === "scorekeeper"), `${S.staff.filter((u) => u.role === "scorekeeper").length} scorekeepers`)}</div>`;
 }
 
@@ -4261,7 +4261,7 @@ function adminNews(r) {
   }
   return `<div class="page-head row between"><h1 class="h1">News</h1><a class="btn btn-primary btn-sm" href="#/admin/news/new" data-tour="admin-news">New post</a></div>
     <div class="card list">${[...S.news].sort((a, b) => b.at.localeCompare(a.at)).map((p) => `<a class="list-item" href="#/admin/news/${p.id}"><div class="grow"><b>${esc(p.title)}</b><div class="tiny muted">${NEWS_CATS[p.category]} · ${fmtDay(p.at)}${p.pinned ? " · Pinned" : ""}</div></div><span class="tag ${p.published ? "tag-good" : ""}">${p.published ? "Published" : "Draft"}</span></a>`).join("")}</div>
-    <p class="small muted">Game results and recaps are written automatically from every final, so you only post the rest.</p>`;
+    `;
 }
 
 /* ---- games */
@@ -4355,7 +4355,7 @@ function adminFamilies() {
   const pending = all.filter((f) => f.status === "pending");
   const approved = all.filter((f) => f.status === "approved");
   const row = (f, btns) => `<div class="list-item"><div class="grow"><b>${esc(f.user)}</b> <span class="small muted">says they're a parent of</span> <a href="#/player/${f.pid}"><b>${esc(nameOf(f.pid))}</b></a> <span class="tiny muted">${esc(teamOf(f.pid)?.abbr || "")}</span></div>${btns}</div>`;
-  return `<div class="page-head"><h1 class="h1">Families</h1><p class="muted">Parents ask to follow their kid from the player page. Approve the ones you recognize; they'll see their kid on their home page and get a notification.</p></div>
+  return `<div class="page-head"><h1 class="h1">Families</h1><p class="muted">Approve the parents you recognize.</p></div>
     ${sectionHead(`Waiting for you (${pending.length})`)}<div class="card list" data-tour="admin-families">${pending.map((f) => row(f, `<button class="btn btn-sm btn-secondary" data-act="fam" data-id="${f.id}" data-yes="0">Decline</button><button class="btn btn-sm btn-green" data-act="fam" data-id="${f.id}" data-yes="1">Approve</button>`)).join("") || `<p class="pad small muted">No requests right now.</p>`}</div>
     ${sectionHead("Approved")}<div class="card list">${approved.map((f) => row(f, `<button class="btn btn-sm btn-secondary" data-act="fam" data-id="${f.id}" data-yes="0">Remove</button>`)).join("") || `<p class="pad small muted">None yet.</p>`}</div>`;
 }
@@ -4385,7 +4385,7 @@ function adminSettings() {
       ${num("Minimum innings in the field per kid", "minDefensiveOuts", 0, 12, R.minDefensiveOuts / 3)}
       ${num("Pitch limit, ages 9–10", "pitchLimits.age9to10", 30, 120, R.pitchLimits.age9to10)}
       ${num("Pitch limit, ages 11–12", "pitchLimits.age11to12", 30, 120, R.pitchLimits.age11to12)}
-    </div><p class="small muted">Live scoring follows these right away.</p></section>`;
+    </div></section>`;
 }
 function setRule(path, value) {
   const R = JSON.parse(JSON.stringify(W.rules));
